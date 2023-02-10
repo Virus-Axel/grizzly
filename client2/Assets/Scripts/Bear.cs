@@ -16,8 +16,7 @@ public class Bear : MonoBehaviour
     const float RUN_SPEED = 0.2F;
     const float WALK_SPEED = 0.1F;
 
-    const float STAMINA_PENALITY = 0.05F;
-    const float STAMINA_RECOVERY = 0.01F;
+    const float STAMINA_RECOVERY = 0.015F;
 
     float brainSize = 1.0F;
     float lowerArmSize = 1.0F;
@@ -35,17 +34,6 @@ public class Bear : MonoBehaviour
 
     float attackTime = 1.0F;
 
-    public enum ABILITY
-    {
-        NONE,
-        PUNCH,
-        KICK,
-        TEST1,
-        TEST2,
-        TEST3,
-        NO_ABILITIES,
-    };
-
     public enum BEAR_STATE
     {
         WALKING,
@@ -55,27 +43,26 @@ public class Bear : MonoBehaviour
     }
 
     public BEAR_STATE state = BEAR_STATE.WALKING;
-    public ABILITY currentAction = ABILITY.NONE;
+    public Ability currentAction = AbilityList.abilities[0];
 
-    int[] abilityLevels = new int[(int)ABILITY.NO_ABILITIES - 1]{0, 0, 0, 0, 0};
+    int[] abilityLevels = new int[AbilityList.NO_ABILITIES - 1]{0, 0, 0};
 
-    List<ABILITY> equippedAbilities = new List<ABILITY>{};
+    List<Ability> equippedAbilities = new List<Ability>{};
 
     public Bear target = null;
 
     public void Act()
     {
         currentAction = ChoseAction();
-        UnityEngine.Debug.Log(currentAction);
-        if (currentAction != ABILITY.NONE)
+        if (currentAction.index != 0)
         {
             this.GetComponent<Renderer>().material.color = Color.green;
         }
     }
 
-    public void EquipAbility(ABILITY ability, int index = -1)
+    public void EquipAbility(Ability ability, int index = -1)
     {
-        int levelIndex = (int) ability - 1;
+        int levelIndex = (int) ability.index - 1;
         if (levelIndex >= abilityLevels.Length || levelIndex < 0)
         {
             return;
@@ -98,21 +85,37 @@ public class Bear : MonoBehaviour
         }
     }
 
-    public void UpgradeAbility(ABILITY ability)
+    public void UpgradeAbility(Ability ability)
     {
-        if (ability == ABILITY.NONE || ability == ABILITY.NO_ABILITIES){
+        if (ability.index == 0){
             return;
         }
-        abilityLevels[(int) ability - 1] += 1;
+        abilityLevels[(int) ability.index - 1] += 1;
     }
 
-    ABILITY ChoseAction()
+    float CalcAbilityDamage(Ability ability)
+    {
+        float ret = 0.0F;
+
+        ret += heartSize * ability.gainHeart;
+        ret += brainSize * ability.gainBrain;
+        ret += lowerArmSize * ability.gainUpperArm;
+        ret += upperArmSize * ability.gainUpperArm;
+        ret += lowerLegSize * ability.gainUpperLeg;
+        ret += upperLegSize * ability.gainUpperLeg;
+        ret += lowerBodySize * ability.gainUpperBody;
+        ret += upperBodySize * ability.gainUpperBody;
+    
+        return ret;
+    }
+
+    Ability ChoseAction()
     {
         float randomVal = Random.Range(0.0F, 1.0F);
         if (randomVal > stamina || equippedAbilities.Count <= 0)
         {
             stamina += STAMINA_RECOVERY;
-            return ABILITY.NONE;
+            return AbilityList.abilities[0];
         }
 
         int randomIndex = Random.Range(0, equippedAbilities.Count);
@@ -125,8 +128,10 @@ public class Bear : MonoBehaviour
         target = newTarget;
     }
 
-    public void HitBear(float damage, bool heavy=false)
+    public void HitBear(Ability ability, bool heavy=false)
     {
+        float damage = CalcAbilityDamage(ability);
+        print(ability.name + " did " + damage + " damage");
         health -= damage;
         if (health <= 0.0F)
         {
@@ -174,7 +179,7 @@ public class Bear : MonoBehaviour
 
     void TryAttack()
     {
-        if(currentAction == ABILITY.NONE)
+        if(currentAction.index == 0)
         {
             return;
         }
@@ -183,7 +188,7 @@ public class Bear : MonoBehaviour
         {
             SetState(BEAR_STATE.ATTACKING);
             this.GetComponent<Renderer>().material.color = Color.yellow;
-            stamina -= STAMINA_PENALITY;
+            stamina -= currentAction.staminaCost;
         }
     }
 
@@ -221,8 +226,8 @@ public class Bear : MonoBehaviour
                 {
                     timer = 0.0F;
                     SetState(BEAR_STATE.WALKING);
-                    target.HitBear(0.2F);
-                    currentAction = ABILITY.NONE;
+                    target.HitBear(currentAction);
+                    currentAction = AbilityList.abilities[0];
                 }
                 break;
             case BEAR_STATE.STAGGERED:
