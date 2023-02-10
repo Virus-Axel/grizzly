@@ -1,5 +1,15 @@
 {
   "dependencies": {
+    "com.solana.unity_sdk": {
+      "version": "https://github.com/garbles-labs/Solana.Unity-SDK.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.nuget.newtonsoft-json": "3.0.2",
+        "com.unity.textmeshpro": "3.0.6"
+      },
+      "hash": "43ab3b15ff59664a66567f3d969b1c034ee37133"
+    },
     "com.unity.adaptiveperformance": {
       "version": "4.0.1",
       "depth": 1,
@@ -73,6 +83,13 @@
       "dependencies": {
         "com.unity.modules.androidjni": "1.0.0"
       },
+      "url": "https://packages.unity.com"
+    },
+    "com.unity.nuget.newtonsoft-json": {
+      "version": "3.0.2",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.profiling.core": {

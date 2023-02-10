@@ -333,7 +333,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e192a48db7054bf991c1c6c06bf04a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  dead: 0
+  state: 0
+  target: {fileID: 2068231871}
 --- !u!136 &1108188489
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -442,6 +444,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8521a89936cc9d244acbbe7a8cd32826, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blueBear: {fileID: 1108188488}
+  redBear: {fileID: 2068231871}
 --- !u!4 &1967468770
 Transform:
   m_ObjectHideFlags: 0
@@ -489,7 +493,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02e192a48db7054bf991c1c6c06bf04a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 0}
+  dead: 0
+  state: 0
+  target: {fileID: 1108188488}
 --- !u!136 &2068231872
 CapsuleCollider:
   m_ObjectHideFlags: 0
