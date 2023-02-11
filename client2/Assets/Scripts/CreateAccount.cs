@@ -1,26 +1,37 @@
-using System.Security.Cryptography.X509Certificates;
-using System.Xml.Serialization;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 using Solana.Unity.Programs;
 using Solana.Unity.Rpc;
 using Solana.Unity.Rpc.Models;
+using Solana.Unity.Rpc.Builders;
 using Solana.Unity.Wallet;
 public class CreateAccount : MonoBehaviour
 {
 
-    void CreateMapAccount(PublicKey payer)
+    void CreateMapAccount(Account payer)
     {
+        print("Creating client");
         IRpcClient rpcClient = ClientFactory.GetClient(Cluster.TestNet);
+        print("client created");
+
+        var leastLamports = rpcClient.GetMinimumBalanceForRentExemption((long) SmartContract.MAP_ACCOUNT_DATA_LENGTH);
+        print("minimum balance calculated");
+
+        return;
+
         var recentHash = rpcClient.GetRecentBlockHash();
+        print("blockhash fetched");
 
-        ulong leastLamports = rpcClient.GetMinimumBalanceForRent(SmartContract.MAP_ACCOUNT_DATA_LENGTH);
         Account newAccount = new Account();
+        TransactionInstruction instruction = SystemProgram.CreateAccount(payer, newAccount.PublicKey, leastLamports.Result, SmartContract.MAP_ACCOUNT_DATA_LENGTH, SmartContract.ID);
+        print("Instruction created");
 
-        TransactionInstruction instruction = SystemProgram.CreateAccount(payer, newAccount.PublicKey, leastLamports, SmartContract.MAP_ACCOUNT_DATA_LENGTH);
+        var transaction = new TransactionBuilder().SetRecentBlockHash(recentHash.Result.Value.Blockhash).SetFeePayer(payer.PublicKey).AddInstruction(instruction).Build(payer);
+
+        print("Transaction built");
+        rpcClient.SendTransaction(transaction);
+        print("Sent transaction");
     }
 
     // Start is called before the first frame update
@@ -31,9 +42,11 @@ public class CreateAccount : MonoBehaviour
         Button bearButton = root.Q<Button>("BearButton");
         Button unassigned = root.Q<Button>("Unassigned");
 
-        mapButton.clicked += () => CreateMapAccount();
-        bearButton.clicked += () => CreateMapAccount();
-        unassigned.clicked += () => CreateMapAccount();
+        Account payer = new Account();
+
+        mapButton.clicked += () => CreateMapAccount(payer);
+        bearButton.clicked += () => CreateMapAccount(payer);
+        unassigned.clicked += () => CreateMapAccount(payer);
     }
     // Update is called once per frame
     void Update()

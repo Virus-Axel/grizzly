@@ -12,7 +12,7 @@ using System;
 public class SmartContract : MonoBehaviour
 {
     public const int MAP_ACCOUNT_DATA_LENGTH = 64;
-    public PublicKey ID;
+    public static PublicKey ID = new PublicKey("11111111111111111111111111111111");
 
     public TransactionInstruction SignUpForFightInstruction(PublicKey payer)
     {
