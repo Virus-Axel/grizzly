@@ -1,11 +1,21 @@
 extends Node
 class_name Web3;
 
-var URL = "https://api.testnet.solana.com"
+const ID = "1289JhmLHgUWFjiNoP89krWdtfDJPc73nB3jUTnUck4"
+const SYSTEM_PROGRAM = "11111111111111111111111111111111"
+const URL = "https://api.testnet.solana.com"
 var response_data
+
+func connect_phantom_wallet():
+	$phantom_handler.generateDiffiePubkey()
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	
+	signup_for_battle()
+	pass
+	
+func signup_for_battle():
 	get_latest_block_hash()
 	await $get_latest_block_hash.request_completed
 	var blockhash = response_data['result']['value']['blockhash']
@@ -17,7 +27,7 @@ func _ready():
 	print(publicKey)
 	print(privateKey)
 	
-	$program_handler.setKeys(privateKey, publicKey,"11111111111111111111111111111111")
+	$program_handler.setKeys("8B5LAjwFNkB4jo3kZEmzn7QD57igRW7gJXNi9t2RNxaA", "GFvZnxPPaZCeiA2d6gNVyE9ffu7B3PbHjw5AvRgPaZo6", ID)
 	var transaction_signature = $program_handler.getTransactionSignature(PackedByteArray(), blockhash)
 	
 	send_transaction(transaction_signature)
@@ -55,7 +65,7 @@ func get_latest_block_hash():
 		push_error("An error occurred in the HTTP request.")
 	pass
 
-func send_http():
+func create_account():
 	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -83,3 +93,4 @@ func _on_get_latest_block_hash_request_completed(result, response_code, headers,
 	json.parse(body.get_string_from_utf8())
 	response_data = json.get_data();
 	var response = json.get_data()
+	print(response)

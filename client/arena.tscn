@@ -1,3 +1,24 @@
-[gd_scene format=3 uid="uid://p52raow4vxs6"]
+[gd_scene load_steps=3 format=3 uid="uid://p52raow4vxs6"]
 
-[node name="Node3D" type="Node3D"]
+[sub_resource type="CylinderMesh" id="CylinderMesh_33ihj"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ubhbm"]
+albedo_color = Color(0.960784, 0.384314, 0.305882, 1)
+
+[node name="arena" type="Node3D"]
+
+[node name="CSGMesh3D" type="CSGMesh3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.05205, 0, 0)
+mesh = SubResource("CylinderMesh_33ihj")
+
+[node name="CSGMesh3D2" type="CSGMesh3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.61917, 0, 0)
+mesh = SubResource("CylinderMesh_33ihj")
+material = SubResource("StandardMaterial3D_ubhbm")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.417679, 4.47686)
+current = true
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.33662)

@@ -9,7 +9,9 @@ edition = "2021"
 no-entrypoint = []
 
 [dependencies]
-solana-program = "*"
+borsh = "*"
+borsh-derive = "*"
+solana-program = "1.14.*"
 
 [lib]
 name = "cclib"
