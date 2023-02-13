@@ -4,15 +4,27 @@ class_name Web3;
 const ID = "1289JhmLHgUWFjiNoP89krWdtfDJPc73nB3jUTnUck4"
 const SYSTEM_PROGRAM = "11111111111111111111111111111111"
 const URL = "https://api.testnet.solana.com"
+const APP_URL = "https%3A%2F%2Faxel.app"
+const PHANTOM_URL = "https://phantom.app/ul/v1/connect"
+const REDIRECTION_LINK = "redirect_link%3Dmydapp%3A%2F%2FonPhantomConnected"
+const CLUSTER = "testnet"
+
 var response_data
+var body_data
 
 func connect_phantom_wallet():
-	$phantom_handler.generateDiffiePubkey()
+	var encryption_key = $phantom_handler.generateDiffiePubkey()
+	var phantom_string = PHANTOM_URL + "?app_url=" + APP_URL + "&dapp_encryption_public_key=" + encryption_key + "&redirect_link=" + REDIRECTION_LINK + "&cluster=" + CLUSTER
+	print(phantom_string)
+	$get_latest_block_hash.request(phantom_string, ["Content-Type: application/json"], true, HTTPClient.METHOD_GET)
+	await $get_latest_block_hash.request_completed
+	OS.shell_open(phantom_string)
+	print(response_data);
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	
-	signup_for_battle()
+	connect_phantom_wallet()
+	#signup_for_battle()
 	pass
 	
 func signup_for_battle():
@@ -87,7 +99,9 @@ func _on_get_latest_block_hash_request_completed(result, response_code, headers,
 	print(result)
 	print(response_code)
 	print(headers)
-	print(body)
+	#print(body)
+	body_data = body.get_string_from_utf8()
+	print(body_data)
 	
 	var json = JSON.new()
 	json.parse(body.get_string_from_utf8())
