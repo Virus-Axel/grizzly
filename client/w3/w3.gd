@@ -6,7 +6,8 @@ const SYSTEM_PROGRAM = "11111111111111111111111111111111"
 const URL = "https://api.testnet.solana.com"
 const APP_URL = "https%3A%2F%2Faxel.app"
 const PHANTOM_URL = "https://phantom.app/ul/v1/connect"
-const REDIRECTION_LINK = "redirect_link%3Dmydapp%3A%2F%2FonPhantomConnected"
+#const REDIRECTION_LINK = "redirect_link%3Dhttps%3A%2F%2Faxel.app%3A%2F%2FonPhantomConnected"
+const REDIRECTION_LINK = "client%3A%2F%2Faxel.app%2F"
 const CLUSTER = "testnet"
 
 var response_data
@@ -20,6 +21,17 @@ func connect_phantom_wallet():
 	await $get_latest_block_hash.request_completed
 	OS.shell_open(phantom_string)
 	print(response_data);
+	var got_url = false
+	var url = ""
+	while not got_url:
+		if Engine.has_singleton('AppLinks'):
+			url = Engine.get_singleton("AppLinks").getUrl()
+			print(url)
+			if url != "":
+				got_url = true
+			else:
+				await get_tree().create_timer(0.5).timeout
+	print(url)
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
