@@ -11,7 +11,7 @@ no-entrypoint = []
 [dependencies]
 borsh = "*"
 borsh-derive = "*"
-solana-program = "1.14.*"
+solana-program = "*"
 
 [lib]
 name = "cclib"

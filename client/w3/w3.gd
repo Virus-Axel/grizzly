@@ -13,11 +13,23 @@ const CLUSTER = "testnet"
 var response_data
 var body_data
 
+func get_query_params(url):
+	var qmark = url.find('?')
+	var eq_1 = url.find('=', qmark)
+	var and_1 = url.find('&', eq_1)
+	var shared_secret = url.substr(eq_1 + 1, and_1 - eq_1 - 1)
+	var eq_2 = url.find('=', and_1)
+	var and_2 = url.find('&', eq_2)
+	var nounce = url.substr(eq_2 + 1, and_2 - eq_2 - 1)
+	var eq_3 = url.find('=', and_2)
+	var data = url.substr(eq_3 + 1)
+	return [shared_secret, nounce, data]
+
 func connect_phantom_wallet():
 	var encryption_key = $phantom_handler.generateDiffiePubkey()
 	var phantom_string = PHANTOM_URL + "?app_url=" + APP_URL + "&dapp_encryption_public_key=" + encryption_key + "&redirect_link=" + REDIRECTION_LINK + "&cluster=" + CLUSTER
 	print(phantom_string)
-	$get_latest_block_hash.request(phantom_string, ["Content-Type: application/json"], true, HTTPClient.METHOD_GET)
+	$get_latest_block_hash.request(phantom_string, ["Content-Type: application/json"], HTTPClient.METHOD_GET)
 	await $get_latest_block_hash.request_completed
 	OS.shell_open(phantom_string)
 	print(response_data);
@@ -26,15 +38,20 @@ func connect_phantom_wallet():
 	while not got_url:
 		if Engine.has_singleton('AppLinks'):
 			url = Engine.get_singleton("AppLinks").getUrl()
-			print(url)
 			if url != "":
 				got_url = true
 			else:
 				await get_tree().create_timer(0.5).timeout
-	print(url)
+	var params = get_query_params(url)
+	var shared_secret = $phantom_handler.getSharedPubkey(params[0])
+	print($phantom_handler.decryptPhantomMessage(shared_secret, params[2], params[1]))
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	#var params = get_query_params("client://axel.app/?phantom_encryption_public_key=8ALaWaL16BNRbE64JQheNimo4KqKKaDWB8AUxkbvNkF1&nonce=Jf9FUqg334jw76rUv9ke74GfsTCZb6gKa&data=5FrbwaoSDqFWUP9xZSfj1MHJCQByNpXPwfH6QUQTTyQWBJt8ZpmEyH4EeUFgwJiiahSWt4BcMwmr5hEYDd4n7cNhCHiPG6F2eWvaxDgPKMsEhnfajv3M8T4JWhS6YieLUFNCDYeJ2Ezrne8XFBGsxpbzDtSQ7HkdxpQkDTg9XQXz7FgpjwzsnPDKn7nby62gv4s8E1LMqPMod7piLTeyX6QthZmGgsVQ716j7KySHUNdU1FAB5hrSaZgK9j7wv8CfHZTXnToSQWoBSEATMP7s23BGzwHZKLqe5KnV8CBTeiQZ7JfpqNzu2Cqxc99vGikFngrmMdFjA7R6HL5ff1zYt2MkjEeroiQ31ZDCdQmtbUuF9qUkUYKdFEhEjBRrj2VXkDwYgC2QCDVWFoVoc1BBb6sB7BQ8P5Si")
+	#var shared_secret = $phantom_handler.getSharedPubkey(params[0])
+	#print($phantom_handler.decryptPhantomMessage(shared_secret, params[2], params[1]))
+	return
 	connect_phantom_wallet()
 	#signup_for_battle()
 	pass
