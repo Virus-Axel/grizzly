@@ -11,8 +11,8 @@ no-entrypoint = []
 [dependencies]
 borsh = "*"
 borsh-derive = "*"
-solana-program = "*"
+solana-program = "1.14.*"
 
 [lib]
-name = "cclib"
+name = "grizzly_arena"
 crate-type = ["cdylib", "lib"]
