@@ -9,9 +9,11 @@ edition = "2021"
 no-entrypoint = []
 
 [dependencies]
+bs58 = "*"
 borsh = "*"
 borsh-derive = "*"
 solana-program = "1.14.*"
+mpl-token-metadata = {version = "*", features = ["no-entrypoint"]}
 
 [lib]
 name = "grizzly_arena"
