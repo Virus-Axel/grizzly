@@ -19,13 +19,6 @@ use crate::{
 
 use mod_exp::mod_exp;
 
-fn get_mapping_keys(account_data: &[u8]) -> Result<(Pubkey, Pubkey), ProgramError> {
-    let nft_pubkey = Pubkey::new(&account_data[0..32]);
-    let grizzly_pubkey = Pubkey::new(&account_data[32..64]);
-    Ok((nft_pubkey, grizzly_pubkey))
-}
-
-
 /*
     Signup for a battle in the arena.
 

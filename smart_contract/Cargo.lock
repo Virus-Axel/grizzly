@@ -634,6 +634,8 @@ dependencies = [
  "mpl-token-metadata",
  "oorandom",
  "solana-program",
+ "spl-associated-token-account",
+ "spl-token",
 ]
 
 [[package]]

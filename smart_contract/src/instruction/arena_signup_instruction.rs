@@ -14,17 +14,11 @@ use crate::{
         is_battle_aborted,
     },
     arena_queue_id,
+    token_handler::grizzly_token::get_mapping_keys,
     data_structures::{arena_structure, grizzly_structure},
 };
 
 use mod_exp::mod_exp;
-
-fn get_mapping_keys(account_data: &[u8]) -> Result<(Pubkey, Pubkey), ProgramError> {
-    let nft_pubkey = Pubkey::new(&account_data[0..32]);
-    let grizzly_pubkey = Pubkey::new(&account_data[32..64]);
-    Ok((nft_pubkey, grizzly_pubkey))
-}
-
 
 /*
     Signup for a battle in the arena.
