@@ -9,14 +9,15 @@ use solana_program::{
 
 use crate::{
     account_security::verify_and_get_mut_data,
+    arena::fight_system::{
+        evaluate_winner,
+        is_battle_aborted,
+    },
     arena_queue_id,
     data_structures::{arena_structure, grizzly_structure},
-    arena::abilities::ABILITIES,
 };
 
-const MAX_FIGHT_ROUNDS: usize = 50;
-const FIGHT_CONFIRMATION_TIME: i64 = 10;
-
+use mod_exp::mod_exp;
 
 fn get_mapping_keys(account_data: &[u8]) -> Result<(Pubkey, Pubkey), ProgramError> {
     let nft_pubkey = Pubkey::new(&account_data[0..32]);
@@ -24,47 +25,32 @@ fn get_mapping_keys(account_data: &[u8]) -> Result<(Pubkey, Pubkey), ProgramErro
     Ok((nft_pubkey, grizzly_pubkey))
 }
 
-fn is_battle_aborted(bear_data: &[u8]) -> bool {
-    let current_time = Clock::get().unwrap().unix_timestamp;
-    let delta_time =
-        i64::from_le_bytes(bear_data[grizzly_structure::TIMESTAMP].try_into().unwrap())
-            - current_time;
-    if (bear_data[grizzly_structure::ARENA_STATE] == grizzly_structure::STATE_ACCEPTED_CHALLENGE
-        || bear_data[grizzly_structure::ARENA_STATE] == grizzly_structure::STATE_CHALLENGING)
-        && delta_time > FIGHT_CONFIRMATION_TIME
-    {
-        return true;
-    }
-    false
-}
 
-fn evaluate_winner(sender_bear: &mut [u8], opponent_bear: &mut [u8]) -> ProgramResult {
-    // Handle aborted battle
-    if sender_bear[grizzly_structure::ARENA_STATE] == grizzly_structure::STATE_CHALLENGING{
-        sender_bear[grizzly_structure::PENALTY] += 1;
-        sender_bear[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_NO_FIGHT;
-        sender_bear[grizzly_structure::TARGET].copy_from_slice(&[0; 32]);
+/*
+    Signup for a battle in the arena.
 
-        opponent_bear[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_NO_FIGHT;
-        opponent_bear[grizzly_structure::TARGET].copy_from_slice(&[0; 32]);
-    }
-    else if sender_bear[grizzly_structure::ARENA_STATE] == grizzly_structure::STATE_ACCEPTED_CHALLENGE{
-        opponent_bear[grizzly_structure::PENALTY] += 1;
-        opponent_bear[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_NO_FIGHT;
-        opponent_bear[grizzly_structure::TARGET].copy_from_slice(&[0; 32]);
+    program_id: Public key of the executing program
+    accounts: Accounts of the program. The account order is as follows:
+        sender_account,
+        mapping_account,
+        nft_accounts,
+        grizzly_account,
+        arena_queue_account,
+        past_challenger_bear (If there is one),
+        challenging_bear (If there is one)
+    instruction_data: Data should consist of:
+        instruction type - offset 0, length 1
+        P -
+        G -
+        AB -
+        (shared_secret - if instruction_type is 1)
 
-        sender_bear[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_NO_FIGHT;
-        sender_bear[grizzly_structure::TARGET].copy_from_slice(&[0; 32]);
-    }
-    else{
-        for round in 0..MAX_FIGHT_ROUNDS {
-
-        }
-    }
-    Ok(())
-}
-
-pub fn arena_signup<'a>(program_id: &Pubkey, accounts: &'a [AccountInfo<'a>]) -> ProgramResult {
+*/
+pub fn arena_signup<'a>(
+    program_id: &Pubkey,
+    accounts: &'a [AccountInfo<'a>],
+    instruction_data: &[u8],
+) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 
     // Get the accounts
@@ -90,7 +76,8 @@ pub fn arena_signup<'a>(program_id: &Pubkey, accounts: &'a [AccountInfo<'a>]) ->
     // Check that bear is ready for battle.
     if is_battle_aborted(&grizzly_data) {
         let past_challenging_bear = next_account_info(accounts_iter)?;
-        let mut past_challenging_bear_data = verify_and_get_mut_data(program_id, past_challenging_bear)?;
+        let mut past_challenging_bear_data =
+            verify_and_get_mut_data(program_id, past_challenging_bear)?;
         let past_challenging_key = Pubkey::new(&arena_queue_data[arena_structure::LAST_BEAR]);
 
         // Make sure we provided the correct past bear.
@@ -98,10 +85,23 @@ pub fn arena_signup<'a>(program_id: &Pubkey, accounts: &'a [AccountInfo<'a>]) ->
             return Err(ProgramError::InvalidAccountData);
         }
 
-        evaluate_winner(&mut grizzly_data, &mut past_challenging_bear_data)?;
+        evaluate_winner(&mut grizzly_data, &mut past_challenging_bear_data, 0)?;
     } else if grizzly_data[grizzly_structure::ARENA_STATE] != grizzly_structure::STATE_NO_FIGHT {
         return Err(ProgramError::AccountAlreadyInitialized);
     }
+
+    // Set encryption public keys.
+    let secret = u64::from_le_bytes(instruction_data[17..25].try_into().unwrap());
+
+    grizzly_data[grizzly_structure::P].copy_from_slice(&instruction_data[1..9]);
+    grizzly_data[grizzly_structure::G].copy_from_slice(&instruction_data[9..17]);
+
+    let ab = mod_exp(u64::from_le_bytes(grizzly_data[grizzly_structure::G].try_into().unwrap()),
+        secret,
+        u64::from_le_bytes(grizzly_data[grizzly_structure::P].try_into().unwrap())
+    );
+
+    grizzly_data[grizzly_structure::AB].copy_from_slice(&ab.to_le_bytes());
 
     // Check if there is a challenger bear.
     if arena_queue_data[arena_structure::HAS_CHALLENGER] == 1 {
@@ -114,6 +114,27 @@ pub fn arena_signup<'a>(program_id: &Pubkey, accounts: &'a [AccountInfo<'a>]) ->
         }
 
         let mut challenging_bear_data = verify_and_get_mut_data(program_id, challenging_bear)?;
+
+        // Set targets.
+        challenging_bear_data[grizzly_structure::TARGET]
+            .copy_from_slice(&(*grizzly_account).key.to_bytes());
+        grizzly_data[grizzly_structure::TARGET]
+            .copy_from_slice(&(*challenging_bear).key.to_bytes());
+
+        // Calculate shared key
+        let shared_key = mod_exp(
+            u64::from_le_bytes(challenging_bear_data[grizzly_structure::AB].try_into().unwrap()),
+            secret,
+            u64::from_le_bytes(grizzly_data[grizzly_structure::P].try_into().unwrap()),
+        );
+        grizzly_data[grizzly_structure::SHARED_KEY].copy_from_slice(&shared_key.to_le_bytes());
+
+        // Set the challenge accepted state.
+        grizzly_data[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_ACCEPTED_CHALLENGE;
+    }
+    else{
+        // Set challenging state.
+        grizzly_data[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_CHALLENGING;
     }
 
     Ok(())

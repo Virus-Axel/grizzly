@@ -1,4 +1,4 @@
-mod arena_instruction;
+mod instruction;
 mod account_security;
 mod data_structures;
 mod arena;
@@ -11,6 +11,8 @@ use solana_program::{
     program_error::ProgramError,
     msg, config::program,
 };
+
+use instruction::arena_signup_instruction;
 
 pub fn arena_queue_id() -> Pubkey{
     Pubkey::new(bs58::decode("arenaqueuepubkey123").into_vec().as_ref().unwrap())
@@ -26,7 +28,7 @@ pub fn process_instruction<'a>(
     instruction_data: &[u8],
 ) -> ProgramResult {
     match instruction_data[0]{
-        0 => arena_instruction::arena_signup(program_id, &accounts),
+        0 => arena_signup_instruction::arena_signup(program_id, &accounts, &instruction_data),
         _ => Err(ProgramError::InvalidInstructionData),
     }
 }

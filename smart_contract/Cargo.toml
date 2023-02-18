@@ -13,6 +13,8 @@ bs58 = "*"
 borsh = "*"
 borsh-derive = "*"
 solana-program = "1.14.*"
+mod_exp = "*"
+oorandom = "*"
 mpl-token-metadata = {version = "*", features = ["no-entrypoint"]}
 
 [lib]
