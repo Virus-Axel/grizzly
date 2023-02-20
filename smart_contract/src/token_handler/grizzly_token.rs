@@ -29,7 +29,7 @@ use mpl_token_metadata::instruction::{
 
 use crate::account_security::{verify_bank_account, verify_and_get_mut_data};
 
-const AUTHORITY_SEED: &[u8] = b"GRIZZLY_SEED";
+pub const AUTHORITY_SEED: &[u8] = b"GRIZZLY_SEED";
 const NFT_COST: u64 = 100000000;
 
 pub fn get_mapping_keys(account_data: &[u8]) -> Result<(Pubkey, Pubkey), ProgramError> {

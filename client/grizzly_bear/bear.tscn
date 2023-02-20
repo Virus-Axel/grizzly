@@ -1,0 +1,19 @@
+[gd_scene load_steps=5 format=3 uid="uid://ttswkolua5eq"]
+
+[ext_resource type="PackedScene" uid="uid://cau5h6ke8vqp0" path="res://grizzly_bear/grizzly.glb" id="1_jxsnj"]
+[ext_resource type="Script" path="res://grizzly_bear/bear.gd" id="2_h6c7c"]
+[ext_resource type="Shader" path="res://shaders/fur.gdshader" id="2_qqj32"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lhjif"]
+render_priority = 0
+shader = ExtResource("2_qqj32")
+shader_parameter/fur_color = Vector3(1, 0, 0)
+shader_parameter/DENSITY = 100.0
+shader_parameter/FUR_THICKNESS = 0.01
+shader_parameter/DISSPLACEMENT = 0.0
+
+[node name="grizzly" instance=ExtResource("1_jxsnj")]
+script = ExtResource("2_h6c7c")
+
+[node name="male_Base_mesh" parent="." index="0"]
+surface_material_override/0 = SubResource("ShaderMaterial_lhjif")

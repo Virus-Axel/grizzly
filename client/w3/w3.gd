@@ -48,6 +48,8 @@ func connect_phantom_wallet():
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	$get_latest_block_hash.setUrl(URL)
+	create_account(100)
 	#var params = get_query_params("client://axel.app/?phantom_encryption_public_key=8ALaWaL16BNRbE64JQheNimo4KqKKaDWB8AUxkbvNkF1&nonce=Jf9FUqg334jw76rUv9ke74GfsTCZb6gKa&data=5FrbwaoSDqFWUP9xZSfj1MHJCQByNpXPwfH6QUQTTyQWBJt8ZpmEyH4EeUFgwJiiahSWt4BcMwmr5hEYDd4n7cNhCHiPG6F2eWvaxDgPKMsEhnfajv3M8T4JWhS6YieLUFNCDYeJ2Ezrne8XFBGsxpbzDtSQ7HkdxpQkDTg9XQXz7FgpjwzsnPDKn7nby62gv4s8E1LMqPMod7piLTeyX6QthZmGgsVQ716j7KySHUNdU1FAB5hrSaZgK9j7wv8CfHZTXnToSQWoBSEATMP7s23BGzwHZKLqe5KnV8CBTeiQZ7JfpqNzu2Cqxc99vGikFngrmMdFjA7R6HL5ff1zYt2MkjEeroiQ31ZDCdQmtbUuF9qUkUYKdFEhEjBRrj2VXkDwYgC2QCDVWFoVoc1BBb6sB7BQ8P5Si")
 	#var shared_secret = $phantom_handler.getSharedPubkey(params[0])
 	#print($phantom_handler.decryptPhantomMessage(shared_secret, params[2], params[1]))
@@ -76,6 +78,24 @@ func signup_for_battle():
 	print(response_data)
 	pass # Replace with function body.
 
+func create_account(account_size):
+	get_latest_block_hash()
+	await $get_latest_block_hash.request_completed
+	var blockhash = response_data['result']['value']['blockhash']
+	
+	$program_handler.generateKeypair()
+	var publicKey = $program_handler.pubkey()
+	var privateKey = $program_handler.secret()
+	
+	$program_handler.setKeys("8B5LAjwFNkB4jo3kZEmzn7QD57igRW7gJXNi9t2RNxaA", "GFvZnxPPaZCeiA2d6gNVyE9ffu7B3PbHjw5AvRgPaZo6", ID)
+	var transaction_signature = $program_handler.getCreateAccountSignature(account_size, blockhash)
+	
+	send_transaction(transaction_signature)
+	await $get_latest_block_hash.request_completed
+	print(response_data)
+	pass # Replace with function body.
+
+
 func send_transaction(transaction_signature):
 	var body = JSON.new().stringify({
 		"id":1,
@@ -85,7 +105,7 @@ func send_transaction(transaction_signature):
 			transaction_signature
 		]
 	})
-	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], true, HTTPClient.METHOD_POST, body)
+	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
 	pass
@@ -101,12 +121,9 @@ func get_latest_block_hash():
 			}
 		]
 	})
-	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], true, HTTPClient.METHOD_POST, body)
+	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
-	pass
-
-func create_account():
 	pass
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

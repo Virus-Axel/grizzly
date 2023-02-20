@@ -4,17 +4,18 @@ use solana_program::{
     msg,
     program_error::ProgramError,
     pubkey::Pubkey,
-    sysvar::{clock::Clock, Sysvar},
 };
 
 use crate::{
-    account_security::verify_and_get_mut_data,
+    account_security::{
+        verify_and_get_mut_data,
+        validate_bear_nft,
+    },
     arena::fight_system::{
         evaluate_winner,
         is_battle_aborted,
     },
     arena_queue_id,
-    token_handler::grizzly_token::get_mapping_keys,
     data_structures::{arena_structure, grizzly_structure},
 };
 
@@ -48,23 +49,27 @@ pub fn arena_signup<'a>(
     let accounts_iter = &mut accounts.iter();
 
     // Get the accounts
-    let _sender_account = next_account_info(accounts_iter)?;
+    let sender_account = next_account_info(accounts_iter)?;
     let mapping_account = next_account_info(accounts_iter)?;
-    let nft_account = next_account_info(accounts_iter)?;
+
+    // NFT for verification
+    let mint_account = next_account_info(accounts_iter)?;
+    let token_account = next_account_info(accounts_iter)?;
+    let metadata_account = next_account_info(accounts_iter)?;
+
     let grizzly_account = next_account_info(accounts_iter)?;
     let arena_queue_account = next_account_info(accounts_iter)?;
 
-    // Verify owners and extract data
-    let mut mapping_data = verify_and_get_mut_data(program_id, mapping_account)?;
-    let (nft_pubkey, grizzly_pubkey) = get_mapping_keys(&mapping_data)?;
-    if nft_pubkey != *nft_account.key
-        || grizzly_pubkey != *grizzly_account.key
-        || *arena_queue_account.key != arena_queue_id()
+    match validate_bear_nft(program_id, sender_account, mint_account, token_account, metadata_account, grizzly_account, mapping_account){
+        Ok(_) => (),
+        Err(e) => return Err(ProgramError::IllegalOwner),
+    }
+
+    if *arena_queue_account.key != arena_queue_id()
     {
         return Err(ProgramError::InvalidAccountData);
     }
     let mut grizzly_data = verify_and_get_mut_data(program_id, mapping_account)?;
-    let mut nft_data = verify_and_get_mut_data(&mpl_token_metadata::ID, mapping_account)?;
     let mut arena_queue_data = verify_and_get_mut_data(program_id, arena_queue_account)?;
 
     // Check that bear is ready for battle.
@@ -125,10 +130,15 @@ pub fn arena_signup<'a>(
 
         // Set the challenge accepted state.
         grizzly_data[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_ACCEPTED_CHALLENGE;
+
+        arena_queue_data[arena_structure::HAS_CHALLENGER] = 0;
     }
     else{
         // Set challenging state.
         grizzly_data[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_CHALLENGING;
+
+        arena_queue_data[arena_structure::HAS_CHALLENGER] = 1;
+        arena_queue_data[arena_structure::LAST_BEAR].copy_from_slice(&grizzly_account.key.to_bytes());
     }
 
     Ok(())
