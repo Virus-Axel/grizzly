@@ -5,6 +5,8 @@ uniform vec3 fur_color;
 uniform float DENSITY = 900;
 uniform float FUR_THICKNESS = 0.3;
 uniform float DISSPLACEMENT = 0.1;
+uniform int layer = 0;
+uniform vec3 wind = vec3(0.0, 0.0, 0.0);
 
 float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289_i(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
@@ -37,7 +39,8 @@ void vertex(){
 	float dissplacement_x = noise(wrld_vertex * 50000.0) * DISSPLACEMENT;
 	float dissplacement_y = noise(300.0 + wrld_vertex * 50000.0) * DISSPLACEMENT;
 	float dissplacement_z = noise(600.0 + wrld_vertex * 50000.0) * DISSPLACEMENT;
-	VERTEX = VERTEX + (vec3(DISSPLACEMENT) - vec3(dissplacement_x, dissplacement_y, dissplacement_z));
+	VERTEX = float(layer) * wind + VERTEX + (vec3(DISSPLACEMENT) - vec3(dissplacement_x, dissplacement_y, dissplacement_z));
+	VERTEX.x += 0.001 - sin(TIME * 2.1) * 0.002;
 }
 
 void fragment() {
@@ -45,8 +48,8 @@ void fragment() {
 	vec3 wrld_vertex = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	float noise_float = noise(wrld_vertex * DENSITY);
 	if(noise_float < FUR_THICKNESS){
-		//ALPHA = (FUR_THICKNESS - noise_float) / FUR_THICKNESS;
-		ALPHA = 255.0;
+		ALPHA = (FUR_THICKNESS - noise_float) / FUR_THICKNESS;
+		//ALPHA = 255.0;
 	}
 	else{
 		ALPHA = 0.0;

@@ -8,9 +8,11 @@
 render_priority = 0
 shader = ExtResource("2_qqj32")
 shader_parameter/fur_color = Vector3(1, 0, 0)
-shader_parameter/DENSITY = 100.0
-shader_parameter/FUR_THICKNESS = 0.01
+shader_parameter/DENSITY = 700.0
+shader_parameter/FUR_THICKNESS = 0.8
 shader_parameter/DISSPLACEMENT = 0.0
+shader_parameter/layer = null
+shader_parameter/wind = Vector3(0, 0, -0.001)
 
 [node name="grizzly" instance=ExtResource("1_jxsnj")]
 script = ExtResource("2_h6c7c")
