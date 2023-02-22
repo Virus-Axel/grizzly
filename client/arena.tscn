@@ -1,35 +1,26 @@
-[gd_scene load_steps=5 format=3 uid="uid://p52raow4vxs6"]
+[gd_scene load_steps=4 format=3 uid="uid://p52raow4vxs6"]
 
 [ext_resource type="Script" path="res://arena/Camera3D.gd" id="1_dlcvc"]
 [ext_resource type="PackedScene" uid="uid://ttswkolua5eq" path="res://grizzly_bear/bear.tscn" id="1_kiksg"]
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_33ihj"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ubhbm"]
-albedo_color = Color(0.960784, 0.384314, 0.305882, 1)
+[ext_resource type="PackedScene" uid="uid://fxwvh5nt1v0" path="res://arena/arena.glb" id="3_je1uo"]
 
 [node name="arena" type="Node3D"]
 
-[node name="CSGMesh3D" type="CSGMesh3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.05205, 0, 0)
-mesh = SubResource("CylinderMesh_33ihj")
-
-[node name="CSGMesh3D2" type="CSGMesh3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.61917, 0, 0)
-mesh = SubResource("CylinderMesh_33ihj")
-material = SubResource("StandardMaterial3D_ubhbm")
-
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.417679, 4.47686)
+transform = Transform3D(1, 0, 0, 0, 0.911324, 0.411689, 0, -0.411689, 0.911324, 1.60794, 0.446468, 3.75886)
 current = true
 script = ExtResource("1_dlcvc")
 
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35043, 6.85729)
-light_energy = 10.0
-
 [node name="grizzly2" parent="." instance=ExtResource("1_kiksg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.686125, 1.12225)
+transform = Transform3D(0.361811, 0, 0, 0, 0.361811, 0, 0, 0, 0.361811, 2.01707, -0.988188, 1.72637)
 
 [node name="grizzly" parent="." instance=ExtResource("1_kiksg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.03105, 3.12608)
+transform = Transform3D(0.361811, 0, 0, 0, 0.361811, 0, 0, 0, 0.361811, 0.774746, -1.00067, 2.45137)
+
+[node name="arena" parent="." instance=ExtResource("3_je1uo")]
+transform = Transform3D(0.361811, 0, 0, 0, 0.361811, 0, 0, 0, 0.361811, 1.45619, -0.961492, 2.02884)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.504226, 0.863572, 0, -0.863572, 0.504226, 0, 3, 0)
+shadow_enabled = true
+shadow_opacity = 0.3

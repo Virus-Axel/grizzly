@@ -1,9 +1,9 @@
 extends Node3D
 
 const LAYERS = 10;
-const FUR_LENGTH = 1.5;
+const FUR_LENGTH = 1.0;
 const FUR_DENSITY = 1.0
-const color = Vector3(0.6, 0.2, 0.0);
+const color = Vector3(0.3, 0.10, 0.0);
 
 func grow_scale():
 	pass
