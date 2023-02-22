@@ -26,9 +26,10 @@ script = ExtResource("1_dlcvc")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.35043, 6.85729)
+light_energy = 10.0
 
 [node name="grizzly2" parent="." instance=ExtResource("1_kiksg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.686125, 1.12225)
 
 [node name="grizzly" parent="." instance=ExtResource("1_kiksg")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.343062, 3.12608)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.03105, 3.12608)

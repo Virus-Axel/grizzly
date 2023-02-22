@@ -7,6 +7,7 @@ uniform float FUR_THICKNESS = 0.3;
 uniform float DISSPLACEMENT = 0.1;
 uniform int layer = 0;
 uniform vec3 wind = vec3(0.0, 0.0, 0.0);
+uniform sampler2D fur_bump;
 
 float mod289(float x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
 vec4 mod289_i(vec4 x){return x - floor(x * (1.0 / 289.0)) * 289.0;}
@@ -34,6 +35,25 @@ float noise(vec3 p){
     return o4.y * d.y + o4.x * (1.0 - d.y);
 }
 
+vec2 random(vec2 uv){
+    uv = vec2( dot(uv, vec2(127.1,311.7) ),
+               dot(uv, vec2(269.5,183.3) ) );
+    return -1.0 + 2.0 * fract(sin(uv) * 43758.5453123);
+}
+
+float noise_2(vec2 uv) {
+    vec2 uv_index = floor(uv);
+    vec2 uv_fract = fract(uv);
+
+    vec2 blur = smoothstep(0.0, 1.0, uv_fract);
+
+    return mix( mix( dot( random(uv_index + vec2(0.0,0.0) ), uv_fract - vec2(0.0,0.0) ),
+                     dot( random(uv_index + vec2(1.0,0.0) ), uv_fract - vec2(1.0,0.0) ), blur.x),
+                mix( dot( random(uv_index + vec2(0.0,1.0) ), uv_fract - vec2(0.0,1.0) ),
+                     dot( random(uv_index + vec2(1.0,1.0) ), uv_fract - vec2(1.0,1.0) ), blur.x), blur.y) + 0.5;
+}
+
+
 void vertex(){
 	vec3 wrld_vertex = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
 	float dissplacement_x = noise(wrld_vertex * 50000.0) * DISSPLACEMENT;
@@ -46,13 +66,18 @@ void vertex(){
 void fragment() {
 	ALBEDO = fur_color;
 	vec3 wrld_vertex = (INV_VIEW_MATRIX * vec4(VERTEX, 1.0)).xyz;
-	float noise_float = noise(wrld_vertex * DENSITY);
+	//float noise_float = noise_2(UV * DENSITY);
+	float noise_float = texture(fur_bump, UV * DENSITY).r;
 	if(noise_float < FUR_THICKNESS){
 		ALPHA = (FUR_THICKNESS - noise_float) / FUR_THICKNESS;
 		//ALPHA = 255.0;
 	}
 	else{
 		ALPHA = 0.0;
+	}
+	ALPHA = 2.0 * noise_float;
+	if(layer == 0){
+		ALPHA = 1.0F;
 	}
 	// Place fragment code here.
 }
