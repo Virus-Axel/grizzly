@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3 uid="uid://buwc1q3cx48t"]
+
+[ext_resource type="Script" path="res://UI/start.gd" id="1_tqii2"]
+[ext_resource type="PackedScene" uid="uid://fj78n0gpmtcr" path="res://w3/w3.tscn" id="2_r6g78"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tqii2")
+
+[node name="w3" parent="." instance=ExtResource("2_r6g78")]

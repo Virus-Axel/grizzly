@@ -26,13 +26,17 @@ func get_query_params(url):
 	return [shared_secret, nounce, data]
 
 func connect_phantom_wallet():
-	var encryption_key = $phantom_handler.generateDiffiePubkey()
-	var phantom_string = PHANTOM_URL + "?app_url=" + APP_URL + "&dapp_encryption_public_key=" + encryption_key + "&redirect_link=" + REDIRECTION_LINK + "&cluster=" + CLUSTER
+	var encryption_keys = $phantom_handler.generateDiffiePubkey()
+	if encryption_keys.size() == 0:
+		print("no keys")
+		return
+	print("secret key: ", encryption_keys[0])
+	print("public key: ", encryption_keys[1])
+	var phantom_string = PHANTOM_URL + "?app_url=" + APP_URL + "&dapp_encryption_public_key=" + encryption_keys[1] + "&redirect_link=" + REDIRECTION_LINK + "&cluster=" + CLUSTER
 	print(phantom_string)
-	$get_latest_block_hash.request(phantom_string, ["Content-Type: application/json"], HTTPClient.METHOD_GET)
+	$get_latest_block_hash.request(phantom_string, [], HTTPClient.METHOD_GET)
 	await $get_latest_block_hash.request_completed
 	OS.shell_open(phantom_string)
-	print(response_data);
 	var got_url = false
 	var url = ""
 	while not got_url:
@@ -42,15 +46,25 @@ func connect_phantom_wallet():
 				got_url = true
 			else:
 				await get_tree().create_timer(0.5).timeout
+	print("Phantom URL response: ", url)
 	var params = get_query_params(url)
 	var shared_secret = $phantom_handler.getSharedPubkey(params[0])
-	print($phantom_handler.decryptPhantomMessage(shared_secret, params[2], params[1]))
+	print("shared secret is: ", shared_secret)
+	print("nounce is: ", params[1])
+	print("data is: ", params[2])
+	var decrypted_data = $phantom_handler.decryptPhantomMessage(shared_secret, params[2], params[1])
+	var end_mark = decrypted_data.find('}')
+	var json = decrypted_data.substr(0, end_mark + 1)
+	print(json);
+	
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$get_latest_block_hash.setUrl(URL)
-	create_account(100)
-	#var params = get_query_params("client://axel.app/?phantom_encryption_public_key=8ALaWaL16BNRbE64JQheNimo4KqKKaDWB8AUxkbvNkF1&nonce=Jf9FUqg334jw76rUv9ke74GfsTCZb6gKa&data=5FrbwaoSDqFWUP9xZSfj1MHJCQByNpXPwfH6QUQTTyQWBJt8ZpmEyH4EeUFgwJiiahSWt4BcMwmr5hEYDd4n7cNhCHiPG6F2eWvaxDgPKMsEhnfajv3M8T4JWhS6YieLUFNCDYeJ2Ezrne8XFBGsxpbzDtSQ7HkdxpQkDTg9XQXz7FgpjwzsnPDKn7nby62gv4s8E1LMqPMod7piLTeyX6QthZmGgsVQ716j7KySHUNdU1FAB5hrSaZgK9j7wv8CfHZTXnToSQWoBSEATMP7s23BGzwHZKLqe5KnV8CBTeiQZ7JfpqNzu2Cqxc99vGikFngrmMdFjA7R6HL5ff1zYt2MkjEeroiQ31ZDCdQmtbUuF9qUkUYKdFEhEjBRrj2VXkDwYgC2QCDVWFoVoc1BBb6sB7BQ8P5Si")
+	#print($phantom_handler.decryptPhantomMessage("C4bTKdHW1AkgjQythRHr2vBSpSvsLxbKpzeb2a3TEuK6", "4uzhZEtsxYgWeGc21jdHun5tynwQhXtG9GRfK251MSxHAZQAtWrYSrYjLS6kSghwnFx5pLwAkuv8aaipx9tE4zcW8DjnUqLjwRqeyaNXeqZMEcJ4gbvbnLWw9Uj2BGAuYRMh92ErKbP8zxNUkRtCK2YkhjAZFSPB7pjsLpNbvLza4u7Ku4TmHTedKUEUm9ewrNMdkUiEBeemf5X8UvrDVNPL2A6pifE9GrZH9YMqP9WpYjmyocpv9XGiR78X8XuwmcupRi5CD6573UXgK4c5uoViPWuBZk4mnMM4mvW2zC7Kh76hp1LZnp2oQ6ieWHPPWVsyPYK1EE71m9D59hEq45zSkGJnr3MGqypwKEbLfQzm2MPjRHTKFHfXEh9cgCPTfjdKoTyE9Rs3Bzto9F9FBuent34KJDYVb", "PPisLSUJDDzyowz4Pk9hiTV9ZgZriXrdZ"))
+	#create_account(100)
+	#var params = get_query_params("client://axel.app/?phantom_encryption_public_key=H1Q6Bpd77ekjmwZymUk5jJdnXidPT4hJ6HJW7PqsQ3pM&nonce=4ZS6M9q5Ph6c3FT9gPZtGxFv9K9YvRkMH&data=2TLWu3t38xAfSZshioaRPS9GMYjZEr2VX8zgrdJL1qppU99uJvHmZyVzeifRs8oeez1zr2PxHdhLjNpF1LAxi8aZn1APzTz8QJULM1sgMpygMhEKLBptm4YE22uYDJ5yDKd1oaMMCXjJ6nM1KYvJMP4GT1BrDL5LP4Giw2gZoNJiu6rU7yxLy7Qbm5pMwQANXCfjNkTEapB95PUMy6XudfAMvv53Cfrx63L3X9pKDtHvmfMgDBrk4ZRW9yMcw3pFauubMEpbCcrSr9J2vMSJPcoNXxx5hs6bLs5C3nXZ85Qy7feDHLuVkophBc4aD5K2G7ygJioSsWkx51HtGc5S2mnmpGdhMVp1HJXpFwWSFhV7m7bqiMLUC9o2pvwEcFiZWHJd9imWzNgeovjzL8bPtpeHjsAyFC2eS")
+	#print(params)
 	#var shared_secret = $phantom_handler.getSharedPubkey(params[0])
 	#print($phantom_handler.decryptPhantomMessage(shared_secret, params[2], params[1]))
 	return
