@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://buwc1q3cx48t"]
+[gd_scene load_steps=4 format=3 uid="uid://buwc1q3cx48t"]
 
 [ext_resource type="Script" path="res://UI/start.gd" id="1_tqii2"]
 [ext_resource type="PackedScene" uid="uid://fj78n0gpmtcr" path="res://w3/w3.tscn" id="2_r6g78"]
+[ext_resource type="Script" path="res://tweetnacl.gd" id="3_4gmoi"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -13,3 +14,6 @@ grow_vertical = 2
 script = ExtResource("1_tqii2")
 
 [node name="w3" parent="." instance=ExtResource("2_r6g78")]
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("3_4gmoi")

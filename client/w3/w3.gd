@@ -5,13 +5,28 @@ const ID = "1289JhmLHgUWFjiNoP89krWdtfDJPc73nB3jUTnUck4"
 const SYSTEM_PROGRAM = "11111111111111111111111111111111"
 const URL = "https://api.testnet.solana.com"
 const APP_URL = "https%3A%2F%2Faxel.app"
-const PHANTOM_URL = "https://phantom.app/ul/v1/connect"
+const PHANTOM_CONNECT_URL = "https://phantom.app/ul/v1/connect"
+const PHANTOM_SIGN_TRANSACTION_URL = "https://phantom.app/ul/v1/signAndSendTransaction"
 #const REDIRECTION_LINK = "redirect_link%3Dhttps%3A%2F%2Faxel.app%3A%2F%2FonPhantomConnected"
 const REDIRECTION_LINK = "client%3A%2F%2Faxel.app%2F"
 const CLUSTER = "testnet"
 
 var response_data
 var body_data
+var signature
+
+var diffie_public_key = ""
+var phantom_session = ""
+var phantom_pubkey = ""
+var shared_secret = ""
+
+func get_random_nounce(length):
+	var arr = PackedByteArray();
+	arr.resize(length)
+	for i in range(length):
+		#arr[i] = randi() % 256
+		arr[i] = 10;
+	return arr
 
 func get_query_params(url):
 	var qmark = url.find('?')
@@ -25,6 +40,35 @@ func get_query_params(url):
 	var data = url.substr(eq_3 + 1)
 	return [shared_secret, nounce, data]
 
+func phantom_send_transaction(encoded_transaction):
+	var payload = "{\"transaction:\"" + encoded_transaction + "\",\"sendOptions\":\"\",\"session\":\"" + phantom_session + "\"}"
+	print("send transaction payload: ", payload)
+	
+	print("encrypting with: ", shared_secret)
+	var encryption_data = $phantom_handler.encryptPhantomMessage(phantom_pubkey, payload, get_random_nounce(24))
+	print(encryption_data)
+	var phantom_string = PHANTOM_SIGN_TRANSACTION_URL + "?dapp_encryption_public_key=" + diffie_public_key + "&nonce=" + encryption_data[0] + "&redirect_link=" + REDIRECTION_LINK + "&payload=" + encryption_data[1]
+	print(phantom_string)
+	$get_latest_block_hash.request(phantom_string, ["Content-Type: application/json"], HTTPClient.METHOD_GET)
+	await $get_latest_block_hash.request_completed
+	OS.shell_open(phantom_string)
+	var got_url = false
+	var url = ""
+	while not got_url:
+		if Engine.has_singleton('AppLinks'):
+			url = Engine.get_singleton("AppLinks").getUrl()
+			if url != "":
+				got_url = true
+			else:
+				await get_tree().create_timer(0.5).timeout
+	print("Phantom URL response: ", url)
+	#var decrypted_data = $phantom_handler.decryptPhantomMessage(shared_secret, params[2], params[1])
+	#var end_mark = decrypted_data.find('}')
+	#var json_string = decrypted_data.substr(0, end_mark + 1)
+	#var json = JSON.new()
+	#json.parse(json_string)
+	#print(json.get_data());
+
 func connect_phantom_wallet():
 	var encryption_keys = $phantom_handler.generateDiffiePubkey()
 	if encryption_keys.size() == 0:
@@ -32,7 +76,8 @@ func connect_phantom_wallet():
 		return
 	print("secret key: ", encryption_keys[0])
 	print("public key: ", encryption_keys[1])
-	var phantom_string = PHANTOM_URL + "?app_url=" + APP_URL + "&dapp_encryption_public_key=" + encryption_keys[1] + "&redirect_link=" + REDIRECTION_LINK + "&cluster=" + CLUSTER
+	diffie_public_key = encryption_keys[1]
+	var phantom_string = PHANTOM_CONNECT_URL + "?app_url=" + APP_URL + "&dapp_encryption_public_key=" + encryption_keys[1] + "&redirect_link=" + REDIRECTION_LINK + "&cluster=" + CLUSTER
 	print(phantom_string)
 	$get_latest_block_hash.request(phantom_string, [], HTTPClient.METHOD_GET)
 	await $get_latest_block_hash.request_completed
@@ -48,20 +93,37 @@ func connect_phantom_wallet():
 				await get_tree().create_timer(0.5).timeout
 	print("Phantom URL response: ", url)
 	var params = get_query_params(url)
-	var shared_secret = $phantom_handler.getSharedPubkey(params[0])
+	phantom_pubkey = params[0]
+	shared_secret = $phantom_handler.getSharedPubkey(params[0])
 	print("shared secret is: ", shared_secret)
 	print("nounce is: ", params[1])
 	print("data is: ", params[2])
-	var decrypted_data = $phantom_handler.decryptPhantomMessage(shared_secret, params[2], params[1])
+	var decrypted_data = $phantom_handler.decryptPhantomMessage(params[0], params[2], params[1])
 	var end_mark = decrypted_data.find('}')
-	var json = decrypted_data.substr(0, end_mark + 1)
-	print(json);
+	var json_string = decrypted_data.substr(0, end_mark + 1)
+	var json = JSON.new()
+	if json.parse(json_string) == null:
+		print("failed to parse data")
+	else:
+		print("json data: ", json.get_data())
+		phantom_session = json.get_data()['session'];
 	
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$get_latest_block_hash.setUrl(URL)
-	#print($phantom_handler.decryptPhantomMessage("C4bTKdHW1AkgjQythRHr2vBSpSvsLxbKpzeb2a3TEuK6", "4uzhZEtsxYgWeGc21jdHun5tynwQhXtG9GRfK251MSxHAZQAtWrYSrYjLS6kSghwnFx5pLwAkuv8aaipx9tE4zcW8DjnUqLjwRqeyaNXeqZMEcJ4gbvbnLWw9Uj2BGAuYRMh92ErKbP8zxNUkRtCK2YkhjAZFSPB7pjsLpNbvLza4u7Ku4TmHTedKUEUm9ewrNMdkUiEBeemf5X8UvrDVNPL2A6pifE9GrZH9YMqP9WpYjmyocpv9XGiR78X8XuwmcupRi5CD6573UXgK4c5uoViPWuBZk4mnMM4mvW2zC7Kh76hp1LZnp2oQ6ieWHPPWVsyPYK1EE71m9D59hEq45zSkGJnr3MGqypwKEbLfQzm2MPjRHTKFHfXEh9cgCPTfjdKoTyE9Rs3Bzto9F9FBuent34KJDYVb", "PPisLSUJDDzyowz4Pk9hiTV9ZgZriXrdZ"))
+	return;
+	var keys_p = $phantom_handler.generateDiffiePubkey()
+	var keys_m = $phantom_handler.generateDiffiePubkey()
+	var sk = $phantom_handler.getSharedPubkey(keys_p[1])
+	
+	print(keys_p)
+	print(keys_m)
+	print(sk)
+	
+	var encrypt = $phantom_handler.encryptPhantomMessage(keys_p[1], "11111111111111111111111111111111111111111111111111111111111111111111", get_random_nounce(24))
+	print(encrypt)
+	print($phantom_handler.decryptPhantomMessage(sk, encrypt[1], encrypt[0]))
 	#create_account(100)
 	#var params = get_query_params("client://axel.app/?phantom_encryption_public_key=H1Q6Bpd77ekjmwZymUk5jJdnXidPT4hJ6HJW7PqsQ3pM&nonce=4ZS6M9q5Ph6c3FT9gPZtGxFv9K9YvRkMH&data=2TLWu3t38xAfSZshioaRPS9GMYjZEr2VX8zgrdJL1qppU99uJvHmZyVzeifRs8oeez1zr2PxHdhLjNpF1LAxi8aZn1APzTz8QJULM1sgMpygMhEKLBptm4YE22uYDJ5yDKd1oaMMCXjJ6nM1KYvJMP4GT1BrDL5LP4Giw2gZoNJiu6rU7yxLy7Qbm5pMwQANXCfjNkTEapB95PUMy6XudfAMvv53Cfrx63L3X9pKDtHvmfMgDBrk4ZRW9yMcw3pFauubMEpbCcrSr9J2vMSJPcoNXxx5hs6bLs5C3nXZ85Qy7feDHLuVkophBc4aD5K2G7ygJioSsWkx51HtGc5S2mnmpGdhMVp1HJXpFwWSFhV7m7bqiMLUC9o2pvwEcFiZWHJd9imWzNgeovjzL8bPtpeHjsAyFC2eS")
 	#print(params)
@@ -156,15 +218,15 @@ func _http_request_completed(result, response_code, headers, body):
 
 
 func _on_get_latest_block_hash_request_completed(result, response_code, headers, body):
-	print(result)
-	print(response_code)
-	print(headers)
+	#print(result)
+	#print(response_code)
+	#print(headers)
 	#print(body)
 	body_data = body.get_string_from_utf8()
-	print(body_data)
+	#print(body_data)
 	
 	var json = JSON.new()
 	json.parse(body.get_string_from_utf8())
 	response_data = json.get_data();
 	var response = json.get_data()
-	print(response)
+	#print(response)
