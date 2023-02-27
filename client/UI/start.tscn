@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://buwc1q3cx48t"]
+[gd_scene load_steps=5 format=3 uid="uid://buwc1q3cx48t"]
 
 [ext_resource type="Script" path="res://UI/start.gd" id="1_tqii2"]
 [ext_resource type="PackedScene" uid="uid://fj78n0gpmtcr" path="res://w3/w3.tscn" id="2_r6g78"]
 [ext_resource type="Script" path="res://tweetnacl.gd" id="3_4gmoi"]
+[ext_resource type="Theme" uid="uid://g2udyqfqc7q4" path="res://UI/start/phantom_theme.tres" id="5_ahuom"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -17,3 +18,26 @@ script = ExtResource("1_tqii2")
 
 [node name="Node" type="Node" parent="."]
 script = ExtResource("3_4gmoi")
+
+[node name="nacl" type="Node" parent="."]
+script = ExtResource("3_4gmoi")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 61.0
+offset_top = 492.0
+offset_right = -72.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="connect_phantom_button" type="Button" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+focus_mode = 0
+theme = ExtResource("5_ahuom")
+expand_icon = true
+
+[connection signal="pressed" from="VBoxContainer/connect_phantom_button" to="." method="_on_connect_phantom_button_pressed"]

@@ -46,14 +46,15 @@ func pack25519(o, n):
 	car25519(t);
 	car25519(t);
 	car25519(t);
+	
 	for j in range(2):
 		m[0] = t[0] - 0xffed;
-		for i in range(15):
-			m[i] = t[i] - 0xffff - ((m[i-1]>>16) & 1);
+		for i in range(1, 15):
+			m[i] = t[i] - 0xffff - ((signed_shift_right(m[i-1], 16)) & 1);
 			m[i-1] &= 0xffff;
 
-		m[15] = t[15] - 0x7fff - ((m[14]>>16) & 1);
-		b = (m[15]>>16) & 1;
+		m[15] = t[15] - 0x7fff - ((signed_shift_right(m[14], 16)) & 1);
+		b = (signed_shift_right(m[15], 16)) & 1;
 		m[14] &= 0xffff;
 		sel25519(t, m, 1-b);
 	for i in range(16):
@@ -92,7 +93,7 @@ func inv25519(o, i):
 
 
 func gf(list):
-	var ret = PackedFloat64Array(list)
+	var ret = PackedInt64Array(list)
 	ret.resize(16)
 	return ret
 
@@ -108,9 +109,9 @@ func S(o, a):
 	M(o, a, a);
 
 func M(o, a, b):
-	var t = PackedFloat64Array()
+	var t = PackedInt64Array()
 	t.resize(31)
-	for i in range(32):
+	for i in range(31):
 		t[i] = 0
 	for i in range(16):
 		for j in range(16):
@@ -126,15 +127,29 @@ func M(o, a, b):
 func unpack25519(o, n):
 	for i in range(16):
 		o[i] = n[2*i] + (n[2*i+1] << 8)
-	o[15] = int(o[15]) & 0x7fff;
+	o[15] = o[15] & 0x7fff;
+
+func signed_shift_right(num, bits):
+	if num < 0:
+		var ret = (abs(num) - 1) >> bits
+		return ~ret
+	else:
+		return num >> bits
+
+func signed_shift_left(num, bits):
+	if num < 0:
+		var ret = (abs(num) - 1) << bits
+		return ~ret
+	else:
+		return num << bits
 
 func zero_shift_right(num, bits):
-	# If num is negative, convert it to its two's complement equivalent
-	if (num < 0):
-		num = (0xFFFFFFFF + num + 1);
-  
-  # Shift the bits to the right by multiplying by 2^-bits
-	return floor(num / pow(2, bits));
+	if num < 0:
+		var ret = ((1 << 63) + num) >> bits
+		ret += (1 << 62) >> (bits - 1)
+		return ret
+	else:
+		return num >> bits
 
 func sel25519(p, q, b):
 	var t
@@ -151,8 +166,11 @@ func ld32(x, i):
 	u = (u << 8) | (x[i + 1] & 0xff);
 	return (u << 8) | (x[i + 0] & 0xff)
 
-func L32(x, c):
-	return (x << c) | (zero_shift_right(x, (32 - c)));
+func L32(x, c, is_32 = false):
+	if is_32:
+		return signed_shift_left(x, c) % (1 << 32) | (zero_shift_right(x % (1 << 32), (32 - c)));
+	else:
+		return signed_shift_left(x, c) | (zero_shift_right(x, (32 - c)));
 
 func st32(x, j, u):
 	for i in range(4):
@@ -171,9 +189,9 @@ func check_array_types():
 	pass
 
 func checkBoxLengths(pk, sk):
-	if (pk.len() != crypto_box_PUBLICKEYBYTES):
+	if (pk.size() != crypto_box_PUBLICKEYBYTES):
 		return false
-	if (sk.len() != crypto_box_SECRETKEYBYTES):
+	if (sk.size() != crypto_box_SECRETKEYBYTES):
 		return false
 	return true
 
@@ -221,15 +239,15 @@ func crypto_stream_salsa20_xor(c,cpos,m,mpos,b,n,k):
 func crypto_onetimeauth(out, outpos, m, mpos, n, k):
 	var s
 	var u
-	var x = PackedInt32Array()
+	var x = PackedInt64Array()
 	x.resize(17)
-	var r = PackedInt32Array()
+	var r = PackedInt64Array()
 	r.resize(17)
-	var h = PackedInt32Array()
+	var h = PackedInt64Array()
 	h.resize(17)
-	var c = PackedInt32Array()
+	var c = PackedInt64Array()
 	c.resize(17)
-	var g = PackedInt32Array()
+	var g = PackedInt64Array()
 	g.resize(17)
 	for j in range(17):
 		r[j] = 0
@@ -261,28 +279,28 @@ func crypto_onetimeauth(out, outpos, m, mpos, n, k):
 				if (j <= i):
 					x[i] = (x[i] + (h[j] * (r[i - j])) | 0) | 0;
 				else:
-					(x[i] + (h[j] * (r[i - j])) | 0) | 0;
+					x[i] = (x[i] + (h[j] * ((320 * r[i + 17 - j])|0)) | 0) | 0;
 		for i in range(17):
 			h[i] = x[i]
 		u = 0;
 		for j in range(16):
 			u = (u + h[j]) | 0;
 			h[j] = u & 255;
-			u = zero_shift_right(u, 8);
+			u = zero_shift_right(u % (1 << 32), 8);
 
 		u = (u + h[16]) | 0; h[16] = u & 3;
-		u = (5 * zero_shift_right(u, 2)) | 0;
+		u = (5 * zero_shift_right(u % (1 << 32), 2)) | 0;
 		for j in range(16):
 			u = (u + h[j]) | 0;
 			h[j] = u & 255;
-			u = zero_shift_right(u, 8);
+			u = zero_shift_right(u % (1 << 32), 8);
 
 		u = (u + h[16]) | 0; h[16] = u;
 
 	for j in range(17):
 		g[j] = h[j];
 	add1305(h, minusp);
-	s = (-zero_shift_right(h[16], 7) | 0);
+	s = (-zero_shift_right(h[16] % (1 << 32), 7) | 0);
 	for j in range(17):
 		h[j] ^= s & (g[j] ^ h[j]);
 
@@ -295,20 +313,20 @@ func crypto_onetimeauth(out, outpos, m, mpos, n, k):
 	return 0;
 
 func core(out, inp, k, c, h):
-	var w = PackedInt32Array()
+	var w = PackedInt64Array()
 	w.resize(16)
-	var x = PackedInt32Array()
+	var x = PackedInt64Array()
 	x.resize(16)
-	var y = PackedInt32Array()
+	var y = PackedInt64Array()
 	y.resize(16)
-	var t = PackedInt32Array()
+	var t = PackedInt64Array()
 	t.resize(4)
 
 	for i in range(4):
-		x[5 * i] = ld32(c, 4 * i);
-		x[1 + i] = ld32(k, 4 * i);
-		x[6 + i] = ld32(inp, 4 * i);
-		x[11 + i] = ld32(k, 16 + 4 * i);
+		x[5 * i] = ld32(c, 4 * i) % (1 << 32);
+		x[1 + i] = ld32(k, 4 * i) % (1 << 32);
+		x[6 + i] = ld32(inp, 4 * i) % (1 << 32);
+		x[11 + i] = ld32(k, 16 + 4 * i) % (1 << 32);
 
 	for i in range(16):
 		y[i] = x[i]
@@ -317,13 +335,14 @@ func core(out, inp, k, c, h):
 		for j in range(4):
 			for m in range(4):
 				t[m] = x[(5 * j + 4 * m) % 16]
-			t[1] ^= L32((t[0] + t[3]) | 0, 7);
-			t[2] ^= L32((t[1] + t[0]) | 0, 9);
-			t[3] ^= L32((t[2] + t[1]) | 0, 13);
-			t[0] ^= L32((t[3] + t[2]) | 0, 18);
+			t[1] = t[1] ^ (L32((t[0] + t[3]), 7, true) % (1 << 32))
+			t[2] = t[2] ^ (L32((t[1] + t[0]), 9, true) % (1 << 32))
+			t[3] = t[3] ^ (L32((t[2] + t[1]), 13, true) % (1 << 32))
+			t[0] = t[0] ^ (L32((t[3] + t[2]), 18, true) % (1 << 32))
 			for m in range(4):
 				w[4 * j + (j + m) % 4] = t[m]
-				
+		for m in range(16):
+			x[m] = w[m];
 	if h:
 		for i in range(16):
 			x[i] = (x[i] + y[i]) | 0
@@ -349,12 +368,13 @@ func crypto_stream_xor(c,cpos,m,mpos,d,n,k):
 	var s = PackedByteArray()
 	s.resize(32)
 	crypto_core_hsalsa20(s,n,k,sigma);
-	return crypto_stream_salsa20_xor(c,cpos,m,mpos,d,n.subarray(16),s);
+	return crypto_stream_salsa20_xor(c,cpos,m,mpos,d,n.slice(16),s);
 
 func crypto_box_beforenm(k, y, x):
 	var s = PackedByteArray();
 	s.resize(32)
 	crypto_scalarmult(s, x, y);
+	print("s is: ", s)
 	return crypto_core_hsalsa20(k, _0, s, sigma);
 
 func crypto_secretbox(c, m, d, n, k):
@@ -375,9 +395,9 @@ func box_before(publicKey, secretKey):
 	return k;
 	
 func checkLengths(k, n):
-	if (k.len != crypto_secretbox_KEYBYTES):
+	if (k.size() != crypto_secretbox_KEYBYTES):
 		return false
-	if (n.len != crypto_secretbox_NONCEBYTES):
+	if (n.size() != crypto_secretbox_NONCEBYTES):
 		return false
 
 func secretbox(msg, nonce, key):
@@ -385,24 +405,77 @@ func secretbox(msg, nonce, key):
 	#
 	checkLengths(key, nonce);
 	var m = PackedByteArray();
-	m.resize(crypto_secretbox_ZEROBYTES + msg.len())
+	m.resize(crypto_secretbox_ZEROBYTES + msg.size())
 	var c = PackedByteArray();
-	c.resize(m.length)
-	for i in range(msg.len()):
+	c.resize(m.size())
+	for i in range(msg.size()):
 		m[i + crypto_secretbox_ZEROBYTES] = msg[i];
-	crypto_secretbox(c, m, m.length, nonce, key);
-	return c.subarray(crypto_secretbox_BOXZEROBYTES);
+	crypto_secretbox(c, m, m.size(), nonce, key);
+	return c.slice(crypto_secretbox_BOXZEROBYTES);
 
+func crypto_stream_salsa20(c,cpos,d,n,k):
+	return crypto_stream_salsa20_xor(c,cpos,null,0,d,n,k);
+
+func crypto_stream(c,cpos,d,n,k):
+	var s = PackedByteArray()
+	s.resize(32)
+	crypto_core_hsalsa20(s,n,k,sigma);
+	return crypto_stream_salsa20(c,cpos,d,n.slice(16),s);
+
+func vn(x, xi, y, yi, n):
+	var d = 0;
+	for i in range(n):
+		d |= x[xi+i]^y[yi+i];
+	return (1 & zero_shift_right((d - 1), 8)) - 1;
+
+func crypto_verify_16(x, xi, y, yi):
+	return vn(x,xi,y,yi,16);
+
+func crypto_onetimeauth_verify(h, hpos, m, mpos, n, k):
+	var x = PackedByteArray()
+	x.resize(16)
+	crypto_onetimeauth(x,0,m,mpos,n,k);
+	return crypto_verify_16(h,hpos,x,0);
+
+func crypto_secretbox_open(m,c,d,n,k):
+	var x = PackedByteArray()
+	x.resize(32)
+	if (d < 32):
+		return -1;
+	crypto_stream(x,0,32,n,k);
+	if (crypto_onetimeauth_verify(c, 16,c, 32,d - 32,x) != 0):
+		return -1;
+	crypto_stream_xor(m,0,c,0,d,n,k);
+	for i in range(32):
+		m[i] = 0;
+	return 0;
+
+func secretbox_open(box, nonce, key):
+	checkLengths(key, nonce);
+	var c = PackedByteArray()
+	c.resize(crypto_secretbox_BOXZEROBYTES + box.size())
+	var m = PackedByteArray()
+	m.resize(c.size())
+	for i in range(box.size()):
+		c[i+crypto_secretbox_BOXZEROBYTES] = box[i];
+	if (c.size() < 32):
+		return null;
+	if (crypto_secretbox_open(m, c, c.size(), nonce, key) != 0):
+		return null;
+	return m.slice(crypto_secretbox_ZEROBYTES);
 
 func box(msg, nonce, publicKey, secretKey):
 	var k = box_before(publicKey, secretKey);
 	return secretbox(msg, nonce, k);
 
+func box_open(msg, nonce, publicKey, secretKey):
+	var k = box_before(publicKey, secretKey);
+	return secretbox_open(msg, nonce, k);
 
 func crypto_scalarmult(q, n, p):
 	var z = PackedByteArray()
 	z.resize(32)
-	var x = PackedFloat64Array()
+	var x = PackedInt64Array()
 	x.resize(80)
 	var r
 	var a = gf([])
@@ -426,7 +499,7 @@ func crypto_scalarmult(q, n, p):
 	a[0] = 1
 	d[0] = 1;
 	for i in range(254, -1, -1):
-		r = int((zero_shift_right(z[zero_shift_right(i, 3)], (i & 7)))) & 1;
+		r = (zero_shift_right(z[zero_shift_right(i, 3)], (i & 7))) & 1;
 		sel25519(a,b,r);
 		sel25519(c,d,r);
 		A(e,a,c);
@@ -456,8 +529,8 @@ func crypto_scalarmult(q, n, p):
 		x[i+48] = b[i];
 		x[i+64] = d[i];
 
-	var x32 = x.subarray(32);
-	var x16 = x.subarray(16);
+	var x32 = x.slice(32);
+	var x16 = x.slice(16);
 	inv25519(x32, x32);
 	M(x16, x16, x32);
 	pack25519(q, x16);
@@ -466,6 +539,7 @@ func crypto_scalarmult(q, n, p):
 func randombytes(x, size):
 	for i in range(size):
 		x[i] = randi() % 256
+		#x[i] = 1
 
 func crypto_box_keypair(y, x):
 	randombytes(x, 32);
@@ -481,7 +555,6 @@ func box_keypair():
 	sk.resize(crypto_box_SECRETKEYBYTES)
 	crypto_box_keypair(pk, sk);
 	return [sk, pk];
-
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

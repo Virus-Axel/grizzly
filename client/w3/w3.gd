@@ -15,10 +15,12 @@ var response_data
 var body_data
 var signature
 
+var diffie_secret_key = ""
 var diffie_public_key = ""
 var phantom_session = ""
 var phantom_pubkey = ""
 var shared_secret = ""
+var wallet_key = ""
 
 func get_random_nounce(length):
 	var arr = PackedByteArray();
@@ -41,13 +43,25 @@ func get_query_params(url):
 	return [shared_secret, nounce, data]
 
 func phantom_send_transaction(encoded_transaction):
-	var payload = "{\"transaction:\"" + encoded_transaction + "\",\"sendOptions\":\"\",\"session\":\"" + phantom_session + "\"}"
+	var json_payload = {
+		"transaction": "hello",
+		"sendOptions": "",
+		"session": phantom_session,
+	}
+	var payload = JSON.new().stringify(json_payload)
+	print("payload is: ", payload)
+	#var payload = "{\"transaction:\"" + encoded_transaction + "\",\"sendOptions\":\"\",\"session\":\"" + phantom_session + "\"}"
 	print("send transaction payload: ", payload)
 	
-	print("encrypting with: ", shared_secret)
-	var encryption_data = $phantom_handler.encryptPhantomMessage(phantom_pubkey, payload, get_random_nounce(24))
-	print(encryption_data)
-	var phantom_string = PHANTOM_SIGN_TRANSACTION_URL + "?dapp_encryption_public_key=" + diffie_public_key + "&nonce=" + encryption_data[0] + "&redirect_link=" + REDIRECTION_LINK + "&payload=" + encryption_data[1]
+	print("encrypting with: ", phantom_pubkey)
+	var nounce = get_random_nounce(24)
+	#var encryption_data = $phantom_handler.encryptPhantomMessage(phantom_pubkey, payload, get_random_nounce(24))
+	var cipher = $nacl.box(payload.to_utf8_buffer(), nounce, bs58.decode(phantom_pubkey), diffie_secret_key)
+	var encryption_data = bs58.encode(cipher)
+	print("encrypted payload is: ", encryption_data)
+	print("maybe: ", encryption_data[-1])
+	print("nounce is: ", bs58.encode(nounce))
+	var phantom_string = PHANTOM_SIGN_TRANSACTION_URL + "?dapp_encryption_public_key=" + bs58.encode(diffie_public_key) + "&nonce=" + bs58.encode(nounce) + "&redirect_link=" + REDIRECTION_LINK + "&payload=" + encryption_data
 	print(phantom_string)
 	$get_latest_block_hash.request(phantom_string, ["Content-Type: application/json"], HTTPClient.METHOD_GET)
 	await $get_latest_block_hash.request_completed
@@ -70,14 +84,15 @@ func phantom_send_transaction(encoded_transaction):
 	#print(json.get_data());
 
 func connect_phantom_wallet():
-	var encryption_keys = $phantom_handler.generateDiffiePubkey()
+	var encryption_keys = $nacl.box_keypair()
 	if encryption_keys.size() == 0:
 		print("no keys")
 		return
 	print("secret key: ", encryption_keys[0])
 	print("public key: ", encryption_keys[1])
+	diffie_secret_key = encryption_keys[0]
 	diffie_public_key = encryption_keys[1]
-	var phantom_string = PHANTOM_CONNECT_URL + "?app_url=" + APP_URL + "&dapp_encryption_public_key=" + encryption_keys[1] + "&redirect_link=" + REDIRECTION_LINK + "&cluster=" + CLUSTER
+	var phantom_string = PHANTOM_CONNECT_URL + "?app_url=" + APP_URL + "&dapp_encryption_public_key=" + bs58.encode(encryption_keys[1]) + "&redirect_link=" + REDIRECTION_LINK + "&cluster=" + CLUSTER
 	print(phantom_string)
 	$get_latest_block_hash.request(phantom_string, [], HTTPClient.METHOD_GET)
 	await $get_latest_block_hash.request_completed
@@ -94,11 +109,14 @@ func connect_phantom_wallet():
 	print("Phantom URL response: ", url)
 	var params = get_query_params(url)
 	phantom_pubkey = params[0]
-	shared_secret = $phantom_handler.getSharedPubkey(params[0])
-	print("shared secret is: ", shared_secret)
+	print("phantom encryption key: ", phantom_pubkey)
+	#shared_secret = $phantom_handler.getSharedPubkey(params[0])
+	#print("shared secret is: ", shared_secret)
 	print("nounce is: ", params[1])
 	print("data is: ", params[2])
-	var decrypted_data = $phantom_handler.decryptPhantomMessage(params[0], params[2], params[1])
+	#var decrypted_data = $phantom_handler.decryptPhantomMessage(params[0], params[2], params[1])
+	var decrypted_data = $nacl.box_open(bs58.decode(params[2]), bs58.decode(params[1]), bs58.decode(params[0]), diffie_secret_key).get_string_from_utf8()
+	print("decrypted data is: ", decrypted_data)
 	var end_mark = decrypted_data.find('}')
 	var json_string = decrypted_data.substr(0, end_mark + 1)
 	var json = JSON.new()

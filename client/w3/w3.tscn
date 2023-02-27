@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://fj78n0gpmtcr"]
+[gd_scene load_steps=3 format=3 uid="uid://fj78n0gpmtcr"]
 
 [ext_resource type="Script" path="res://w3/w3.gd" id="1_lgi08"]
+[ext_resource type="Script" path="res://tweetnacl.gd" id="2_whc5s"]
 
 [node name="w3" type="Node"]
 script = ExtResource("1_lgi08")
@@ -11,5 +12,8 @@ use_threads = true
 [node name="program_handler" type="HTTPRequest" parent="."]
 
 [node name="phantom_handler" type="HTTPRequest" parent="."]
+
+[node name="nacl" type="Node" parent="."]
+script = ExtResource("2_whc5s")
 
 [connection signal="request_completed" from="get_latest_block_hash" to="." method="_on_get_latest_block_hash_request_completed"]
