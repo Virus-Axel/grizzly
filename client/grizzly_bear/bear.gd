@@ -22,7 +22,7 @@ func _ready():
 	#start.get_surface_override_material(0).set_shader_parameter("DENSITY", 1)
 	for i in range(LAYERS):
 		var shell_1 = start.duplicate()
-		print(FUR_LENGTH / LAYERS * (i + 1));
+		#print(FUR_LENGTH / LAYERS * (i + 1));
 		shell_1.set("blend_shapes/fur", FUR_LENGTH / LAYERS * (i+1))
 		shell_1.set_surface_override_material(0, shell_1.get_surface_override_material(0).duplicate(15))
 		shell_1.get_surface_override_material(0).set_shader_parameter("FUR_THICKNESS", 0.8 - (1.0 - 1.0 * FUR_DENSITY) / LAYERS * (i+1))

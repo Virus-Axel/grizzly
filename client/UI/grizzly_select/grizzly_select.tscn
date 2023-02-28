@@ -1,0 +1,69 @@
+[gd_scene load_steps=5 format=3 uid="uid://bdejmorry3wo3"]
+
+[ext_resource type="PackedScene" uid="uid://ttswkolua5eq" path="res://grizzly_bear/bear.tscn" id="1_fghej"]
+[ext_resource type="Script" path="res://UI/grizzly_select/grizzly_select.gd" id="1_hes3p"]
+[ext_resource type="PackedScene" uid="uid://xebxovqnhbd6" path="res://UI/start/error_prompt.tscn" id="3_2ylgj"]
+[ext_resource type="PackedScene" uid="uid://dvlrtmckj5deu" path="res://UI/loading_indicator.tscn" id="4_d6rmb"]
+
+[node name="grizzly_select" type="Node3D"]
+script = ExtResource("1_hes3p")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+
+[node name="SpotLight3D" type="SpotLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.329048, 0.944313, 0, -0.944313, 0.329048, 0, 1.88639, -2.2635)
+
+[node name="grizzly" parent="." instance=ExtResource("1_fghej")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31234, -3.71923)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="error_prompt" parent="CanvasLayer" instance=ExtResource("3_2ylgj")]
+visible = false
+anchors_preset = 14
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -144.0
+offset_bottom = 144.0
+
+[node name="loading_indicator" parent="CanvasLayer" instance=ExtResource("4_d6rmb")]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Sprite2D" parent="CanvasLayer/loading_indicator/leaves" index="0"]
+layout_mode = 0
+
+[node name="Sprite2D3" parent="CanvasLayer/loading_indicator/leaves" index="1"]
+layout_mode = 0
+
+[node name="Sprite2D4" parent="CanvasLayer/loading_indicator/leaves" index="2"]
+layout_mode = 0
+
+[node name="Sprite2D5" parent="CanvasLayer/loading_indicator/leaves" index="3"]
+layout_mode = 0
+
+[node name="Sprite2D6" parent="CanvasLayer/loading_indicator/leaves" index="4"]
+layout_mode = 0
+
+[node name="Sprite2D7" parent="CanvasLayer/loading_indicator/leaves" index="5"]
+layout_mode = 0
+
+[node name="Sprite2D8" parent="CanvasLayer/loading_indicator/leaves" index="6"]
+layout_mode = 0
+
+[node name="Sprite2D9" parent="CanvasLayer/loading_indicator/leaves" index="7"]
+layout_mode = 0
+
+[node name="Label" parent="CanvasLayer/loading_indicator" index="2"]
+text = "Fetching Grizzlybears..."
+
+[editable path="CanvasLayer/loading_indicator"]

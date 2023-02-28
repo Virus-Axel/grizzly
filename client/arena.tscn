@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://p52raow4vxs6"]
+[gd_scene load_steps=4 format=3 uid="uid://bsabauhycew5b"]
 
 [ext_resource type="Script" path="res://arena/Camera3D.gd" id="1_dlcvc"]
 [ext_resource type="PackedScene" uid="uid://ttswkolua5eq" path="res://grizzly_bear/bear.tscn" id="1_kiksg"]

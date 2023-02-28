@@ -16,4 +16,12 @@ use_threads = true
 [node name="nacl" type="Node" parent="."]
 script = ExtResource("2_whc5s")
 
+[node name="connect_check" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="send_transaction_check" type="Timer" parent="."]
+wait_time = 0.5
+
 [connection signal="request_completed" from="get_latest_block_hash" to="." method="_on_get_latest_block_hash_request_completed"]
+[connection signal="timeout" from="connect_check" to="." method="_on_connect_check_timeout"]
+[connection signal="timeout" from="send_transaction_check" to="." method="_on_send_transaction_check_timeout"]

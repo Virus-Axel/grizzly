@@ -22,6 +22,11 @@ var phantom_pubkey = ""
 var shared_secret = ""
 var wallet_key = ""
 
+signal connect_response
+signal send_transaction_response
+signal disconnected
+signal bears_loaded
+
 func get_random_nounce(length):
 	var arr = PackedByteArray();
 	arr.resize(length)
@@ -66,15 +71,20 @@ func phantom_send_transaction(encoded_transaction):
 	$get_latest_block_hash.request(phantom_string, ["Content-Type: application/json"], HTTPClient.METHOD_GET)
 	await $get_latest_block_hash.request_completed
 	OS.shell_open(phantom_string)
+	$send_transaction_check.start()
+	
+func check_send_transaction_response():
 	var got_url = false
 	var url = ""
-	while not got_url:
-		if Engine.has_singleton('AppLinks'):
-			url = Engine.get_singleton("AppLinks").getUrl()
-			if url != "":
-				got_url = true
-			else:
-				await get_tree().create_timer(0.5).timeout
+
+	if Engine.has_singleton('AppLinks'):
+		url = Engine.get_singleton("AppLinks").getUrl()
+		if url != "":
+			got_url = true
+		else:
+			return false
+	else:
+		return false
 	print("Phantom URL response: ", url)
 	#var decrypted_data = $phantom_handler.decryptPhantomMessage(shared_secret, params[2], params[1])
 	#var end_mark = decrypted_data.find('}')
@@ -82,6 +92,8 @@ func phantom_send_transaction(encoded_transaction):
 	#var json = JSON.new()
 	#json.parse(json_string)
 	#print(json.get_data());
+	emit_signal("send_transaction_response")
+	return true
 
 func connect_phantom_wallet():
 	var encryption_keys = $nacl.box_keypair()
@@ -97,15 +109,21 @@ func connect_phantom_wallet():
 	$get_latest_block_hash.request(phantom_string, [], HTTPClient.METHOD_GET)
 	await $get_latest_block_hash.request_completed
 	OS.shell_open(phantom_string)
+	$connect_check.start()
+	
+func check_connect_response():
 	var got_url = false
 	var url = ""
-	while not got_url:
-		if Engine.has_singleton('AppLinks'):
-			url = Engine.get_singleton("AppLinks").getUrl()
-			if url != "":
-				got_url = true
-			else:
-				await get_tree().create_timer(0.5).timeout
+
+	if Engine.has_singleton('AppLinks'):
+		url = Engine.get_singleton("AppLinks").getUrl()
+		if url != "":
+			got_url = true
+		else:
+			return false
+	else:
+		return false
+
 	print("Phantom URL response: ", url)
 	var params = get_query_params(url)
 	phantom_pubkey = params[0]
@@ -124,8 +142,114 @@ func connect_phantom_wallet():
 		print("failed to parse data")
 	else:
 		print("json data: ", json.get_data())
+		wallet_key = json.get_data()['public_key']
 		phantom_session = json.get_data()['session'];
 	
+	emit_signal("connect_response")
+	return true
+	
+func get_mapping_from_mint(mint):
+	print("Checking mint: ", mint)
+	var ret = []
+	var body = JSON.new().stringify({
+		"id":1,
+		"jsonrpc":"2.0",
+		"method":"getProgramAccounts",
+		"params":[
+			ID,
+			{
+			"filters": [
+				{
+					"dataSize": 64
+				},
+				{
+					"memcmp": {
+						"offset": 0,
+						"bytes": mint
+					}
+				},
+			],
+		},
+	],})
+	
+	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	if error != OK:
+		push_error("An error occurred in the HTTP request.")
+	await $get_latest_block_hash.request_completed
+	if response_data['result'].size() == 0:
+		emit_signal("disconnected")
+		return []
+	else:
+		var mapping_data = bs58.decode(response_data['result'][0]['account']['data'])
+		return [bs58.encode(mapping_data.slice(0, 32)), bs58.encode(mapping_data.slice(32))]
+
+func get_nft_keys(owner):
+	print("Getting token accounts for: ", owner)
+	var ret = []
+	var body = JSON.new().stringify({
+		"id":1,
+		"jsonrpc":"2.0",
+		"method":"getTokenAccountsByOwner",
+		"params":[
+			owner,
+		]
+	})
+	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	if error != OK:
+		push_error("An error occurred in the HTTP request.")
+	await $get_latest_block_hash.request_completed
+	if not response_data.has('result'):
+		return []
+	for account in response_data['result']['value']:
+		var mint = response_data['account']['data']['parsed']['info']['mint']
+		var mapping = await get_mapping_from_mint(mint)
+		if mapping.size() == 2:
+			ret.append(mapping)
+	emit_signal("bears_loaded")
+	return ret
+
+func mint_nft(owner):
+	# PDA mint (NOT USED)
+	#addExistingAccount("11111111111111111111111111111111", programId);
+	
+	# Mint acc
+	#addAccount(4321, programId);
+	#addExistingAccount("ERLQKy88Pt7JFXtA5GSjAFLcL2y8eaPvpJXVGqLCExrV", programId);
+	$program_handler.addNewSigner(); # NOTE: Adds two accounts (new signer + authority)
+	
+	# Token acc
+	print("auth is: ", $program_handler.getAccountAt(2));
+	var mint_acc = $program_handler.getAccountAt(1);
+	$program_handler.addAssociatedTokenAccount(mint_acc, owner);
+	print("token acc: ", $program_handler.getAccountAt(3))
+	print("mint acc: ", $program_handler.getAccountAt(1))
+	#addExistingAccount("7aXHE95fx1jjRDJMcJJixKWUAqKqjnv34SE7mNMe8HfA", programId);
+	
+	# Rent acc
+	$program_handler.addAccount(4322, ID);
+	
+	addExistingAccount("11111111111111111111111111111111", programId);
+	addExistingAccount(token, programId, false, false);
+	addExistingAccount(atoken, programId, false, false);
+	#addExistingAccount("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s", programId, false, false);
+	addExistingAccount(mpl_token, programId, false, false);
+	
+	# Metadata account
+	addAssociatedMetaAccount(mint_acc, mpl_token, false);
+	print("metadata: ", getAccountAt(9))
+	
+	# Metadata edition account
+	addAssociatedMetaAccount(mint_acc, mpl_token, true);
+	print("edition: ", getAccountAt(10))
+	
+	# Lastly the play key and bank
+	addExistingAccount(playKey, programId);
+	addExistingAccount(bankAccountId, programId);
+	
+	var ret = sendTransaction(1122, nft_level, nft_level, 0, 0, empty, empty, empty, empty);
+	add_item("Mint NFT");
+	clearAccountVector();
+	return ret;
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -248,3 +372,17 @@ func _on_get_latest_block_hash_request_completed(result, response_code, headers,
 	response_data = json.get_data();
 	var response = json.get_data()
 	#print(response)
+
+
+func _on_connect_check_timeout():
+	print("checking connect")
+	if check_connect_response():
+		$connect_check.stop()
+	pass # Replace with function body.
+
+
+func _on_send_transaction_check_timeout():
+	print("checking send transaction")
+	if check_send_transaction_response():
+		$send_transaction_check.stop()
+	pass # Replace with function body.
