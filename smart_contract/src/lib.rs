@@ -36,6 +36,6 @@ pub fn process_instruction<'a>(
     match instruction_data[0]{
         0 => arena_signup_instruction::arena_signup(program_id, &accounts, &instruction_data),
         1 => create_grizzly_token(program_id, &accounts, &instruction_data),
-        _ => Err(ProgramError::InvalidInstructionData),
+        _ => {msg!("instruction data is {} hehe", instruction_data[0]); return Err(ProgramError::InvalidInstructionData)},
     }
 }

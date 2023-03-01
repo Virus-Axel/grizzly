@@ -2,8 +2,10 @@ extends Control
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	#get_node("/root/w3").mint_nft("8jWTFapkMZfRRMiYQ3PoJT7VEccs5Hj1UuPSDQeVg6KT")
-	#return;
+	var id = get_node("/root/w3").ID
+	get_node("/root/w3").get_node("program_handler").setKeys("HJyMW82CKUrsbfTSKaNXdsgqcS1HJm8jAjbVVq3Uj4AN", "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", id)
+	get_node("/root/w3").mint_nft("9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm")
+	return;
 	get_node("/root/w3").connect_response.connect(Callable(self, "_on_w_3_connect_response"))
 	#var a = PackedInt64Array([4281319108, 177002846, 261659528])
 	#print(a[2] ^ ($Node.L32(a[0] + a[1], 9, true) % (1 << 32)))

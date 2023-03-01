@@ -58,10 +58,12 @@ pub fn create_grizzly_token<'a>(
 
     let token_account = next_account_info(accounts_iter)?;
     let rent = next_account_info(accounts_iter)?;
+
     let system_program = next_account_info(accounts_iter)?;
     let token_program = next_account_info(accounts_iter)?;
     let associated_token_program = next_account_info(accounts_iter)?;
     let metadata_program = next_account_info(accounts_iter)?;
+
     let metadata_account = next_account_info(accounts_iter)?;
     let master_edition = next_account_info(accounts_iter)?;
 
@@ -70,6 +72,24 @@ pub fn create_grizzly_token<'a>(
     // Accounts for mapping NFT to grizzly
     let mapping_account = next_account_info(accounts_iter)?;
     let grizzly_account = next_account_info(accounts_iter)?;
+
+    msg!("Trying to create mapping account");
+    // Create Mapping account and grizzly account
+    invoke(
+        &create_account(
+            &sender_account.key,
+            &mapping_account.key,
+            4593600,
+            64,
+            &program_id,
+        ),
+        &[
+            mapping_account.clone(),
+            sender_account.clone(),
+        ],
+    )?;
+
+    msg!("Verifying mapping accounts");
 
     // Verify mapping accounts and set internal keys
     let mut mapping_data = verify_and_get_mut_data(program_id, mapping_account)?;

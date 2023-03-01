@@ -9,6 +9,12 @@ func _ready():
 	#print(nft_keys)
 	pass # Replace with function body.
 
+func hide_content():
+	$CanvasLayer/loading_indicator.visible = false
+
+func show_network_error():
+	hide_content()
+	$CanvasLayer/error_prompt.show_client_error()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

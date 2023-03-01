@@ -1,21 +1,25 @@
 extends Node
-class_name Web3;
 
-const ID = "1289JhmLHgUWFjiNoP89krWdtfDJPc73nB3jUTnUck4"
+var ID = "Gb8JJHRC7jrhnBQHJYxabPnKgKjj1RU1A7SB4iwchkeQ"
 const ATOKEN = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
 const TOKEN = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-#const mpl_token = "HxGDqY4vFw2ZZg7KfTzHDtsmGfLaWfhsBrwYbP1VKhu5";
-const MPL_TOKEN = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
+const MPL_TOKEN = "6sk5uQWhBTwWN2tLzLpE4jDD9rRd8H6ucQgAjocWkTcm";
+#const MPL_TOKEN = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
 const BANK_ID = "6XKKJCMgwpMa32ZDK1vEp96QmJ5pSTaUQtTWz4puBoeE";
 
 const SYSTEM_PROGRAM = "11111111111111111111111111111111"
-const URL = "https://api.testnet.solana.com"
+
+#const URL = "https://api.testnet.solana.com"
+const URL = "http://127.0.0.1:8899"
+
 const APP_URL = "https%3A%2F%2Faxel.app"
 const PHANTOM_CONNECT_URL = "https://phantom.app/ul/v1/connect"
 const PHANTOM_SIGN_TRANSACTION_URL = "https://phantom.app/ul/v1/signAndSendTransaction"
 #const REDIRECTION_LINK = "redirect_link%3Dhttps%3A%2F%2Faxel.app%3A%2F%2FonPhantomConnected"
 const REDIRECTION_LINK = "client%3A%2F%2Faxel.app%2F"
-const CLUSTER = "testnet"
+
+#const CLUSTER = "testnet"
+const CLUSTER = "localhost"
 
 var response_data
 var body_data
@@ -32,6 +36,7 @@ signal connect_response
 signal send_transaction_response
 signal disconnected
 signal bears_loaded
+signal phantom_error
 
 func get_random_nounce(length):
 	var arr = PackedByteArray();
@@ -40,6 +45,10 @@ func get_random_nounce(length):
 		#arr[i] = randi() % 256
 		arr[i] = 10;
 	return arr
+
+func keypair():
+	$get_latest_block_hash.generateKeypair()
+	return [$get_latest_block_hash.secret(), $get_latest_block_hash.pubkey()]
 
 func get_query_params(url, params=3):
 	var qmark = url.find('?')
@@ -98,6 +107,10 @@ func check_send_transaction_response():
 		return false
 	print("Phantom URL response: ", url)
 	var params = get_query_params(url, 2)
+	if url.find("&errorMessage") != -1:
+		emit_signal("phantom_error", params[1])
+		return true
+	
 	print("params: ", params)
 	print("phantom pubkey: ", phantom_pubkey)
 	print("diffie secret: ", diffie_secret_key)
@@ -110,7 +123,7 @@ func check_send_transaction_response():
 	#var json = JSON.new()
 	#json.parse(json_string)
 	#print(json.get_data());
-	emit_signal("send_transaction_response")
+	emit_signal("send_transaction_response", decrypted_data)
 	return true
 
 func connect_phantom_wallet():
@@ -227,6 +240,21 @@ func get_nft_keys(owner):
 	emit_signal("bears_loaded")
 	return ret
 
+func send_transaction(transaction):
+	var body = JSON.new().stringify({
+		"id":1,
+		"jsonrpc":"2.0",
+		"method":"sendTransaction",
+		"params":[
+			transaction,
+		]
+	})
+	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	if error != OK:
+		push_error("An error occurred in the HTTP request.")
+	await $get_latest_block_hash.request_completed
+	return response_data
+
 func mint_nft(owner):
 	# PDA mint (NOT USED)
 	#addExistingAccount("11111111111111111111111111111111", programId);
@@ -265,15 +293,26 @@ func mint_nft(owner):
 	# Lastly the bank
 	$program_handler.addExistingAccount(BANK_ID, ID);
 	
-	var send_data = PackedByteArray([1]);
+	# mapping and grizzly
+	$program_handler.addNewSigner()
+	$program_handler.addNewSigner()
+	
+	var send_data = PackedByteArray();
+	send_data.resize(1)
+	send_data[0] = 1
 	get_latest_block_hash()
 	await $get_latest_block_hash.request_completed
 	var latest_blockhash = response_data['result']['value']['blockhash']
-	var transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, false)
+	var transaction
+	if CLUSTER == "localhost":
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
+		print(await send_transaction(transaction))
+	else:
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, false)
 
-	print("transaction is: ", transaction)
+		print("transaction is: ", transaction)
 	
-	phantom_send_transaction(transaction)
+		phantom_send_transaction(transaction)
 
 	$program_handler.clearAccountVector();
 
@@ -322,7 +361,7 @@ func signup_for_battle():
 	print(response_data)
 	pass # Replace with function body.
 
-func create_account(account_size):
+func create_account(account_size, pubkey=""):
 	get_latest_block_hash()
 	await $get_latest_block_hash.request_completed
 	var blockhash = response_data['result']['value']['blockhash']
@@ -331,28 +370,14 @@ func create_account(account_size):
 	var publicKey = $program_handler.pubkey()
 	var privateKey = $program_handler.secret()
 	
-	$program_handler.setKeys("8B5LAjwFNkB4jo3kZEmzn7QD57igRW7gJXNi9t2RNxaA", "GFvZnxPPaZCeiA2d6gNVyE9ffu7B3PbHjw5AvRgPaZo6", ID)
+	#$program_handler.setKeys("8B5LAjwFNkB4jo3kZEmzn7QD57igRW7gJXNi9t2RNxaA", "GFvZnxPPaZCeiA2d6gNVyE9ffu7B3PbHjw5AvRgPaZo6", ID)
 	var transaction_signature = $program_handler.getCreateAccountSignature(account_size, blockhash)
 	
 	send_transaction(transaction_signature)
 	await $get_latest_block_hash.request_completed
 	print(response_data)
-	pass # Replace with function body.
+	return [privateKey, publicKey]
 
-
-func send_transaction(transaction_signature):
-	var body = JSON.new().stringify({
-		"id":1,
-		"jsonrpc":"2.0",
-		"method":"sendTransaction",
-		"params":[
-			transaction_signature
-		]
-	})
-	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
-	if error != OK:
-		push_error("An error occurred in the HTTP request.")
-	pass
 
 func get_latest_block_hash():
 	var body = JSON.new().stringify({
