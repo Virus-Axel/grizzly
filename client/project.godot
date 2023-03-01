@@ -23,6 +23,7 @@ w3="*res://w3/w3.tscn"
 
 window/size/viewport_width=1080
 window/size/viewport_height=1080
+window/energy_saving/keep_screen_on=false
 window/handheld/orientation=6
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"

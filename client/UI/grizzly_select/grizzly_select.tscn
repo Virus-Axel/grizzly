@@ -33,35 +33,11 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = -200.0
+offset_top = -225.0
 offset_right = 200.0
-offset_bottom = 200.0
+offset_bottom = 225.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="Sprite2D" parent="CanvasLayer/loading_indicator/leaves" index="0"]
-layout_mode = 0
-
-[node name="Sprite2D3" parent="CanvasLayer/loading_indicator/leaves" index="1"]
-layout_mode = 0
-
-[node name="Sprite2D4" parent="CanvasLayer/loading_indicator/leaves" index="2"]
-layout_mode = 0
-
-[node name="Sprite2D5" parent="CanvasLayer/loading_indicator/leaves" index="3"]
-layout_mode = 0
-
-[node name="Sprite2D6" parent="CanvasLayer/loading_indicator/leaves" index="4"]
-layout_mode = 0
-
-[node name="Sprite2D7" parent="CanvasLayer/loading_indicator/leaves" index="5"]
-layout_mode = 0
-
-[node name="Sprite2D8" parent="CanvasLayer/loading_indicator/leaves" index="6"]
-layout_mode = 0
-
-[node name="Sprite2D9" parent="CanvasLayer/loading_indicator/leaves" index="7"]
-layout_mode = 0
 
 [node name="Label" parent="CanvasLayer/loading_indicator" index="2"]
 text = "Fetching Grizzlybears..."

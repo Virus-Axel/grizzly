@@ -60,6 +60,9 @@ static func encode(bytes: PackedByteArray) -> String:
 
 static func decode(str: String) -> PackedByteArray:
 	var result = PackedByteArray()
+	if str.length() == 0:
+		print("nothing to decode")
+		return result
 	result.resize(str.length() * 2)
 	result[0] = 0;
 	var resultlen = 1;

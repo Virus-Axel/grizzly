@@ -2,6 +2,12 @@ extends Node
 class_name Web3;
 
 const ID = "1289JhmLHgUWFjiNoP89krWdtfDJPc73nB3jUTnUck4"
+const ATOKEN = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
+const TOKEN = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
+#const mpl_token = "HxGDqY4vFw2ZZg7KfTzHDtsmGfLaWfhsBrwYbP1VKhu5";
+const MPL_TOKEN = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
+const BANK_ID = "6XKKJCMgwpMa32ZDK1vEp96QmJ5pSTaUQtTWz4puBoeE";
+
 const SYSTEM_PROGRAM = "11111111111111111111111111111111"
 const URL = "https://api.testnet.solana.com"
 const APP_URL = "https%3A%2F%2Faxel.app"
@@ -35,21 +41,26 @@ func get_random_nounce(length):
 		arr[i] = 10;
 	return arr
 
-func get_query_params(url):
+func get_query_params(url, params=3):
 	var qmark = url.find('?')
 	var eq_1 = url.find('=', qmark)
 	var and_1 = url.find('&', eq_1)
 	var shared_secret = url.substr(eq_1 + 1, and_1 - eq_1 - 1)
 	var eq_2 = url.find('=', and_1)
 	var and_2 = url.find('&', eq_2)
-	var nounce = url.substr(eq_2 + 1, and_2 - eq_2 - 1)
-	var eq_3 = url.find('=', and_2)
-	var data = url.substr(eq_3 + 1)
-	return [shared_secret, nounce, data]
+	var nounce
+	if params == 3:
+		nounce = url.substr(eq_2 + 1, and_2 - eq_2 - 1)
+		var eq_3 = url.find('=', and_2)
+		var data = url.substr(eq_3 + 1)
+		return [shared_secret, nounce, data]
+	else:
+		nounce = url.substr(eq_2 + 1)
+		return [shared_secret, nounce]
 
 func phantom_send_transaction(encoded_transaction):
 	var json_payload = {
-		"transaction": "hello",
+		"transaction": encoded_transaction,
 		"sendOptions": "",
 		"session": phantom_session,
 	}
@@ -86,6 +97,13 @@ func check_send_transaction_response():
 	else:
 		return false
 	print("Phantom URL response: ", url)
+	var params = get_query_params(url, 2)
+	print("params: ", params)
+	print("phantom pubkey: ", phantom_pubkey)
+	print("diffie secret: ", diffie_secret_key)
+	var decrypted_data = $nacl.box_open(bs58.decode(params[1]), bs58.decode(params[0]), bs58.decode(phantom_pubkey), diffie_secret_key).get_string_from_utf8()
+	
+	print("decrypted data is: ", decrypted_data)
 	#var decrypted_data = $phantom_handler.decryptPhantomMessage(shared_secret, params[2], params[1])
 	#var end_mark = decrypted_data.find('}')
 	#var json_string = decrypted_data.substr(0, end_mark + 1)
@@ -143,6 +161,7 @@ func check_connect_response():
 	else:
 		print("json data: ", json.get_data())
 		wallet_key = json.get_data()['public_key']
+		$program_handler.setKeys(SYSTEM_PROGRAM, wallet_key, ID);
 		phantom_session = json.get_data()['session'];
 	
 	emit_signal("connect_response")
@@ -215,6 +234,7 @@ func mint_nft(owner):
 	# Mint acc
 	#addAccount(4321, programId);
 	#addExistingAccount("ERLQKy88Pt7JFXtA5GSjAFLcL2y8eaPvpJXVGqLCExrV", programId);
+	print("adding signer")
 	$program_handler.addNewSigner(); # NOTE: Adds two accounts (new signer + authority)
 	
 	# Token acc
@@ -228,28 +248,34 @@ func mint_nft(owner):
 	# Rent acc
 	$program_handler.addAccount(4322, ID);
 	
-	addExistingAccount("11111111111111111111111111111111", programId);
-	addExistingAccount(token, programId, false, false);
-	addExistingAccount(atoken, programId, false, false);
+	$program_handler.addExistingAccount("11111111111111111111111111111111", ID);
+	$program_handler.addExistingAccount(TOKEN, ID, false, false);
+	$program_handler.addExistingAccount(ATOKEN, ID, false, false);
 	#addExistingAccount("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s", programId, false, false);
-	addExistingAccount(mpl_token, programId, false, false);
+	$program_handler.addExistingAccount(MPL_TOKEN, ID, false, false);
 	
 	# Metadata account
-	addAssociatedMetaAccount(mint_acc, mpl_token, false);
-	print("metadata: ", getAccountAt(9))
+	$program_handler.addAssociatedMetaAccount(mint_acc, MPL_TOKEN, false);
+	print("metadata: ", $program_handler.getAccountAt(9))
 	
 	# Metadata edition account
-	addAssociatedMetaAccount(mint_acc, mpl_token, true);
-	print("edition: ", getAccountAt(10))
+	$program_handler.addAssociatedMetaAccount(mint_acc, MPL_TOKEN, true);
+	print("edition: ", $program_handler.getAccountAt(10))
 	
-	# Lastly the play key and bank
-	addExistingAccount(playKey, programId);
-	addExistingAccount(bankAccountId, programId);
+	# Lastly the bank
+	$program_handler.addExistingAccount(BANK_ID, ID);
 	
-	var ret = sendTransaction(1122, nft_level, nft_level, 0, 0, empty, empty, empty, empty);
-	add_item("Mint NFT");
-	clearAccountVector();
-	return ret;
+	var send_data = PackedByteArray([1]);
+	get_latest_block_hash()
+	await $get_latest_block_hash.request_completed
+	var latest_blockhash = response_data['result']['value']['blockhash']
+	var transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, false)
+
+	print("transaction is: ", transaction)
+	
+	phantom_send_transaction(transaction)
+
+	$program_handler.clearAccountVector();
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
