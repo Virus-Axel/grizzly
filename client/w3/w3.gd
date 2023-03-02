@@ -181,6 +181,7 @@ func check_connect_response():
 	return true
 
 func get_attributes_from_data(data):
+	const ATTRIBUTE_OFFSET = 10 
 	const NO_ATTRIBUTES = 8
 	const BYTES_PER_ATTRIBUTE = 4
 	var ret = PackedInt32Array()
@@ -188,7 +189,7 @@ func get_attributes_from_data(data):
 	for i in range(NO_ATTRIBUTES):
 		var attribute: int = 0
 		for j in range(BYTES_PER_ATTRIBUTE):
-			attribute += data[i * BYTES_PER_ATTRIBUTE + j] << 8 * (BYTES_PER_ATTRIBUTE - j - 1)
+			attribute += data[ATTRIBUTE_OFFSET + i * BYTES_PER_ATTRIBUTE + j] << 8 * j
 		ret[i] = attribute
 
 	return ret

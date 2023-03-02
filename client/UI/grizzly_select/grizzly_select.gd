@@ -1,9 +1,11 @@
 extends Node3D
 
 func create_bear(attributes):
-	pass
-
-
+	var bear = load("res://grizzly_bear/bear.tscn").instantiate()
+	bear.init(attributes)
+	$bears.add_child(bear)
+	return bear
+	
 
 func add_selectable_bear(key):
 	var w3 = get_node("/root/w3")
@@ -12,13 +14,16 @@ func add_selectable_bear(key):
 		print("could not get bear data...")
 		return
 	var decoded_data = bs58.decode(bear_data)
-	print(w3.get_attributes_from_data(bear_data))
+	var attributes = w3.get_attributes_from_data(bear_data)
+	var bear = create_bear(attributes)
 	pass
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var w3 = get_node("/root/w3")
 	var nft_keys = w3.get_nft_keys(w3.wallet_key)
+	for map in nft_keys:
+		add_selectable_bear(map[1])
 	#w3.mint_nft(w3.wallet_key)
 	
 	#print(nft_keys)

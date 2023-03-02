@@ -109,8 +109,8 @@ pub fn create_grizzly_token<'a>(
             //grizzly_program.clone(),
         ],
     )?;
-    let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
-    grizzly_data[grizzly_structure::HEART_SIZE].copy_from_slice(&1_u32.to_le_bytes());
+    //let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
+    //grizzly_data[grizzly_structure::HEART_SIZE].copy_from_slice(&1_u32.to_le_bytes());
 
     msg!("Verifying mapping accounts");
 

@@ -1,23 +1,13 @@
 extends Control
 
-func add_selectable_bear(key):
-	var w3 = get_node("/root/w3")
-	var bear_data = await w3.get_bear_data(key)
-	print(bear_data)
-	if bear_data == "":
-		print("could not get bear data...")
-		return
-	var decoded_data = bs64.decode(bear_data)
-	print(w3.get_attributes_from_data(decoded_data))
-	pass
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var id = get_node("/root/w3").ID
 	#get_node("/root/w3").get_node("program_handler").setKeys("HJyMW82CKUrsbfTSKaNXdsgqcS1HJm8jAjbVVq3Uj4AN", "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", id)
 	#print(await get_node("/root/w3").mint_nft("9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", "Noin"))
 	var arr = await get_node("/root/w3").get_nft_keys("9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm")
-	for bear in arr:
-		add_selectable_bear(bear[1])
+
 	return;
 	get_node("/root/w3").connect_response.connect(Callable(self, "_on_w_3_connect_response"))
 	#var a = PackedInt64Array([4281319108, 177002846, 261659528])

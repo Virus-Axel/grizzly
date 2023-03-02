@@ -13,7 +13,9 @@ script = ExtResource("1_hes3p")
 [node name="SpotLight3D" type="SpotLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.329048, 0.944313, 0, -0.944313, 0.329048, 0, 1.88639, -2.2635)
 
-[node name="grizzly" parent="." instance=ExtResource("1_fghej")]
+[node name="bears" type="Node" parent="."]
+
+[node name="grizzly" parent="bears" instance=ExtResource("1_fghej")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31234, -3.71923)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]

@@ -5,9 +5,15 @@ const FUR_LENGTH = 1.0;
 const FUR_DENSITY = 1.0
 const color = Vector3(0.3, 0.10, 0.0);
 
+const MAX_BLEND_VALUE = 2.0
+
 func grow_scale():
 	pass
 
+func init(attributes):
+	for index in attributes.size():
+		var value = index * float(attributes[index]) / 4294967296.0
+		$Sphere028.set_blend_shape_value(index, attributes[index])
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
