@@ -21,7 +21,7 @@ pub fn arena_queue_id() -> Pubkey{
 }
 
 pub fn bank_account_id() -> Pubkey{
-    Pubkey::new(bs58::decode("bankaccountkey123").into_vec().as_ref().unwrap())
+    Pubkey::new(bs58::decode("ANdidaLBCN3KrDFyraGtPVQhpaQr2oAqpPqN2DJL4CXv").into_vec().as_ref().unwrap())
 }
 
 // Declare and export the program's entrypoint

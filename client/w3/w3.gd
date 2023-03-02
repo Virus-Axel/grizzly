@@ -5,7 +5,7 @@ const ATOKEN = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
 const TOKEN = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 const MPL_TOKEN = "6sk5uQWhBTwWN2tLzLpE4jDD9rRd8H6ucQgAjocWkTcm";
 #const MPL_TOKEN = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
-const BANK_ID = "6XKKJCMgwpMa32ZDK1vEp96QmJ5pSTaUQtTWz4puBoeE";
+const BANK_ID = "ANdidaLBCN3KrDFyraGtPVQhpaQr2oAqpPqN2DJL4CXv";
 
 const SYSTEM_PROGRAM = "11111111111111111111111111111111"
 
@@ -179,7 +179,46 @@ func check_connect_response():
 	
 	emit_signal("connect_response")
 	return true
+
+func get_attributes_from_data(data):
+	const NO_ATTRIBUTES = 8
+	const BYTES_PER_ATTRIBUTE = 4
+	var ret = PackedInt32Array()
+	ret.resize(NO_ATTRIBUTES)
+	for i in range(NO_ATTRIBUTES):
+		var attribute: int = 0
+		for j in range(BYTES_PER_ATTRIBUTE):
+			attribute += data[i * BYTES_PER_ATTRIBUTE + j] << 8 * (BYTES_PER_ATTRIBUTE - j - 1)
+		ret[i] = attribute
+
+	return ret
+
+func get_bear_data(key):
+	var body = JSON.new().stringify({
+		"id":1,
+		"jsonrpc":"2.0",
+		"method":"getAccountInfo",
+		"params":[
+			key,
+			{
+				"encoding": "base64",
+			}
+		],
+	})
 	
+	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	if error != OK:
+		push_error("An error occurred in the HTTP request.")
+	await $get_latest_block_hash.request_completed
+	if response_data.has("result"):
+		if response_data["result"]["value"] == null:
+			print("value is null")
+			return ""
+		return response_data["result"]["value"]["data"][0]
+	else:
+		print(response_data)
+		return ""
+
 func get_mapping_from_mint(mint):
 	print("Checking mint: ", mint)
 	var ret = []
@@ -224,16 +263,24 @@ func get_nft_keys(owner):
 		"method":"getTokenAccountsByOwner",
 		"params":[
 			owner,
+			{
+				"programId": TOKEN,
+			}
+			,
+			{
+				"encoding": "jsonParsed"
+			}
 		]
 	})
 	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
 	await $get_latest_block_hash.request_completed
+	print(response_data)
 	if not response_data.has('result'):
 		return []
 	for account in response_data['result']['value']:
-		var mint = response_data['account']['data']['parsed']['info']['mint']
+		var mint = account['account']['data']['parsed']['info']['mint']
 		var mapping = await get_mapping_from_mint(mint)
 		if mapping.size() == 2:
 			ret.append(mapping)
@@ -255,7 +302,7 @@ func send_transaction(transaction):
 	await $get_latest_block_hash.request_completed
 	return response_data
 
-func mint_nft(owner):
+func mint_nft(owner, name):
 	# PDA mint (NOT USED)
 	#addExistingAccount("11111111111111111111111111111111", programId);
 	
@@ -295,11 +342,19 @@ func mint_nft(owner):
 	
 	# mapping and grizzly
 	$program_handler.addNewSigner()
+	print("mapping: ", $program_handler.getAccountAt(12))
 	$program_handler.addNewSigner()
+	print("grizzly: ", $program_handler.getAccountAt(13))
+	$program_handler.addExistingAccount(ID, SYSTEM_PROGRAM);
 	
 	var send_data = PackedByteArray();
-	send_data.resize(1)
+	if name.to_utf8_buffer().size() > 255:
+		print("Name length is too long")
+		return;
+	send_data.resize(2)
 	send_data[0] = 1
+	send_data[1] = name.to_utf8_buffer().size()
+	send_data.append_array(name.to_utf8_buffer())
 	get_latest_block_hash()
 	await $get_latest_block_hash.request_completed
 	var latest_blockhash = response_data['result']['value']['blockhash']

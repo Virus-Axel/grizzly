@@ -23,12 +23,15 @@ pub fn verify_and_get_mut_data<'a>(
 }
 
 pub fn verify_bank_account<'a>(owner: &Pubkey, account: &'a AccountInfo<'a>) -> ProgramResult {
+    msg!("0");
     if account.owner != owner {
         return Err(ProgramError::IllegalOwner);
     }
-    if *account.key != bank_account_id() {
+    msg!("1");
+    if account.key != &bank_account_id() {
         return Err(ProgramError::InvalidArgument);
     }
+    msg!("2");
 
     Ok(())
 }
