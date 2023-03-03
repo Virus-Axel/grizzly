@@ -7,6 +7,8 @@ const MPL_TOKEN = "6sk5uQWhBTwWN2tLzLpE4jDD9rRd8H6ucQgAjocWkTcm";
 #const MPL_TOKEN = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
 const BANK_ID = "ANdidaLBCN3KrDFyraGtPVQhpaQr2oAqpPqN2DJL4CXv";
 
+const ARENA_ID = "AErDcHrJfrPKNBP9is4EeW9v1abWsDdKW1kaosXbm3PL"
+
 const SYSTEM_PROGRAM = "11111111111111111111111111111111"
 
 #const URL = "https://api.testnet.solana.com"
@@ -25,12 +27,15 @@ var response_data
 var body_data
 var signature
 
+var arena_secret := PackedByteArray()
+
 var diffie_secret_key = ""
 var diffie_public_key = ""
 var phantom_session = ""
 var phantom_pubkey = ""
 var shared_secret = ""
 var wallet_key = ""
+var nft_map = ""
 
 signal connect_response
 signal send_transaction_response
@@ -252,8 +257,9 @@ func get_mapping_from_mint(mint):
 		emit_signal("disconnected")
 		return []
 	else:
+		var mapping_pubkey = response_data['result'][0]['pubkey']
 		var mapping_data = bs58.decode(response_data['result'][0]['account']['data'])
-		return [bs58.encode(mapping_data.slice(0, 32)), bs58.encode(mapping_data.slice(32))]
+		return [bs58.encode(mapping_data.slice(0, 32)), bs58.encode(mapping_data.slice(32)), mapping_pubkey]
 
 func get_nft_keys(owner):
 	print("Getting token accounts for: ", owner)
@@ -283,7 +289,7 @@ func get_nft_keys(owner):
 	for account in response_data['result']['value']:
 		var mint = account['account']['data']['parsed']['info']['mint']
 		var mapping = await get_mapping_from_mint(mint)
-		if mapping.size() == 2:
+		if mapping.size() == 3:
 			ret.append(mapping)
 	emit_signal("bears_loaded")
 	return ret
@@ -371,6 +377,81 @@ func mint_nft(owner, name):
 		phantom_send_transaction(transaction)
 
 	$program_handler.clearAccountVector();
+
+func battle():
+	print("map: ", nft_map)
+	var nft_accounts = get_accounts_from_mint(nft_map[0])
+	
+	$program_handler.addExistingAccount(nft_map[2], ID)
+	$program_handler.addExistingAccount(nft_map[0], ID)
+	
+	$program_handler.addExistingAccount(nft_accounts[0], ID)
+	$program_handler.addExistingAccount(nft_accounts[1], ID)
+	
+	# Grizzly
+	$program_handler.addExistingAccount(nft_map[1], ID)
+	$program_handler.addExistingAccount(ARENA_ID, ID)
+	
+	var challenging_bear = await get_challenging_bear()
+	if challenging_bear != "":
+		print("added ", challenging_bear)
+		$program_handler.addExistingAccount(challenging_bear, ID)
+	
+	get_latest_block_hash()
+	await $get_latest_block_hash.request_completed
+	var latest_blockhash = response_data['result']['value']['blockhash']
+	
+	var send_data = PackedByteArray();
+	var prime = $primes.primes[randi() % $primes.primes.size()]
+
+	send_data.resize(25)
+	send_data.fill(0)
+	send_data[2] = randi_range(2, 10);
+	send_data[9] = prime % 256
+	send_data[10] = prime / 256
+	
+	for i in range(17, 25):
+		send_data[i] = randi() % 256
+	
+	arena_secret = send_data.slice(17, 25)
+	
+	var transaction
+	if CLUSTER == "localhost":
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
+		print(await send_transaction(transaction))
+	else:
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, false)
+
+		print("transaction is: ", transaction)
+	
+		phantom_send_transaction(transaction)
+		
+	$program_handler.clearAccountVector();
+
+func get_challenging_bear():
+	var data = await get_bear_data(ARENA_ID)
+	var decoded_data = bs64.decode(data)
+	if decoded_data[0] == 1:
+		return bs58.encode(decoded_data.slice(1))
+	else:
+		return ""
+
+func get_accounts_from_mint(mint):
+	var accounts = [];
+	
+	# Token acc
+	$program_handler.addAssociatedTokenAccount(mint, wallet_key);
+	# Metadata account
+	$program_handler.addAssociatedMetaAccount(mint, MPL_TOKEN, false);
+	# Metadata edition account
+	$program_handler.addAssociatedMetaAccount(mint, MPL_TOKEN, true);
+
+	for i in range(1, 4):
+		accounts.append($program_handler.getAccountAt(i));
+	
+	$program_handler.clearAccountVector();
+	#print(accounts);
+	return accounts;
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

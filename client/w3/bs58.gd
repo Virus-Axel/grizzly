@@ -30,31 +30,38 @@ const ALPHABET_MAP = [
 	255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
 ]
 
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
 
 static func encode(bytes: PackedByteArray) -> String:
-	var encoded = PackedByteArray()
-	encoded.resize((bytes.size() * 138 / 100) + 1)
-	var digit_size = 1
+	var encoded := PackedByteArray()
+	
+	var encoded_size: int = (bytes.size() * 138 / 100) + 1
+	
+	encoded.resize(encoded_size)
+	var digit_size: int = 1
+	
 	for i in range(bytes.size()):
-		var carry = int(bytes[i])
+		var carry := int(bytes[i])
+		
 		for j in range(digit_size):
-			carry = carry + int(encoded[j] << 8);
-			encoded[j] = (carry % 58) % 256;
-			carry /= 58;
+			carry = carry + int(encoded[j] << 8)
+			encoded[j] = (carry % 58) % 256
+			carry /= 58
+			
 		while carry:
-			encoded[digit_size] = (carry % 58) % 256;
+			encoded[digit_size] = (carry % 58) % 256
 			digit_size += 1
 			carry /= 58
-	var result: String;
+			
+	var result: String
+	
 	for i in range(bytes.size() - 1):
 		if bytes[i]:
 			break
 		result += base58map[0];
+		
 	for i in range(digit_size):
-		result += (base58map[encoded[digit_size - 1 - i]]);
+		var map_index: int = encoded[digit_size - 1 - i]
+		result += (base58map[map_index]);
 	return result
 
 
@@ -94,7 +101,3 @@ static func decode(str: String) -> PackedByteArray:
 		result[resultlen - i - 1] = k;
 		i -= 1
 	return result.slice(0, resultlen)
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass

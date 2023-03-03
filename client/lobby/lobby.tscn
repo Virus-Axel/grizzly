@@ -1,0 +1,27 @@
+[gd_scene load_steps=2 format=3 uid="uid://rkg8xa2aoxrr"]
+
+[ext_resource type="Script" path="res://lobby/lobby.gd" id="1_oy7wp"]
+
+[node name="lobby" type="Node3D"]
+script = ExtResource("1_oy7wp")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Button" type="Button" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -50.0
+offset_right = 100.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Fight"
+
+[connection signal="pressed" from="CanvasLayer/Button" to="." method="_on_button_pressed"]

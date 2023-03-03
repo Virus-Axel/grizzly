@@ -21,7 +21,7 @@ static func decode(str: String) -> PackedByteArray:
 		if index >= ret.size():
 			break
 		ret[index] += val << (2 + (i % 4) * 2)
-	return ret.slice(0, -1)
+	return ret.slice(0)
 		
 
 # Called when the node enters the scene tree for the first time.

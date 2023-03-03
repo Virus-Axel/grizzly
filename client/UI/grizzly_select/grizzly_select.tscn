@@ -1,9 +1,12 @@
-[gd_scene load_steps=5 format=3 uid="uid://bdejmorry3wo3"]
+[gd_scene load_steps=6 format=3 uid="uid://bdejmorry3wo3"]
 
-[ext_resource type="PackedScene" uid="uid://ttswkolua5eq" path="res://grizzly_bear/bear.tscn" id="1_fghej"]
 [ext_resource type="Script" path="res://UI/grizzly_select/grizzly_select.gd" id="1_hes3p"]
 [ext_resource type="PackedScene" uid="uid://xebxovqnhbd6" path="res://UI/start/error_prompt.tscn" id="3_2ylgj"]
 [ext_resource type="PackedScene" uid="uid://dvlrtmckj5deu" path="res://UI/loading_indicator.tscn" id="4_d6rmb"]
+[ext_resource type="Texture2D" uid="uid://bak1c4drx6ob4" path="res://UI/grizzly_select/stone_normal.png" id="4_m0lce"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gm22g"]
+texture = ExtResource("4_m0lce")
 
 [node name="grizzly_select" type="Node3D"]
 script = ExtResource("1_hes3p")
@@ -12,11 +15,9 @@ script = ExtResource("1_hes3p")
 
 [node name="SpotLight3D" type="SpotLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.329048, 0.944313, 0, -0.944313, 0.329048, 0, 1.88639, -2.2635)
+light_volumetric_fog_energy = 13.96
 
 [node name="bears" type="Node" parent="."]
-
-[node name="grizzly" parent="bears" instance=ExtResource("1_fghej")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.31234, -3.71923)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -43,5 +44,34 @@ grow_vertical = 2
 
 [node name="Label" parent="CanvasLayer/loading_indicator" index="2"]
 text = "Fetching Grizzlybears..."
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer"]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -123.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 8
+theme_override_constants/margin_left = 230
+theme_override_constants/margin_right = 230
+theme_override_constants/margin_bottom = 40
+
+[node name="Button" type="Button" parent="CanvasLayer/MarginContainer"]
+visible = false
+custom_minimum_size = Vector2(300, 150)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_styles/normal = SubResource("StyleBoxTexture_gm22g")
+
+[node name="swipe_timer" type="Timer" parent="."]
+wait_time = 0.4
+one_shot = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.671565, 0.740945, 0, -0.740945, 0.671565, 0, 7.74798, 8.25949)
+
+[connection signal="pressed" from="CanvasLayer/MarginContainer/Button" to="." method="_on_button_pressed"]
 
 [editable path="CanvasLayer/loading_indicator"]

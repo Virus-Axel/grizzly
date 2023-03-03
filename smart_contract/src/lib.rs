@@ -17,7 +17,7 @@ use instruction::arena_signup_instruction;
 use token_handler::grizzly_token::create_grizzly_token;
 
 pub fn arena_queue_id() -> Pubkey{
-    Pubkey::new(bs58::decode("arenaqueuepubkey123").into_vec().as_ref().unwrap())
+    Pubkey::new(bs58::decode("AErDcHrJfrPKNBP9is4EeW9v1abWsDdKW1kaosXbm3PL").into_vec().as_ref().unwrap())
 }
 
 pub fn bank_account_id() -> Pubkey{

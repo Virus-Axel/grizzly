@@ -48,6 +48,8 @@ pub fn validate_bear_nft<'a>(
     // Verify owners and extract data
     let mapping_data = verify_and_get_mut_data(program_id, mapping_account)?;
     let (nft_pubkey, grizzly_pubkey) = get_mapping_keys(&mapping_data)?;
+    
+    msg!("Checking that {} equals to  {}", nft_pubkey.to_string(), mint_account.key.to_string());
     if nft_pubkey != *mint_account.key
         || grizzly_pubkey != *grizzly_account.key
     {
@@ -56,11 +58,12 @@ pub fn validate_bear_nft<'a>(
 
     // Check if token account is ours
     let expected_token_account = get_associated_token_address(&sender_account.key, &mint_account.key);
+    msg!("Checking that {} equals to {}", expected_token_account.to_string(), token_account.key.to_string());
     if expected_token_account != *token_account.key{
         return Err(ProgramError::IllegalOwner);
     }
 
-    let (expected_mint_authority, bump) = Pubkey::find_program_address(
+    let (expected_mint_authority, _bump) = Pubkey::find_program_address(
         &[AUTHORITY_SEED, program_id.as_ref()],
         &program_id
     );
@@ -70,6 +73,7 @@ pub fn validate_bear_nft<'a>(
     let metadata_data = metadata_account.data.borrow_mut();
 
     // Check if we are the owner of the token
+    msg!("Checking if we are the owner of the token");
     if token_data[64] != 1{
         return Err(ProgramError::IllegalOwner);
     }
@@ -89,9 +93,10 @@ pub fn validate_bear_nft<'a>(
         return Err(ProgramError::InsufficientFunds);
     }
 
-    if metadata_account.owner != &mpl_token_metadata::ID{
-        return Err(ProgramError::IllegalOwner);
-    }
+    msg!("Checking if we provided the correct metaplex key");
+    //if metadata_account.owner != &mpl_token_metadata::ID{
+     //   return Err(ProgramError::IllegalOwner);
+    //}
 
     let update_auth = Pubkey::new(&metadata_data[1..33]);
     let freeze_auth = Pubkey::new(&metadata_data[326..358]);

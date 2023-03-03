@@ -60,18 +60,28 @@ pub fn arena_signup<'a>(
     let grizzly_account = next_account_info(accounts_iter)?;
     let arena_queue_account = next_account_info(accounts_iter)?;
 
+    msg!("Validating bear nft");
     match validate_bear_nft(program_id, sender_account, mint_account, token_account, metadata_account, grizzly_account, mapping_account){
         Ok(_) => (),
         Err(e) => return Err(ProgramError::IllegalOwner),
     }
 
+    msg!("Checking arena account");
     if *arena_queue_account.key != arena_queue_id()
     {
         return Err(ProgramError::InvalidAccountData);
     }
-    let mut grizzly_data = verify_and_get_mut_data(program_id, mapping_account)?;
+
+    if mapping_account.owner != program_id{
+        return Err(ProgramError::IllegalOwner)
+    }
+
+    msg!("Verifying grizzly owner");
+    let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
     let mut arena_queue_data = verify_and_get_mut_data(program_id, arena_queue_account)?;
 
+
+    msg!("Checking if bear is ready for battle");
     // Check that bear is ready for battle.
     if is_battle_aborted(&grizzly_data) {
         let past_challenging_bear = next_account_info(accounts_iter)?;
@@ -86,15 +96,19 @@ pub fn arena_signup<'a>(
 
         evaluate_winner(&mut grizzly_data, &mut past_challenging_bear_data, 0)?;
     } else if grizzly_data[grizzly_structure::ARENA_STATE] != grizzly_structure::STATE_NO_FIGHT {
+        msg!("grizzly state is: {}", grizzly_data[grizzly_structure::ARENA_STATE]);
+        msg!("grizzly account is: {}", grizzly_account.key.to_string());
         return Err(ProgramError::AccountAlreadyInitialized);
     }
 
+    msg!("Setting encryption keys");
     // Set encryption public keys.
     let secret = u64::from_le_bytes(instruction_data[17..25].try_into().unwrap());
 
     grizzly_data[grizzly_structure::P].copy_from_slice(&instruction_data[1..9]);
     grizzly_data[grizzly_structure::G].copy_from_slice(&instruction_data[9..17]);
 
+    msg!("Preparing shared secret");
     let ab = mod_exp(u64::from_le_bytes(grizzly_data[grizzly_structure::G].try_into().unwrap()),
         secret,
         u64::from_le_bytes(grizzly_data[grizzly_structure::P].try_into().unwrap())
