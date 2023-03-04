@@ -35,7 +35,6 @@ func add_selectable_bear(key_map):
 	var bear = create_bear(attributes)
 	var new_light = $SpotLight3D.duplicate()
 	new_light.position.x = $bears.get_child_count() * BEAR_SPACING;
-	print(bear.position)
 	pass
 
 # Called when the node enters the scene tree for the first time.

@@ -84,6 +84,7 @@ pub fn arena_signup<'a>(
     msg!("Checking if bear is ready for battle");
     // Check that bear is ready for battle.
     if is_battle_aborted(&grizzly_data) {
+        msg!("Battle aborted");
         let past_challenging_bear = next_account_info(accounts_iter)?;
         let mut past_challenging_bear_data =
             verify_and_get_mut_data(program_id, past_challenging_bear)?;
@@ -100,21 +101,6 @@ pub fn arena_signup<'a>(
         msg!("grizzly account is: {}", grizzly_account.key.to_string());
         return Err(ProgramError::AccountAlreadyInitialized);
     }
-
-    msg!("Setting encryption keys");
-    // Set encryption public keys.
-    let secret = u64::from_le_bytes(instruction_data[17..25].try_into().unwrap());
-
-    grizzly_data[grizzly_structure::P].copy_from_slice(&instruction_data[1..9]);
-    grizzly_data[grizzly_structure::G].copy_from_slice(&instruction_data[9..17]);
-
-    msg!("Preparing shared secret");
-    let ab = mod_exp(u64::from_le_bytes(grizzly_data[grizzly_structure::G].try_into().unwrap()),
-        secret,
-        u64::from_le_bytes(grizzly_data[grizzly_structure::P].try_into().unwrap())
-    );
-
-    grizzly_data[grizzly_structure::AB].copy_from_slice(&ab.to_le_bytes());
 
     // Check if there is a challenger bear.
     if arena_queue_data[arena_structure::HAS_CHALLENGER] == 1 {
@@ -134,6 +120,21 @@ pub fn arena_signup<'a>(
         grizzly_data[grizzly_structure::TARGET]
             .copy_from_slice(&(*challenging_bear).key.to_bytes());
 
+        msg!("Setting encryption keys");
+        // Set encryption public keys.
+        let secret = u64::from_le_bytes(instruction_data[17..25].try_into().unwrap());
+    
+        grizzly_data[grizzly_structure::P].copy_from_slice(&challenging_bear_data[grizzly_structure::P]);
+        grizzly_data[grizzly_structure::G].copy_from_slice(&challenging_bear_data[grizzly_structure::G]);
+    
+        msg!("Preparing shared secret");
+        let ab = mod_exp(u64::from_le_bytes(grizzly_data[grizzly_structure::G].try_into().unwrap()),
+            secret,
+            u64::from_le_bytes(grizzly_data[grizzly_structure::P].try_into().unwrap())
+        );
+    
+        grizzly_data[grizzly_structure::AB].copy_from_slice(&ab.to_le_bytes());
+
         // Calculate shared key
         let shared_key = mod_exp(
             u64::from_le_bytes(challenging_bear_data[grizzly_structure::AB].try_into().unwrap()),
@@ -148,11 +149,46 @@ pub fn arena_signup<'a>(
         arena_queue_data[arena_structure::HAS_CHALLENGER] = 0;
     }
     else{
+        msg!("Setting encryption keys");
+        // Set encryption public keys.
+        let secret = u64::from_le_bytes(instruction_data[17..25].try_into().unwrap());
+    
+        grizzly_data[grizzly_structure::P].copy_from_slice(&instruction_data[1..9]);
+        grizzly_data[grizzly_structure::G].copy_from_slice(&instruction_data[9..17]);
+    
+        msg!("Preparing shared secret");
+        let ab = u64::from_le_bytes(grizzly_data[grizzly_structure::AB].try_into().unwrap());
+    
+        grizzly_data[grizzly_structure::AB].copy_from_slice(&ab.to_le_bytes());
         // Set challenging state.
         grizzly_data[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_CHALLENGING;
 
         arena_queue_data[arena_structure::HAS_CHALLENGER] = 1;
         arena_queue_data[arena_structure::LAST_BEAR].copy_from_slice(&grizzly_account.key.to_bytes());
+    }
+
+    Ok(())
+}
+
+pub fn clear_bear_data<'a>(
+    program_id: &Pubkey,
+    accounts: &'a [AccountInfo<'a>],
+    instruction_data: &[u8],
+) -> ProgramResult {
+    let accounts_iter = &mut accounts.iter();
+
+    // Get the accounts
+    let _sender_account = next_account_info(accounts_iter)?;
+    let grizzly_account = next_account_info(accounts_iter)?;
+    let arena_account = next_account_info(accounts_iter)?;
+
+    let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
+    let mut arena_data = verify_and_get_mut_data(program_id, arena_account)?;
+    for i in 0..grizzly_structure::SIZE{
+        grizzly_data[i] = 0;
+    }
+    for i in 0..arena_structure::SIZE{
+        arena_data[i] = 0;
     }
 
     Ok(())

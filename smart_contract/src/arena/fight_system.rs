@@ -4,6 +4,8 @@ use solana_program::{
     sysvar::{clock::Clock, Sysvar},
 };
 
+use solana_program::sysvar::slot_history::ProgramError;
+
 use oorandom::Rand32;
 
 use crate::{
@@ -15,7 +17,9 @@ use crate::{
 
 use super::abilities;
 
-const MAX_FIGHT_ROUNDS: usize = 50;
+use crate::token_handler::ability_token::give_ability_token;
+
+const MAX_FIGHT_ROUNDS: usize = 10;
 const FIGHT_CONFIRMATION_TIME: i64 = 10;
 const STAMINA_RECOVERY: f32 = 0.015;
 const HEART_STAMINA_FACTOR: f32 = 0.1;
@@ -60,25 +64,23 @@ fn push_action(bear_data: &mut [u8], opponent_data: &mut [u8], position: usize, 
     }
 }
 
-pub fn evaluate_winner(sender_bear: &mut [u8], opponent_bear: &mut [u8], randomness: u64) -> ProgramResult {
+pub fn evaluate_winner(sender_bear: &mut [u8], opponent_bear: &mut [u8], randomness: u64) -> Result<u32, ProgramError> {
     // Handle aborted battle
-    if sender_bear[grizzly_structure::ARENA_STATE] == grizzly_structure::STATE_CHALLENGING {
+    if sender_bear[grizzly_structure::ARENA_STATE] == grizzly_structure::STATE_CHALLENGING && false {
+        msg!("Battle was aborted (You fled)");
         sender_bear[grizzly_structure::PENALTY] += 1;
         sender_bear[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_NO_FIGHT;
         sender_bear[grizzly_structure::TARGET].copy_from_slice(&[0; 32]);
 
         opponent_bear[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_NO_FIGHT;
         opponent_bear[grizzly_structure::TARGET].copy_from_slice(&[0; 32]);
-    } else if sender_bear[grizzly_structure::ARENA_STATE]
-        == grizzly_structure::STATE_ACCEPTED_CHALLENGE
-    {
-        opponent_bear[grizzly_structure::PENALTY] += 1;
-        opponent_bear[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_NO_FIGHT;
-        opponent_bear[grizzly_structure::TARGET].copy_from_slice(&[0; 32]);
 
-        sender_bear[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_NO_FIGHT;
-        sender_bear[grizzly_structure::TARGET].copy_from_slice(&[0; 32]);
+        return Ok(0);
     } else {
+        // Reset states
+        sender_bear[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_NO_FIGHT;
+        opponent_bear[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_NO_FIGHT;
+
         let mut sender_bear_stamina: f32 = 0.5;
         let mut opponent_bear_stamina: f32 = 0.5;
 
@@ -98,13 +100,13 @@ pub fn evaluate_winner(sender_bear: &mut [u8], opponent_bear: &mut [u8], randomn
                 let ability_level = sender_bear[grizzly_structure::ABILITY_LEVELS + selected_ability_index as usize];
                 opponent_bear_health -= abilities::ABILITIES[selected_ability_index as usize].calculate_damage(sender_bear, ability_level);
 
-                abilities::ABILITIES[selected_ability_index as usize].train_bear(sender_bear, ability_level);
+                abilities::ABILITIES[selected_ability_index as usize].train_bear(sender_bear, ability_level, random_generator.rand_range(50000..100000));
 
                 sender_bear_stamina -= abilities::ABILITIES[selected_ability_index as usize].stamina_cost;
 
                 push_action(sender_bear, opponent_bear, position, selected_ability_index, false);
                 if opponent_bear_health <= 0.0{
-                    return Ok(());
+                    return Ok(random_generator.rand_u32() % 65536);
                 }
 
                 position += 1;
@@ -119,18 +121,23 @@ pub fn evaluate_winner(sender_bear: &mut [u8], opponent_bear: &mut [u8], randomn
                 let ability_level = opponent_bear[grizzly_structure::ABILITY_LEVELS + selected_ability_index as usize];
                 sender_bear_health -= abilities::ABILITIES[selected_ability_index as usize].calculate_damage(opponent_bear, ability_level);
 
-                abilities::ABILITIES[selected_ability_index as usize].train_bear(opponent_bear, ability_level);
+                abilities::ABILITIES[selected_ability_index as usize].train_bear(opponent_bear, ability_level, random_generator.rand_range(50000..100000));
 
                 opponent_bear_health -= abilities::ABILITIES[selected_ability_index as usize].stamina_cost;
 
                 push_action(sender_bear, opponent_bear, position, selected_ability_index, true);
                 if sender_bear_health <= 0.0{
-                    return Ok(());
+                    return Ok(random_generator.rand_u32() % 65536 + 65536);
                 }
 
                 position += 1;
             }
         }
+        if sender_bear_health < opponent_bear_health{
+            return Ok(random_generator.rand_u32() % 65536 + 65536);
+        }
+        else{
+            return Ok(random_generator.rand_u32() % 65536);
+        }
     }
-    Ok(())
 }

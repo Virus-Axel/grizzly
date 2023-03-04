@@ -17,6 +17,8 @@ use crate::{
     data_structures::{arena_structure, grizzly_structure},
 };
 
+use crate::token_handler::ability_token::give_ability_token;
+
 use mod_exp::mod_exp;
 
 /*
@@ -39,11 +41,12 @@ use mod_exp::mod_exp;
         )
 
 */
-pub fn arena_signup<'a>(
+pub fn reveal_secret_instruction<'a>(
     program_id: &Pubkey,
     accounts: &'a [AccountInfo<'a>],
     instruction_data: &[u8],
 ) -> ProgramResult {
+    let accounts_copy = accounts.clone();
     let accounts_iter = &mut accounts.iter();
 
     // Get the accounts
@@ -55,28 +58,50 @@ pub fn arena_signup<'a>(
     let arena_queue_account = next_account_info(accounts_iter)?;
 
     // Verify owners and extract data
+    msg!("Verifying owners of three accounts");
     let mut mapping_data = verify_and_get_mut_data(program_id, mapping_account)?;
     let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
     let mut other_grizzly_data = verify_and_get_mut_data(program_id, other_grizzly_account)?;
 
     // Check if we are challenging or not
+    msg!("Checking if we are in challenging state");
+    if grizzly_data[grizzly_structure::ARENA_STATE] != grizzly_structure::STATE_CHALLENGING{
+        return Err(ProgramError::InvalidAccountData);
+    }
+
     // Set AB and shared secret
+    msg!("Setting AB and shared secret");
     grizzly_data[grizzly_structure::AB].copy_from_slice(&instruction_data[1..9]);
     let secret = u64::from_le_bytes(instruction_data[9..17].try_into().unwrap());
 
     // Calculate shared key
+    msg!("Calculating shared key");
     let shared_key = mod_exp(
         u64::from_le_bytes(other_grizzly_data[grizzly_structure::AB].try_into().unwrap()),
         secret,
         u64::from_le_bytes(grizzly_data[grizzly_structure::P].try_into().unwrap()),
     );
 
+    msg!("Verifying provided shared key {} == {}", u64::from_le_bytes(other_grizzly_data[grizzly_structure::SHARED_KEY].try_into().unwrap()), shared_key);
     if u64::from_le_bytes(other_grizzly_data[grizzly_structure::SHARED_KEY].try_into().unwrap()) != shared_key{
         return Err(ProgramError::InvalidAccountData);
     }
 
     // We have randomness and process went fine
-    evaluate_winner(&mut grizzly_data, &mut other_grizzly_data, shared_key ^ secret);
+    msg!("Evaluating winner");
+    let result = match evaluate_winner(&mut grizzly_data, &mut other_grizzly_data, shared_key ^ secret){
+        Ok(v) => v,
+        Err(e) => return Err(e),
+    };
+
+    if result >= 65536{
+        other_grizzly_data[grizzly_structure::AB.start] = ((result % 65536) as f32).sqrt() as u8;
+        grizzly_data[grizzly_structure::AB.start] = 0;
+    }
+    else{
+        grizzly_data[grizzly_structure::AB.start] = ((result % 65536) as f32).sqrt() as u8;
+        other_grizzly_data[grizzly_structure::AB.start] = 0;
+    }
 
     Ok(())
 }

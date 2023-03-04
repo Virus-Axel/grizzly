@@ -24,4 +24,8 @@ grow_horizontal = 2
 grow_vertical = 2
 text = "Fight"
 
+[node name="poll_timer" type="Timer" parent="."]
+wait_time = 3.0
+
 [connection signal="pressed" from="CanvasLayer/Button" to="." method="_on_button_pressed"]
+[connection signal="timeout" from="poll_timer" to="." method="_on_poll_timer_timeout"]

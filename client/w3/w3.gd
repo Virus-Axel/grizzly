@@ -43,6 +43,17 @@ signal disconnected
 signal bears_loaded
 signal phantom_error
 
+func int_to_array(val):
+	var ret := PackedByteArray()
+	ret.resize(4)
+	ret.fill(0)
+	ret[0] = val % 256
+	ret[1] = (val / 256) % 256
+	ret[2] = (val / 256 / 256) % 256
+	ret[3] = (val / 256 / 256 / 256) % 256
+	
+	return ret
+
 func get_random_nounce(length):
 	var arr = PackedByteArray();
 	arr.resize(length)
@@ -197,6 +208,7 @@ func get_attributes_from_data(data):
 			attribute += data[ATTRIBUTE_OFFSET + i * BYTES_PER_ATTRIBUTE + j] << 8 * j
 		ret[i] = attribute
 
+	print(ret)
 	return ret
 
 func get_bear_data(key):
@@ -378,6 +390,133 @@ func mint_nft(owner, name):
 
 	$program_handler.clearAccountVector();
 
+
+func get_target_bear(bear):
+	const TARGET_POSITION = 42
+	const AB_POSITION = TARGET_POSITION + 48
+	var bear_data = await get_bear_data(bear)
+	var decoded_data = bs64.decode(bear_data)
+	var target_bear = decoded_data.slice(TARGET_POSITION, TARGET_POSITION + 32)
+	var target_pubkey = bs58.encode(target_bear)
+	var AB = decoded_data.slice(AB_POSITION, AB_POSITION + 8)
+
+	return [target_pubkey, AB]
+
+
+func equip_ability_token():
+	var send_data = PackedByteArray();
+	send_data.resize(1)
+	send_data[0] = 4
+	
+	# TODODODODODODODODODODODODODOD
+	
+	get_latest_block_hash()
+	await $get_latest_block_hash.request_completed
+	var latest_blockhash = response_data['result']['value']['blockhash']
+	
+	var transaction
+	if CLUSTER == "localhost":
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
+		print(await send_transaction(transaction))
+	else:
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, false)
+
+		print("transaction is: ", transaction)
+	
+		phantom_send_transaction(transaction)
+		
+	$program_handler.clearAccountVector();
+
+func clear_bear_data():
+	var send_data = PackedByteArray();
+	send_data.resize(1)
+	send_data[0] = 3
+	
+	$program_handler.addExistingAccount(nft_map[1], ID)
+	$program_handler.addExistingAccount(ARENA_ID, ID)
+	
+	get_latest_block_hash()
+	await $get_latest_block_hash.request_completed
+	var latest_blockhash = response_data['result']['value']['blockhash']
+	
+	var transaction
+	if CLUSTER == "localhost":
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
+		print(await send_transaction(transaction))
+	else:
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, false)
+
+		print("transaction is: ", transaction)
+	
+		phantom_send_transaction(transaction)
+		
+	$program_handler.clearAccountVector();
+	return true
+
+
+func is_opponent_ready(bear):
+	const TARGET_POSITION = 42
+	const AB_POSITION = TARGET_POSITION + 48
+	var bear_data = await get_bear_data(bear)
+	var decoded_data = bs64.decode(bear_data)
+	var target_bear = decoded_data.slice(TARGET_POSITION, TARGET_POSITION + 32)
+	var target_pubkey = bs58.encode(target_bear)
+	
+	var opponent_data = await get_bear_data(target_pubkey)
+	var decoded_opponent_data = bs64.decode(opponent_data)
+	
+	if target_pubkey != SYSTEM_PROGRAM and decoded_data[0] == 1 and decoded_opponent_data[0] == 2:
+		return true
+	else:
+		return false
+
+
+func reveal_secret():
+	var send_data = PackedByteArray();
+	var target_bear = await get_target_bear(nft_map[1])
+	if target_bear[0] == SYSTEM_PROGRAM:
+		return false
+
+	send_data.resize(17)
+	send_data[0] = 2
+	for i in range(arena_secret.size()):
+		send_data[9 + i] = arena_secret[i]
+		
+	for i in range(8):
+		send_data[9 + i] = 1
+	
+	for i in range(target_bear[1].size()):
+		send_data[1 + i] = target_bear[1][i]
+		
+	print(send_data)
+	
+	$program_handler.addExistingAccount(nft_map[2], ID)
+	$program_handler.addExistingAccount(nft_map[0], ID)
+	$program_handler.addExistingAccount(nft_map[1], ID)
+	
+	$program_handler.addExistingAccount(target_bear[0], ID)
+	$program_handler.addExistingAccount(ARENA_ID, ID)
+	
+	get_latest_block_hash()
+	await $get_latest_block_hash.request_completed
+	var latest_blockhash = response_data['result']['value']['blockhash']
+	
+
+	var transaction
+	if CLUSTER == "localhost":
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
+		print(await send_transaction(transaction))
+	else:
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, false)
+
+		print("transaction is: ", transaction)
+	
+		phantom_send_transaction(transaction)
+		
+	$program_handler.clearAccountVector();
+	return true
+
+
 func battle():
 	print("map: ", nft_map)
 	var nft_accounts = get_accounts_from_mint(nft_map[0])
@@ -410,8 +549,16 @@ func battle():
 	send_data[9] = prime % 256
 	send_data[10] = prime / 256
 	
-	for i in range(17, 25):
-		send_data[i] = randi() % 256
+	var a_secret = randi()
+	var secret_bytes = int_to_array(a_secret)
+	
+	var AB = int(fmod(pow(send_data[2], a_secret), prime))
+	var AB_bytes = int_to_array(AB)
+	
+	for i in range(17, 21):
+		
+		send_data[i] = AB_bytes[i - 17]
+		#send_data[i] = 1
 	
 	arena_secret = send_data.slice(17, 25)
 	
