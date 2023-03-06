@@ -17,6 +17,7 @@ use crate::{
     },
     arena_queue_id,
     data_structures::{arena_structure, grizzly_structure},
+    token_handler::ability_token::give_ability_token,
 };
 
 use mod_exp::mod_exp;
@@ -35,6 +36,8 @@ use mod_exp::mod_exp;
         challenging_bear (If there is one)
     instruction_data: Data should consist of:
         instruction type - offset 0, length 1
+        allocate_space - offset 1, length 1
+        moveset - offset 2, length 5
         P -
         G -
         AB -
@@ -46,6 +49,8 @@ pub fn arena_signup<'a>(
     accounts: &'a [AccountInfo<'a>],
     instruction_data: &[u8],
 ) -> ProgramResult {
+    const CRYPTO_OFFSET: usize = 7;
+
     let accounts_iter = &mut accounts.iter();
 
     // Get the accounts
@@ -80,6 +85,37 @@ pub fn arena_signup<'a>(
     let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
     let mut arena_queue_data = verify_and_get_mut_data(program_id, arena_queue_account)?;
 
+
+    if grizzly_data[0] == 0 && grizzly_data[grizzly_structure::AB.start] != 0{
+        msg!("Claiming ability token");
+        let _dummy_signer = next_account_info(accounts_iter)?;
+        let mint_authority = next_account_info(accounts_iter)?;
+
+        let ability_mint = next_account_info(accounts_iter)?;
+        let ability_token = next_account_info(accounts_iter)?;
+        let token_program = next_account_info(accounts_iter)?;
+        let associated_token_program = next_account_info(accounts_iter)?;
+        let rent = next_account_info(accounts_iter)?;
+        let system_program = next_account_info(accounts_iter)?;
+        
+
+        let allocate_space = match instruction_data[1]{
+            0 => false,
+            _ => true,
+        };
+        give_ability_token(program_id, sender_account, ability_mint, ability_token, token_program, associated_token_program, mint_authority, rent, system_program, 1, grizzly_data[grizzly_structure::AB.start], allocate_space)?;
+    }
+
+    msg!("Updating moveset");
+    for i in 0..5{
+        const MOVESET_OFFSET: usize = 2;
+        if grizzly_data[instruction_data[MOVESET_OFFSET + i] as usize] > 0{
+            grizzly_data[grizzly_structure::EQUIPPED_ABILITIES + i] = instruction_data[MOVESET_OFFSET + i];
+        }
+        else{
+            return Err(ProgramError::InvalidAccountData);
+        }
+    }
 
     msg!("Checking if bear is ready for battle");
     // Check that bear is ready for battle.
@@ -122,7 +158,7 @@ pub fn arena_signup<'a>(
 
         msg!("Setting encryption keys");
         // Set encryption public keys.
-        let secret = u64::from_le_bytes(instruction_data[17..25].try_into().unwrap());
+        let secret = u64::from_le_bytes(instruction_data[CRYPTO_OFFSET + 16..CRYPTO_OFFSET + 24].try_into().unwrap());
     
         grizzly_data[grizzly_structure::P].copy_from_slice(&challenging_bear_data[grizzly_structure::P]);
         grizzly_data[grizzly_structure::G].copy_from_slice(&challenging_bear_data[grizzly_structure::G]);
@@ -151,15 +187,15 @@ pub fn arena_signup<'a>(
     else{
         msg!("Setting encryption keys");
         // Set encryption public keys.
-        let secret = u64::from_le_bytes(instruction_data[17..25].try_into().unwrap());
+        let secret = u64::from_le_bytes(instruction_data[CRYPTO_OFFSET + 16..CRYPTO_OFFSET + 24].try_into().unwrap());
     
-        grizzly_data[grizzly_structure::P].copy_from_slice(&instruction_data[1..9]);
-        grizzly_data[grizzly_structure::G].copy_from_slice(&instruction_data[9..17]);
+        grizzly_data[grizzly_structure::P].copy_from_slice(&instruction_data[CRYPTO_OFFSET..CRYPTO_OFFSET + 8]);
+        grizzly_data[grizzly_structure::G].copy_from_slice(&instruction_data[CRYPTO_OFFSET + 8..CRYPTO_OFFSET + 16]);
     
         msg!("Preparing shared secret");
         let ab = u64::from_le_bytes(grizzly_data[grizzly_structure::AB].try_into().unwrap());
     
-        grizzly_data[grizzly_structure::AB].copy_from_slice(&ab.to_le_bytes());
+        grizzly_data[grizzly_structure::AB].copy_from_slice(&secret.to_le_bytes());
         // Set challenging state.
         grizzly_data[grizzly_structure::ARENA_STATE] = grizzly_structure::STATE_CHALLENGING;
 
@@ -190,6 +226,8 @@ pub fn clear_bear_data<'a>(
     for i in 0..arena_structure::SIZE{
         arena_data[i] = 0;
     }
+
+    grizzly_data[90] = 2;
 
     Ok(())
 }

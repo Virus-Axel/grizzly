@@ -18,7 +18,14 @@ use instruction::{
     reveal_secret_instruction::{self, reveal_secret_instruction},
     
 };
-use token_handler::{grizzly_token::create_grizzly_token, ability_token::equip_ability_token};
+
+use token_handler::{
+    grizzly_token::create_grizzly_token,
+    ability_token::{
+        equip_ability_token,
+        create_ability_token,
+    }
+};
 
 pub fn arena_queue_id() -> Pubkey{
     Pubkey::new(bs58::decode("AErDcHrJfrPKNBP9is4EeW9v1abWsDdKW1kaosXbm3PL").into_vec().as_ref().unwrap())
@@ -43,6 +50,7 @@ pub fn process_instruction<'a>(
         2 => reveal_secret_instruction(program_id, &accounts, &instruction_data),
         3 => arena_signup_instruction::clear_bear_data(program_id, &accounts, &instruction_data),
         4 => equip_ability_token(program_id, &accounts, &instruction_data),
+        5 => create_ability_token(program_id, &accounts),
         _ => {msg!("instruction data is {} hehe", instruction_data[0]); return Err(ProgramError::InvalidInstructionData)},
     }
 }

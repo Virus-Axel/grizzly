@@ -23,6 +23,15 @@ const REDIRECTION_LINK = "client%3A%2F%2Faxel.app%2F"
 #const CLUSTER = "testnet"
 const CLUSTER = "localhost"
 
+const ABILITY_MINTS = [
+	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
+	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
+	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
+	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
+	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
+	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
+]
+
 var response_data
 var body_data
 var signature
@@ -306,6 +315,20 @@ func get_nft_keys(owner):
 	emit_signal("bears_loaded")
 	return ret
 
+func get_current_moveset():
+	const AMOUNT_OF_ABILITIES = 32
+	const EQUIPPED_TOKEN_LOCATION = 106 + AMOUNT_OF_ABILITIES
+	const NO_EQUIPPED_TOKENS = 5
+	var bear_data = await get_bear_data(nft_map[1])
+	var decoded_data = bs64.decode(bear_data)
+	var ret := PackedByteArray()
+	ret.resize(NO_EQUIPPED_TOKENS)
+	
+	for i in range(NO_EQUIPPED_TOKENS):
+		ret[i] = decoded_data[EQUIPPED_TOKEN_LOCATION + i]
+	
+	return ret
+
 func send_transaction(transaction):
 	var body = JSON.new().stringify({
 		"id":1,
@@ -403,13 +426,35 @@ func get_target_bear(bear):
 	return [target_pubkey, AB]
 
 
-func equip_ability_token():
+func equip_ability_token(ability_index):
 	var send_data = PackedByteArray();
-	send_data.resize(1)
+	send_data.resize(3)
 	send_data[0] = 4
+	send_data[1] = 0
+	send_data[2] = ability_index
 	
-	# TODODODODODODODODODODODODODOD
+	var nft_accounts = get_accounts_from_mint(nft_map[0])
 	
+	$program_handler.addExistingAccount(nft_map[0], ID)
+	$program_handler.addNewSigner()
+	
+	$program_handler.addExistingAccount(nft_accounts[0], ID)
+	$program_handler.addAccount(4322, ID);
+	
+	$program_handler.addExistingAccount(TOKEN, ID, false, false)
+	$program_handler.addExistingAccount(ATOKEN, ID, false, false)
+	$program_handler.addExistingAccount(nft_accounts[1], ID)
+
+	$program_handler.addExistingAccount(nft_map[2], ID)
+	$program_handler.addExistingAccount(nft_map[1], ID)
+
+	# Ability mint
+	$program_handler.addExistingAccount(ABILITY_MINTS[ability_index], ID)
+	$program_handler.addAssociatedTokenAccount(ABILITY_MINTS[ability_index], wallet_key)
+
+	$program_handler.addExistingAccount(SYSTEM_PROGRAM, ID)
+
+
 	get_latest_block_hash()
 	await $get_latest_block_hash.request_completed
 	var latest_blockhash = response_data['result']['value']['blockhash']
@@ -479,6 +524,7 @@ func reveal_secret():
 
 	send_data.resize(17)
 	send_data[0] = 2
+	
 	for i in range(arena_secret.size()):
 		send_data[9 + i] = arena_secret[i]
 		
@@ -517,7 +563,41 @@ func reveal_secret():
 	return true
 
 
-func battle():
+func create_ability_token():
+	$program_handler.addNewSigner()
+	
+	var mint_account = $program_handler.getAccountAt(1)
+	print("new mint: ", mint_account)
+	
+	$program_handler.addAssociatedTokenAccount(mint_account, wallet_key)
+	$program_handler.addAccount(4322, ID);
+	$program_handler.addExistingAccount(TOKEN, ID, false, false)
+	$program_handler.addExistingAccount(SYSTEM_PROGRAM, ID)
+	for i in range(5):
+		print("Acc: ", $program_handler.getAccountAt(i))
+
+	var send_data := PackedByteArray()
+	send_data.resize(1)
+	send_data[0] = 5
+
+	get_latest_block_hash()
+	await $get_latest_block_hash.request_completed
+	var latest_blockhash = response_data['result']['value']['blockhash']
+
+	var transaction
+	if CLUSTER == "localhost":
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
+		print(await send_transaction(transaction))
+	else:
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, false)
+
+		print("transaction is: ", transaction)
+	
+		phantom_send_transaction(transaction)
+		
+	$program_handler.clearAccountVector();
+
+func battle(moveset):
 	print("map: ", nft_map)
 	var nft_accounts = get_accounts_from_mint(nft_map[0])
 	
@@ -531,6 +611,17 @@ func battle():
 	$program_handler.addExistingAccount(nft_map[1], ID)
 	$program_handler.addExistingAccount(ARENA_ID, ID)
 	
+	var bear_data = await get_bear_data(nft_map[1])
+	var decoded_data = bs64.decode(bear_data)
+	if decoded_data[0] == 0 and decoded_data[90] != 0:
+		$program_handler.addNewSigner();
+		$program_handler.addExistingAccount(ABILITY_MINTS[decoded_data[90]], ID)
+		$program_handler.addAssociatedTokenAccount(ABILITY_MINTS[decoded_data[90]], wallet_key)
+		$program_handler.addExistingAccount(TOKEN, ID, false, false)
+		$program_handler.addExistingAccount(ATOKEN, ID, false, false)
+		$program_handler.addAccount(4322, ID);
+		$program_handler.addExistingAccount(SYSTEM_PROGRAM, ID, false, false)
+	
 	var challenging_bear = await get_challenging_bear()
 	if challenging_bear != "":
 		print("added ", challenging_bear)
@@ -543,24 +634,28 @@ func battle():
 	var send_data = PackedByteArray();
 	var prime = $primes.primes[randi() % $primes.primes.size()]
 
-	send_data.resize(25)
+	send_data.resize(231)
 	send_data.fill(0)
-	send_data[2] = randi_range(2, 10);
-	send_data[9] = prime % 256
-	send_data[10] = prime / 256
+	for i in range(moveset.size()):
+		send_data[2 + i]
+	send_data[8] = randi_range(2, 10);
+	send_data[15] = prime % 256
+	send_data[16] = prime / 256
 	
-	var a_secret = randi()
+	#var a_secret = randi()
+	var a_secret = 1000
+	
 	var secret_bytes = int_to_array(a_secret)
 	
 	var AB = int(fmod(pow(send_data[2], a_secret), prime))
 	var AB_bytes = int_to_array(AB)
 	
-	for i in range(17, 21):
+	for i in range(23, 27):
 		
-		send_data[i] = AB_bytes[i - 17]
+		send_data[i] = AB_bytes[i - 23]
 		#send_data[i] = 1
 	
-	arena_secret = send_data.slice(17, 25)
+	arena_secret = send_data.slice(23, 31)
 	
 	var transaction
 	if CLUSTER == "localhost":
@@ -572,8 +667,9 @@ func battle():
 		print("transaction is: ", transaction)
 	
 		phantom_send_transaction(transaction)
-		
+
 	$program_handler.clearAccountVector();
+
 
 func get_challenging_bear():
 	var data = await get_bear_data(ARENA_ID)
@@ -625,7 +721,7 @@ func _ready():
 	#signup_for_battle()
 	pass
 	
-func signup_for_battle():
+func signup_for_battle_not_used():
 	get_latest_block_hash()
 	await $get_latest_block_hash.request_completed
 	var blockhash = response_data['result']['value']['blockhash']
@@ -661,6 +757,65 @@ func create_account(account_size, pubkey=""):
 	await $get_latest_block_hash.request_completed
 	print(response_data)
 	return [privateKey, publicKey]
+
+
+func get_token_account(mint):
+	var body = JSON.new().stringify({
+		"id":1,
+		"jsonrpc":"2.0",
+		"method":"getTokenAccountsByOwner",
+		"params":[
+			wallet_key,
+			{
+				"mint": mint
+			},
+			{
+				"encoding": "jsonParsed"
+			},
+		]
+	})
+	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	if error != OK:
+		push_error("An error occurred in the HTTP request.")
+	await $get_latest_block_hash.request_completed
+	if response_data["result"]["value"].size() != 1:
+		return ""
+	else:
+		return response_data["result"]["value"][0]["pubkey"]
+
+func get_ability_balance(index):
+	var token_account = await get_token_account(ABILITY_MINTS[index])
+	if token_account == "":
+		return 0
+	
+	var body = JSON.new().stringify({
+		"id":1,
+		"jsonrpc":"2.0",
+		"method":"getTokenAccountBalance",
+		"params":[
+			token_account
+		]
+	})
+	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	if error != OK:
+		push_error("An error occurred in the HTTP request.")
+	await $get_latest_block_hash.request_completed
+	return response_data["result"]["value"]["uiAmount"]
+
+
+func get_ability_tokens():
+	var tokens := PackedInt32Array()
+	tokens.resize(ABILITY_MINTS.size())
+	for i in range(ABILITY_MINTS.size()):
+		tokens[i] = await get_ability_balance(i)
+	
+	var bear_data = await get_bear_data(nft_map[1])
+	var decoded_data = bs64.decode(bear_data)
+	
+	if decoded_data[90] != 0 and decoded_data[0] == 0:
+		tokens[decoded_data[90] - 1] += 1
+	
+	return tokens
 
 
 func get_latest_block_hash():

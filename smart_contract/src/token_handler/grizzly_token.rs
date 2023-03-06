@@ -33,6 +33,7 @@ use crate::account_security::{verify_bank_account, verify_and_get_mut_data};
 
 pub const AUTHORITY_SEED: &[u8] = b"cryptoforts_mint_seed";
 const NFT_COST: u64 = 100000000;
+const NATIVE_TOKEN_ID: &str = "ABoFjoNoA5b2CM2iKzYE8RttpWgSwY7ZDnvWpaTg3igA";
 
 pub fn get_mapping_keys(account_data: &[u8]) -> Result<(Pubkey, Pubkey), ProgramError> {
     let nft_pubkey = Pubkey::new(&account_data[0..32]);
@@ -74,7 +75,16 @@ pub fn create_grizzly_token<'a>(
     // Accounts for mapping NFT to grizzly
     let mapping_account = next_account_info(accounts_iter)?;
     let grizzly_account = next_account_info(accounts_iter)?;
+
+    // Accounts for native currency
+    let native_token = next_account_info(accounts_iter)?;
+    let native_mint = next_account_info(accounts_iter)?;
  //   let grizzly_program = next_account_info(accounts_iter)?;
+
+    // Verify native mint
+    if native_mint.key.to_string() != NATIVE_TOKEN_ID{
+        return Err(ProgramError::IllegalOwner);
+    }
 
     msg!("Trying to create mapping account: {}", &mapping_account.key.to_string());
     // Create Mapping account and grizzly account
@@ -176,6 +186,23 @@ pub fn create_grizzly_token<'a>(
         &[
             mint.clone(),
             token_account.clone(),
+            sender_account.clone(),
+            token_program.clone(),
+            associated_token_program.clone(),
+        ],
+    )?;
+
+    msg!("Creating associated native account");
+    invoke(
+        &create_associated_token_account(
+            &sender_account.key,
+            &sender_account.key,
+            &native_mint.key,
+            &spl_token::id()
+        ),
+        &[
+            native_mint.clone(),
+            native_token.clone(),
             sender_account.clone(),
             token_program.clone(),
             associated_token_program.clone(),

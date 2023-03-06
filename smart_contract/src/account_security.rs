@@ -108,6 +108,8 @@ pub fn validate_bear_nft<'a>(
         return Err(ProgramError::InvalidAccountData);
     }
 
+    msg!("NFT is valid");
+
     Ok(())
 }
 
@@ -118,6 +120,7 @@ pub fn verify_ability_token<'a>(
 ) -> ProgramResult{
 
     // Check if token account is ours
+    msg!("Checking if token is ours");
     let expected_token_account = get_associated_token_address(&sender_account.key, &mint_account.key);
     if expected_token_account != *token_account.key{
         return Err(ProgramError::IllegalOwner);
@@ -126,9 +129,11 @@ pub fn verify_ability_token<'a>(
     let mint_data = mint_account.data.borrow_mut();
     let token_data = token_account.data.borrow_mut();
 
-    // Check if we are the owner of the token
-    if token_data[64] != 1{
-        return Err(ProgramError::IllegalOwner);
+    // Check token balance
+    msg!("Checking balance of token");
+    if token_data[64] < 1{
+        msg!("token data at 64 is: {}", token_data[64]);
+        return Err(ProgramError::InsufficientFunds);
     }
 
     if token_data[108] != 1{
@@ -136,9 +141,9 @@ pub fn verify_ability_token<'a>(
     }
 
     // Check if we have one of the token in the mint
-    if mint_data[36] != 1{
+    /*if mint_data[36] != 1{
         return Err(ProgramError::InsufficientFunds);
-    }
+    }*/
 
     Ok(())
 }
