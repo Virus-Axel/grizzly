@@ -6,6 +6,8 @@ const ALPHA_PER_LEAF = 0.2
 func _ready():
 	pass # Replace with function body.
 
+func set_text(text):
+	$Label.text = text
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

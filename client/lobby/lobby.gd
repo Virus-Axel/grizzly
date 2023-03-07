@@ -4,9 +4,9 @@ extends Node3D
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	#get_node("/root/w3").clear_bear_data()
-	get_node("/root/w3").create_ability_token()
+	#get_node("/root/w3").create_ability_token()
 	#get_node("/root/w3").equip_ability_token(2)
-	return
+	#return
 	# Try to reveal secret
 	var w3 = get_node("/root/w3")
 	var ability_tokens = await w3.get_ability_tokens()
