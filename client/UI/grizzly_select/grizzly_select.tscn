@@ -40,30 +40,30 @@ tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/path = NodePath("Control/alpha_pass/fog:position")
-tracks/0/interp = 2
-tracks/0/loop_wrap = false
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0, 6.1, 12),
-"transitions": PackedFloat32Array(1, 1, 1),
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(-1013, 0), Vector2(0, 0)]
+"values": [Vector2(-1300, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_nxxb5"]
 resource_name = "fog"
 length = 15.0
-loop_mode = 1
+loop_mode = 2
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
 tracks/0/path = NodePath("Control/alpha_pass/fog:position")
-tracks/0/interp = 1
+tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
 "times": PackedFloat32Array(0, 15),
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector2(0, 0), Vector2(-1013, 0)]
+"values": [Vector2(0, 0), Vector2(-1300, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_usx60"]
@@ -109,11 +109,13 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_right = 1505.33
+offset_left = -1300.0
+offset_right = 812.046
+offset_bottom = 1080.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_2h3ua")
-expand_mode = 3
+expand_mode = 2
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 anchors_preset = 15
@@ -306,6 +308,7 @@ libraries = {
 "": SubResource("AnimationLibrary_usx60")
 }
 
+[connection signal="resized" from="Control" to="." method="_on_control_resized"]
 [connection signal="pressed" from="CanvasLayer/Button4" to="." method="_on_button_4_pressed"]
 [connection signal="pressed" from="CanvasLayer/Button" to="." method="_on_mint_button"]
 [connection signal="pressed" from="CanvasLayer/refresh" to="." method="_on_refresh_pressed"]

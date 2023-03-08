@@ -6,7 +6,7 @@ func _ready():
 	var id = get_node("/root/w3").ID
 	#get_node("/root/w3").get_node("program_handler").setKeys("HJyMW82CKUrsbfTSKaNXdsgqcS1HJm8jAjbVVq3Uj4AN", "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", id)
 	#print(await get_node("/root/w3").mint_nft("9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", "Noin"))
-	var arr = await get_node("/root/w3").get_nft_keys("9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm")
+	#var arr = await get_node("/root/w3").get_nft_keys("9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm")
 
 	return;
 	get_node("/root/w3").connect_response.connect(Callable(self, "_on_w_3_connect_response"))
@@ -37,4 +37,12 @@ func _on_w_3_connect_response():
 		$MarginContainer/VBoxContainer/connect_phantom_button.visible = false
 		$error_prompt.show_phantom_connect_error()
 	get_tree().change_scene_to_file("res://UI/grizzly_select/grizzly_select.tscn")
+	pass # Replace with function body.
+
+
+func _on_resized():
+	var vp = get_viewport_rect().size
+	var max_val = max(vp.x, vp.y)
+	$TextureRect.size = Vector2(max_val, max_val)
+	$TextureRect.position.x = vp.x / 2 - $TextureRect.size.x / 2
 	pass # Replace with function body.
