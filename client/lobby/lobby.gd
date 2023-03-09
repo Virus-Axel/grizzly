@@ -1,12 +1,13 @@
 extends Node3D
 
+var stats_shown: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	#get_node("/root/w3").clear_bear_data()
 	#get_node("/root/w3").create_ability_token()
 	#get_node("/root/w3").equip_ability_token(2)
-	#return
+	return
 	# Try to reveal secret
 	var w3 = get_node("/root/w3")
 	var ability_tokens = await w3.get_ability_tokens()
@@ -32,13 +33,6 @@ func _process(delta):
 	pass
 
 
-func _on_button_pressed():
-	var w3 = get_node("/root/w3")
-	w3.battle()
-	var challenging_bear = await w3.get_challenging_bear()
-	if challenging_bear == "":
-		$poll_timer.start()
-
 
 func _on_poll_timer_timeout():
 	var w3 = get_node("/root/w3")
@@ -48,4 +42,23 @@ func _on_poll_timer_timeout():
 			print("Commited to previous battle")
 		else:
 			print("Failed to commmit to last battle")
+	pass # Replace with function body.
+
+func send_bear_to_battle():
+	var w3 = get_node("/root/w3")
+	w3.battle()
+	var challenging_bear = await w3.get_challenging_bear()
+	if challenging_bear == "":
+		$poll_timer.start()
+
+func _on_battle_button_pressed():
+	send_bear_to_battle()
+
+
+func _on_stats_button_pressed():
+	if stats_shown:
+		$AnimationPlayer.play_backwards("stats")
+	else:
+		$AnimationPlayer.play("stats")
+	stats_shown = !stats_shown
 	pass # Replace with function body.

@@ -33,7 +33,6 @@ use crate::account_security::{verify_bank_account, verify_and_get_mut_data};
 
 pub const AUTHORITY_SEED: &[u8] = b"cryptoforts_mint_seed";
 const NFT_COST: u64 = 100000000;
-const NATIVE_TOKEN_ID: &str = "ABoFjoNoA5b2CM2iKzYE8RttpWgSwY7ZDnvWpaTg3igA";
 
 pub fn get_mapping_keys(account_data: &[u8]) -> Result<(Pubkey, Pubkey), ProgramError> {
     let nft_pubkey = Pubkey::new(&account_data[0..32]);

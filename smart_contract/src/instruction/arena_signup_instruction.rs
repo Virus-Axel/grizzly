@@ -2,8 +2,13 @@ use solana_program::{
     account_info::{next_account_info, AccountInfo},
     entrypoint::ProgramResult,
     msg,
+    program::invoke,
     program_error::ProgramError,
     pubkey::Pubkey,
+    sysvar::{
+        clock::Clock,
+        Sysvar,
+    },
 };
 
 use crate::{
@@ -17,10 +22,17 @@ use crate::{
     },
     arena_queue_id,
     data_structures::{arena_structure, grizzly_structure},
-    token_handler::ability_token::give_ability_token,
+    token_handler::ability_token::{give_ability_token, give_native_token}, NATIVE_TOKEN_ID,
 };
 
+use spl_token::instruction::burn;
+
+use crate::account_security::verify_ability_token;
+
 use mod_exp::mod_exp;
+
+const ARENA_PRIZE: usize = 100;
+const SECONDS_UNTIL_PRIZE_REDUCTION: usize = 20;
 
 /*
     Signup for a battle in the arena.
@@ -65,6 +77,16 @@ pub fn arena_signup<'a>(
     let grizzly_account = next_account_info(accounts_iter)?;
     let arena_queue_account = next_account_info(accounts_iter)?;
 
+    let native_mint = next_account_info(accounts_iter)?;
+    let native_token = next_account_info(accounts_iter)?;
+
+    let system_program = next_account_info(accounts_iter)?;
+    let token_program = next_account_info(accounts_iter)?;
+    let associated_token_program = next_account_info(accounts_iter)?;
+    let mint_authority = next_account_info(accounts_iter)?;
+    let rent = next_account_info(accounts_iter)?;
+    
+
     msg!("Validating bear nft");
     match validate_bear_nft(program_id, sender_account, mint_account, token_account, metadata_account, grizzly_account, mapping_account){
         Ok(_) => (),
@@ -78,13 +100,47 @@ pub fn arena_signup<'a>(
     }
 
     if mapping_account.owner != program_id{
-        return Err(ProgramError::IllegalOwner)
+        return Err(ProgramError::IllegalOwner);
     }
+
+    if native_mint.key.to_string() != NATIVE_TOKEN_ID{
+        return Err(ProgramError::IllegalOwner);
+    }
+
+
+    // TODO: Give native tokens
 
     msg!("Verifying grizzly owner");
     let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
     let mut arena_queue_data = verify_and_get_mut_data(program_id, arena_queue_account)?;
 
+
+    let timestamp = Clock::get().unwrap().unix_timestamp;
+    let past_timestamp = i64::from_le_bytes(grizzly_data[grizzly_structure::TIMESTAMP].try_into().unwrap());
+
+    let delta_time = timestamp - past_timestamp;
+    give_native_token(program_id, sender_account, native_mint, native_token, token_program, associated_token_program, mint_authority, rent, system_program, (delta_time / SECONDS_UNTIL_PRIZE_REDUCTION as i64) as u64);
+
+    verify_ability_token(sender_account, native_mint, native_token)?;
+    grizzly_data[grizzly_structure::TIMESTAMP].copy_from_slice(&timestamp.to_le_bytes());
+
+    invoke(
+        &burn(
+            &token_program.key,
+            &native_token.key,
+            &native_mint.key,
+            &sender_account.key,
+            &[],
+            ARENA_PRIZE as u64,
+        )?,
+        &[
+            native_token.clone(),
+            native_mint.clone(),
+            sender_account.clone(),
+            token_program.clone(),
+        ],
+      //  &[&[AUTHORITY_SEED, program_id.as_ref(), &[bump]]],
+    )?;
 
     if grizzly_data[0] == 0 && grizzly_data[grizzly_structure::AB.start] != 0{
         msg!("Claiming ability token");
