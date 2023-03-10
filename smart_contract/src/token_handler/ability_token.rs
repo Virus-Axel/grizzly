@@ -187,7 +187,7 @@ pub fn equip_ability_token<'a>(
     if grizzly_data[grizzly_structure::ABILITY_LEVELS + ability_index as usize] == 255{
         return Err(ProgramError::MaxAccountsDataSizeExceeded);
     }
-    grizzly_data[ability_index as usize] += 1;
+    grizzly_data[grizzly_structure::ABILITY_LEVELS + ability_index as usize] += 1;
 
     return Ok(());
 }
@@ -221,6 +221,7 @@ pub fn merge_ability_tokens<'a>(
     let ability_token = next_account_info(accounts_iter)?;
 
     let system_program = next_account_info(accounts_iter)?;
+    
 
     // Verify nft
     validate_bear_nft(program_id, sender_account, mint, token_account, metadata_account, grizzly_account, mapping_account)?;
@@ -231,7 +232,7 @@ pub fn merge_ability_tokens<'a>(
         _ => true,
     };
     let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
-    if grizzly_data[0] == 0 && grizzly_data[grizzly_structure::AB.start] != 0{
+    if grizzly_data[0] == 0 && grizzly_data[grizzly_structure::AB.start] != 0 && instruction_data[2] == grizzly_data[grizzly_structure::AB.start]{
         give_ability_token(program_id, sender_account, ability_mint, ability_token, token_program, associated_token_program, mint_authority, rent, system_program, 1, grizzly_data[grizzly_structure::AB.start], allocate_space)?;
         grizzly_data[grizzly_structure::AB.start] = 0;
     }
@@ -239,7 +240,7 @@ pub fn merge_ability_tokens<'a>(
     // Verify ability token
     verify_ability_token(sender_account, ability_mint, ability_token)?;
 
-    let (expected_mint_authority, bump) =
+    let (expected_mint_authority, _bump) =
         Pubkey::find_program_address(&[AUTHORITY_SEED, program_id.as_ref()], &program_id);
 
     if *mint_authority.key != expected_mint_authority {
@@ -341,7 +342,7 @@ pub fn give_ability_token<'a>(
     allocate_space: bool,
 ) -> ProgramResult {
 
-    msg!("Checking ability token");
+    msg!("Checking ability token {} == {}", mint.key.to_string(), ABILITY_TOKEN_IDS[index as usize]);
     if mint.key.to_string() != ABILITY_TOKEN_IDS[index as usize]{
         return Err(ProgramError::InvalidAccountData);
     }
@@ -349,13 +350,13 @@ pub fn give_ability_token<'a>(
     let (_expected_mint_authority, bump) =
         Pubkey::find_program_address(&[AUTHORITY_SEED, program_id.as_ref()], &program_id);
 
-    msg!("Mint auth: {}", mint_authority.key.to_string());
-    msg!("Sender: {}", sender_account.key.to_string());
+    //msg!("Mint auth: {}", mint_authority.key.to_string());
+    //msg!("Sender: {}", sender_account.key.to_string());
     msg!("Ability mint: {}", mint.key.to_string());
     msg!("Ability token: {}", token_account.key.to_string());
-    msg!("Rent: {}", rent.key.to_string());
-    msg!("Token program: {}", token_program.key.to_string());
-    msg!("Atoken program: {}", associated_token_program.key.to_string());
+    //msg!("Rent: {}", rent.key.to_string());
+    //msg!("Token program: {}", token_program.key.to_string());
+    //msg!("Atoken program: {}", associated_token_program.key.to_string());
 
     if allocate_space{
     msg!("Creating associated token account");
@@ -441,19 +442,22 @@ pub fn trade_ability_token<'a>(
     validate_bear_nft(program_id, sender_account, mint, token_account, metadata_account, grizzly_account, mapping_account)?;
     
     // Pay out prize
+    //msg!("Paying out old prizes");
     let allocate_space = match instruction_data[1]{
         0 => false,
         _ => true,
     };
     let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
-    if grizzly_data[0] == 0 && grizzly_data[grizzly_structure::AB.start] != 0{
+    if grizzly_data[0] == 0 && grizzly_data[grizzly_structure::AB.start] != 0 && instruction_data[2] == grizzly_data[grizzly_structure::AB.start]{
         give_ability_token(program_id, sender_account, ability_mint, ability_token, token_program, associated_token_program, mint_authority, rent, system_program, 1, grizzly_data[grizzly_structure::AB.start], allocate_space)?;
         grizzly_data[grizzly_structure::AB.start] = 0;
     }
 
     // Verify ability token
+    //msg!("Verify ability token");
     verify_ability_token(sender_account, ability_mint, ability_token)?;
 
+    //msg!("Verifying mint authority");
     let (expected_mint_authority, bump) =
         Pubkey::find_program_address(&[AUTHORITY_SEED, program_id.as_ref()], &program_id);
 
@@ -462,12 +466,14 @@ pub fn trade_ability_token<'a>(
     }
 
     // Verify that ability index and key is correct
+    //msg!("Verifying ability index");
     let ability_index = instruction_data[2];
     if ability_mint.key.to_string() != ABILITY_TOKEN_IDS[ability_index as usize]{
         return Err(ProgramError::InvalidInstructionData);
     }
 
     // Figure out prize rate
+    msg!("Getting prize rate");
     let mut arena_data = verify_and_get_mut_data(program_id, arena_account)?;
     let prize_rate = u64::from_le_bytes(arena_data[arena_structure::PRIZES + 8 * ability_index as usize..arena_structure::PRIZES + 8 + 8 * ability_index as usize].try_into().unwrap());
 
@@ -498,11 +504,16 @@ pub fn trade_ability_token<'a>(
         }
         // User wants to get solana
         else{
-            invoke_signed(
+            msg!("Paying money from bank");
+            /*invoke_signed(
                 &system_instruction::transfer(bank_account.key, sender_account.key, LAMPORTS_PER_NATIVE * prize_rate),
                 &[bank_account.clone(), sender_account.clone(), system_program.clone()],
                 &[&[AUTHORITY_SEED, program_id.as_ref(), &[bump]]],
-            )?;
+            )?;*/
+            let mut bank_lamports = bank_account.lamports.borrow_mut();
+            let mut sender_lamports = sender_account.lamports.borrow_mut();
+            **bank_lamports -= LAMPORTS_PER_NATIVE * prize_rate;
+            **sender_lamports += LAMPORTS_PER_NATIVE * prize_rate;
         }
         // Decrease rates
         arena_data[arena_structure::PRIZES + 8 * ability_index as usize..arena_structure::PRIZES + 8 + 8 * ability_index as usize].copy_from_slice(&(prize_rate - 1).to_le_bytes());
@@ -530,24 +541,20 @@ pub fn trade_ability_token<'a>(
             )?;
         }
         else{
-            invoke(
-                &system_instruction::transfer(sender_account.key, bank_account.key, LAMPORTS_PER_NATIVE * prize_rate),
-                &[sender_account.clone(), bank_account.clone(), system_program.clone()],
-            )?;
+            if prize_rate == 0{
+                msg!("Sending money to bank: {}", LAMPORTS_PER_NATIVE * prize_rate);
+                invoke(
+                    &system_instruction::transfer(sender_account.key, bank_account.key, LAMPORTS_PER_NATIVE * prize_rate),
+                    &[sender_account.clone(), bank_account.clone(), system_program.clone()],
+                )?;
+            }
         }
-        give_ability_token(program_id, sender_account, mint, token_account, token_program, associated_token_program, mint_authority, rent, system_program, 1, ability_index, allocate_space)?;
+        give_ability_token(program_id, sender_account, ability_mint, ability_token, token_program, associated_token_program, mint_authority, rent, system_program, 1, ability_index, allocate_space)?;
        
         // Increase rates
         arena_data[arena_structure::PRIZES + 8 * ability_index as usize..arena_structure::PRIZES + 8 + 8 * ability_index as usize].copy_from_slice(&(prize_rate + 1).to_le_bytes());
 
     }
-
-    // Increase the level.
-    msg!("Increasing grizzly level");
-    if grizzly_data[grizzly_structure::ABILITY_LEVELS + ability_index as usize] == 255{
-        return Err(ProgramError::MaxAccountsDataSizeExceeded);
-    }
-    grizzly_data[ability_index as usize] += 1;
 
     return Ok(());
 }

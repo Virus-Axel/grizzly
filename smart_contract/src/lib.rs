@@ -23,12 +23,12 @@ use token_handler::{
     grizzly_token::create_grizzly_token,
     ability_token::{
         equip_ability_token,
-        create_ability_token, merge_ability_tokens,
+        create_ability_token, merge_ability_tokens, trade_ability_token,
     }
 };
 
 pub fn arena_queue_id() -> Pubkey{
-    Pubkey::new(bs58::decode("AErDcHrJfrPKNBP9is4EeW9v1abWsDdKW1kaosXbm3PL").into_vec().as_ref().unwrap())
+    Pubkey::new(bs58::decode("7J749nqtZXHVjw2uvFUQv5jwqRCQdjUjxaVAyvaPN9u4").into_vec().as_ref().unwrap())
 }
 
 pub fn bank_account_id() -> Pubkey{
@@ -53,7 +53,8 @@ pub fn process_instruction<'a>(
         3 => arena_signup_instruction::clear_bear_data(program_id, &accounts, &instruction_data),
         4 => equip_ability_token(program_id, &accounts, &instruction_data),
         5 => create_ability_token(program_id, &accounts),
-        6 => merge_ability_tokens(program_id, &accounts, &instruction_data)
+        6 => merge_ability_tokens(program_id, &accounts, &instruction_data),
+        7 => trade_ability_token(program_id, &accounts, &instruction_data),
         _ => {msg!("instruction data is {} hehe", instruction_data[0]); return Err(ProgramError::InvalidInstructionData)},
     }
 }

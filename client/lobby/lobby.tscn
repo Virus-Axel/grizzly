@@ -1,13 +1,18 @@
-[gd_scene load_steps=22 format=3 uid="uid://rkg8xa2aoxrr"]
+[gd_scene load_steps=25 format=3 uid="uid://rkg8xa2aoxrr"]
 
 [ext_resource type="Script" path="res://lobby/lobby.gd" id="1_oy7wp"]
 [ext_resource type="PackedScene" uid="uid://7ud6q6bvsqan" path="res://lobby/lobby.glb" id="2_mfqke"]
+[ext_resource type="Texture2D" uid="uid://brrwab4m53pc5" path="res://UI/grizzly_select/back_button_normal.png" id="2_ogvej"]
 [ext_resource type="Texture2D" uid="uid://cmh1l51pjmvvj" path="res://lobby/stats_button_n.png" id="2_s62x3"]
 [ext_resource type="Texture2D" uid="uid://ta2fchwvd52u" path="res://lobby/battle_button_n.png" id="3_63mqt"]
 [ext_resource type="Texture2D" uid="uid://dg328eab3coc8" path="res://lobby/shop_button_n.png" id="4_gcqhr"]
 [ext_resource type="Texture2D" uid="uid://buw7ub6dq0u7o" path="res://lobby/rank_button_n.png" id="5_ncs4i"]
+[ext_resource type="PackedScene" uid="uid://cyhddb4ikgf5b" path="res://store/store.tscn" id="7_lyhj0"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_amwoo"]
+texture = ExtResource("2_s62x3")
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_gss48"]
 texture = ExtResource("2_s62x3")
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_uvmeq"]
@@ -34,19 +39,68 @@ corner_radius_bottom_left = 25
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_grcox"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lfvf1"]
-bg_color = Color(1, 0.847059, 0, 1)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3m44n"]
-bg_color = Color(1, 1, 1, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0, 0, 0, 0.478431)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dy38r"]
-bg_color = Color(0, 0, 0, 1)
+[sub_resource type="Animation" id="Animation_mlrlm"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CanvasLayer/Control/Panel:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(200, -224)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0.337355, -2.36212)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Camera3D:rotation")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-0.201062, 0, 0)]
+}
+tracks/3/type = "value"
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/path = NodePath("CanvasLayer/back_button:position")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(15, 1084)]
+}
+tracks/4/type = "value"
+tracks/4/imported = false
+tracks/4/enabled = true
+tracks/4/path = NodePath("CanvasLayer/HBoxContainer:modulate")
+tracks/4/interp = 1
+tracks/4/loop_wrap = true
+tracks/4/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
 
 [sub_resource type="Animation" id="Animation_emdr3"]
 resource_name = "stats"
@@ -64,25 +118,97 @@ tracks/0/keys = {
 "values": [Vector2(200, -224), Vector2(-386, -224)]
 }
 
-[sub_resource type="Animation" id="Animation_mlrlm"]
-length = 0.001
+[sub_resource type="Animation" id="Animation_psoue"]
+resource_name = "store_view"
+length = 2.0
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("CanvasLayer/Control/Panel:position")
-tracks/0/interp = 1
+tracks/0/path = NodePath("Camera3D:position")
+tracks/0/interp = 2
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
 "update": 0,
-"values": [Vector2(200, -224)]
+"values": [Vector3(0, 0.337355, -2.36212), Vector3(0.475418, 0.236622, -4.34486)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D:rotation")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-0.201062, 0, 0), Vector3(-0.313911, -0.0653115, -0.0178722)]
+}
+
+[sub_resource type="Animation" id="Animation_erpsl"]
+resource_name = "fridge_view"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0, 0.337355, -2.36212), Vector3(1.06197, 0.179224, -3.66873)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D:rotation")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-0.201062, 0, 0), Vector3(-0.201062, -0.273092, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_ty6h0"]
+resource_name = "hide_buttons"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("CanvasLayer/back_button:position")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0.3, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(15, 1084), Vector2(15, 927)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("CanvasLayer/HBoxContainer:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.3),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(1, 1, 1, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_pntb8"]
 _data = {
 "RESET": SubResource("Animation_mlrlm"),
-"stats": SubResource("Animation_emdr3")
+"fridge_view": SubResource("Animation_erpsl"),
+"hide_buttons": SubResource("Animation_ty6h0"),
+"stats": SubResource("Animation_emdr3"),
+"store_view": SubResource("Animation_psoue")
 }
 
 [node name="lobby" type="Node3D"]
@@ -93,6 +219,21 @@ transform = Transform3D(1, 0, 0, 0, 0.979855, 0.19971, 0, -0.19971, 0.979855, 0,
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
+[node name="back_button" type="Button" parent="CanvasLayer"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 15.0
+offset_top = 1084.0
+offset_right = 167.0
+offset_bottom = 1231.0
+grow_horizontal = 2
+grow_vertical = 0
+icon = ExtResource("2_ogvej")
+expand_icon = true
+
 [node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer"]
 anchors_preset = 7
 anchor_left = 0.5
@@ -102,6 +243,7 @@ anchor_bottom = 1.0
 offset_left = -458.0
 offset_top = -119.0
 offset_right = 457.0
+offset_bottom = 0.000732422
 grow_horizontal = 2
 grow_vertical = 0
 
@@ -109,21 +251,25 @@ grow_vertical = 0
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxTexture_amwoo")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_gss48")
 
 [node name="battle_button" type="Button" parent="CanvasLayer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxTexture_uvmeq")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_uvmeq")
 
-[node name="Button3" type="Button" parent="CanvasLayer/HBoxContainer"]
+[node name="store_button" type="Button" parent="CanvasLayer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxTexture_4r3sw")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_4r3sw")
 
-[node name="Button4" type="Button" parent="CanvasLayer/HBoxContainer"]
+[node name="rank_button" type="Button" parent="CanvasLayer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxTexture_02f3b")
+theme_override_styles/disabled = SubResource("StyleBoxTexture_02f3b")
 
 [node name="Control" type="Control" parent="CanvasLayer"]
 layout_mode = 3
@@ -145,10 +291,10 @@ anchor_left = 1.0
 anchor_top = 0.5
 anchor_right = 1.0
 anchor_bottom = 0.5
-offset_left = 160.0
-offset_top = -244.0
-offset_right = 582.0
-offset_bottom = 280.0
+offset_left = 200.0
+offset_top = -224.0
+offset_right = 622.0
+offset_bottom = 300.0
 grow_horizontal = 0
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_aj5xh")
@@ -187,43 +333,8 @@ item_5/text = "Stability 150%"
 item_6/text = "Mobility 120%"
 item_7/text = "Kick Strength 999%"
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer"]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -346.0
-offset_top = -466.0
-offset_right = 347.0
-offset_bottom = 383.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer/VBoxContainer"]
-layout_direction = 3
-layout_mode = 2
-
-[node name="buy" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(140, 60)
-layout_mode = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_lfvf1")
-text = "Buy"
-
-[node name="sell" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(140, 60)
-layout_mode = 2
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_3m44n")
-text = "Sell"
-
-[node name="merge" type="Button" parent="CanvasLayer/VBoxContainer/HBoxContainer"]
-custom_minimum_size = Vector2(140, 60)
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_styles/normal = SubResource("StyleBoxFlat_dy38r")
-text = "Merge"
+[node name="Panel" parent="CanvasLayer" instance=ExtResource("7_lyhj0")]
+visible = false
 
 [node name="poll_timer" type="Timer" parent="."]
 wait_time = 3.0
@@ -240,6 +351,16 @@ libraries = {
 "": SubResource("AnimationLibrary_pntb8")
 }
 
+[node name="ui_player" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_pntb8")
+}
+
+[connection signal="pressed" from="CanvasLayer/back_button" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/stats_button" to="." method="_on_stats_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/battle_button" to="." method="_on_battle_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/HBoxContainer/store_button" to="." method="_on_store_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/HBoxContainer/rank_button" to="." method="_on_rank_button_pressed"]
 [connection signal="timeout" from="poll_timer" to="." method="_on_poll_timer_timeout"]
+[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
+[connection signal="animation_finished" from="ui_player" to="." method="_on_animation_player_animation_finished"]

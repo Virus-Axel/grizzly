@@ -119,7 +119,7 @@ pub fn arena_signup<'a>(
     let past_timestamp = i64::from_le_bytes(grizzly_data[grizzly_structure::TIMESTAMP].try_into().unwrap());
 
     let delta_time = timestamp - past_timestamp;
-    give_native_token(program_id, sender_account, native_mint, native_token, token_program, associated_token_program, mint_authority, rent, system_program, (delta_time / SECONDS_UNTIL_PRIZE_REDUCTION as i64) as u64);
+    give_native_token(program_id, sender_account, native_mint, native_token, token_program, associated_token_program, mint_authority, rent, system_program, (delta_time / SECONDS_UNTIL_PRIZE_REDUCTION as i64) as u64)?;
 
     verify_ability_token(sender_account, native_mint, native_token)?;
     grizzly_data[grizzly_structure::TIMESTAMP].copy_from_slice(&timestamp.to_le_bytes());

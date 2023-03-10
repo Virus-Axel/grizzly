@@ -1,11 +1,10 @@
-[gd_scene load_steps=23 format=3 uid="uid://bdejmorry3wo3"]
+[gd_scene load_steps=22 format=3 uid="uid://bdejmorry3wo3"]
 
 [ext_resource type="Script" path="res://UI/grizzly_select/grizzly_select.gd" id="1_hes3p"]
 [ext_resource type="Texture2D" uid="uid://breyx5r3rnw3t" path="res://UI/grizzly_select/fog.png" id="2_2h3ua"]
 [ext_resource type="PackedScene" uid="uid://xebxovqnhbd6" path="res://UI/start/error_prompt.tscn" id="3_2ylgj"]
 [ext_resource type="PackedScene" uid="uid://dvlrtmckj5deu" path="res://UI/loading_indicator.tscn" id="4_d6rmb"]
 [ext_resource type="Texture2D" uid="uid://bak1c4drx6ob4" path="res://UI/grizzly_select/stone_normal.png" id="4_m0lce"]
-[ext_resource type="PackedScene" uid="uid://ttswkolua5eq" path="res://grizzly_bear/bear.tscn" id="4_tjoxi"]
 [ext_resource type="Texture2D" uid="uid://d0yqg75jc8ku5" path="res://UI/grizzly_select/new_bear_button_normal.png" id="5_tdm70"]
 [ext_resource type="PackedScene" uid="uid://dpp54ycsqji8d" path="res://UI/arrow.tscn" id="6_ci0pl"]
 [ext_resource type="Texture2D" uid="uid://brrwab4m53pc5" path="res://UI/grizzly_select/back_button_normal.png" id="6_ejag7"]
@@ -110,8 +109,8 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -1300.0
-offset_right = 1418.76
-offset_bottom = 2160.0
+offset_right = 4573.28
+offset_bottom = 5400.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_2h3ua")
@@ -143,9 +142,6 @@ shadow_blur = 10.0
 spot_angle = 26.1
 
 [node name="bears" type="Node" parent="SubViewportContainer/SubViewport"]
-
-[node name="grizzly" parent="SubViewportContainer/SubViewport/bears" instance=ExtResource("4_tjoxi")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.3, -3.46944)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="SubViewportContainer/SubViewport"]
 transform = Transform3D(1, 0, 0, 0, 0.671565, 0.740945, 0, -0.740945, 0.671565, 0, 7.74798, 8.25949)
@@ -298,6 +294,20 @@ custom_minimum_size = Vector2(130, 0)
 layout_mode = 2
 size_flags_horizontal = 0
 theme_override_styles/normal = SubResource("StyleBoxTexture_sbeag")
+
+[node name="key" type="Label" parent="CanvasLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -264.0
+offset_right = 20.0
+offset_bottom = -241.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 24
 
 [node name="swipe_timer" type="Timer" parent="."]
 wait_time = 0.4

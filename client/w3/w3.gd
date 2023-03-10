@@ -7,7 +7,7 @@ const MPL_TOKEN = "6sk5uQWhBTwWN2tLzLpE4jDD9rRd8H6ucQgAjocWkTcm";
 #const MPL_TOKEN = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
 const BANK_ID = "ANdidaLBCN3KrDFyraGtPVQhpaQr2oAqpPqN2DJL4CXv";
 
-const ARENA_ID = "AErDcHrJfrPKNBP9is4EeW9v1abWsDdKW1kaosXbm3PL"
+const ARENA_ID = "7J749nqtZXHVjw2uvFUQv5jwqRCQdjUjxaVAyvaPN9u4"
 
 const SYSTEM_PROGRAM = "11111111111111111111111111111111"
 
@@ -23,6 +23,7 @@ const REDIRECTION_LINK = "client%3A%2F%2Faxel.app%2F"
 #const CLUSTER = "testnet"
 const CLUSTER = "localhost"
 
+const NATIVE_MINT = "ABoFjoNoA5b2CM2iKzYE8RttpWgSwY7ZDnvWpaTg3igA"
 const ABILITY_MINTS = [
 	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
 	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
@@ -387,15 +388,22 @@ func mint_nft(owner, name):
 	print("mapping: ", $program_handler.getAccountAt(12))
 	$program_handler.addNewSigner()
 	print("grizzly: ", $program_handler.getAccountAt(13))
-	$program_handler.addExistingAccount(ID, SYSTEM_PROGRAM);
+	
+	$program_handler.addExistingAccount(NATIVE_MINT, ID);
+	$program_handler.addAssociatedTokenAccount(NATIVE_MINT, wallet_key);
 	
 	var send_data = PackedByteArray();
 	if name.to_utf8_buffer().size() > 255:
 		print("Name length is too long")
 		return;
-	send_data.resize(2)
+	send_data.resize(3)
 	send_data[0] = 1
 	send_data[1] = name.to_utf8_buffer().size()
+	if await has_token_account(NATIVE_MINT):
+		send_data[2] = 0
+	else:
+		send_data[2] = 1
+	
 	send_data.append_array(name.to_utf8_buffer())
 	get_latest_block_hash()
 	await $get_latest_block_hash.request_completed
@@ -813,7 +821,7 @@ func get_ability_tokens():
 	var decoded_data = bs64.decode(bear_data)
 	
 	if decoded_data[90] != 0 and decoded_data[0] == 0:
-		tokens[decoded_data[90] - 1] += 1
+		tokens[decoded_data[90]] += 1
 	
 	return tokens
 
@@ -876,3 +884,117 @@ func _on_send_transaction_check_timeout():
 	if check_send_transaction_response():
 		$send_transaction_check.stop()
 	pass # Replace with function body.
+
+
+func has_token_account(mint):
+	if await get_bear_data(mint) == "":
+		return false
+	else:
+		return true
+
+
+func trade_ability_token(index, sell, native):
+	var ability_accounts = get_accounts_from_mint(ABILITY_MINTS[index])
+	
+	$program_handler.addExistingAccount(nft_map[0], ID)
+	$program_handler.addNewSigner()
+	$program_handler.addAssociatedTokenAccount(nft_map[0], wallet_key)
+	$program_handler.addAccount(4322, ID)
+	
+	$program_handler.addExistingAccount(TOKEN, ID, false, false)
+	$program_handler.addExistingAccount(ATOKEN, ID, false, false)
+	$program_handler.addAssociatedMetaAccount(nft_map[0], MPL_TOKEN, false);
+	
+	$program_handler.addExistingAccount(nft_map[2], ID)
+	$program_handler.addExistingAccount(nft_map[1], ID)
+	
+	$program_handler.addExistingAccount(ABILITY_MINTS[index], ID)
+	$program_handler.addAssociatedTokenAccount(ABILITY_MINTS[index], wallet_key)
+	
+	$program_handler.addExistingAccount(NATIVE_MINT, ID)
+	$program_handler.addAssociatedTokenAccount(NATIVE_MINT, wallet_key)
+	
+	$program_handler.addExistingAccount(BANK_ID, ID)
+	$program_handler.addExistingAccount(ARENA_ID, ID)
+	
+	$program_handler.addExistingAccount(SYSTEM_PROGRAM, ID, false, false)
+	
+	var send_data = PackedByteArray();
+
+	send_data.resize(5)
+	send_data[0] = 7
+	if await has_token_account(ABILITY_MINTS[index]):
+		send_data[1] = 0
+	else:
+		send_data[1] = 1
+	send_data[2] = index
+	if sell:
+		send_data[3] = 0
+	else:
+		send_data[3] = 1
+	
+	if native:
+		send_data[4] = 0
+	else:
+		send_data[4] = 1
+		
+	get_latest_block_hash()
+	await $get_latest_block_hash.request_completed
+	var latest_blockhash = response_data['result']['value']['blockhash']
+	
+	var transaction
+	if CLUSTER == "localhost":
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
+		print(await send_transaction(transaction))
+	else:
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, false)
+		phantom_send_transaction(transaction)
+		
+	$program_handler.clearAccountVector();
+	
+
+func merge_ability_tokens(index):
+	print(nft_map[1])
+	$program_handler.addExistingAccount(nft_map[0], ID)
+	$program_handler.addNewSigner()
+	$program_handler.addAssociatedTokenAccount(nft_map[0], wallet_key)
+	
+	$program_handler.addAccount(4322, ID)
+	
+	$program_handler.addExistingAccount(TOKEN, ID, false, false)
+	$program_handler.addExistingAccount(ATOKEN, ID, false, false)
+	$program_handler.addAssociatedMetaAccount(nft_map[0], MPL_TOKEN, false);
+	
+	$program_handler.addExistingAccount(nft_map[2], ID)
+	$program_handler.addExistingAccount(nft_map[1], ID)
+	
+	$program_handler.addExistingAccount(ABILITY_MINTS[index], ID)
+	$program_handler.addAssociatedTokenAccount(ABILITY_MINTS[index], wallet_key)
+	
+	$program_handler.addExistingAccount(SYSTEM_PROGRAM, ID, false, false)
+	
+	var send_data = PackedByteArray();
+
+	send_data.resize(3)
+	send_data[0] = 6
+	
+	if await has_token_account(ABILITY_MINTS[index]):
+		send_data[1] = 0
+	else:
+		send_data[1] = 1
+	send_data[2] = index
+
+	get_latest_block_hash()
+	await $get_latest_block_hash.request_completed
+	var latest_blockhash = response_data['result']['value']['blockhash']
+	
+	var transaction
+	if CLUSTER == "localhost":
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
+		print(await send_transaction(transaction))
+	else:
+		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, false)
+		phantom_send_transaction(transaction)
+		
+	$program_handler.clearAccountVector();
+	

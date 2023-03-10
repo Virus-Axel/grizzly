@@ -79,17 +79,20 @@ pub fn validate_bear_nft<'a>(
     }
 
     if token_data[108] != 1{
+        msg!("Data at 108 is not 1: {}", token_data[108]);
         return Err(ProgramError::InsufficientFunds);
     }
 
     // Check if we have one of the token in the mint
     if mint_data[36] != 1{
+        msg!("Data at 36 is not 1: {}", token_data[36]);
         return Err(ProgramError::InsufficientFunds);
     }
 
     // Verify with metaplex
     const METADATA_SIGNED: usize = 358;
     if metadata_data[METADATA_SIGNED] == 0{
+        msg!("Data at 358 is not 1: {}", token_data[358]);
         return Err(ProgramError::InsufficientFunds);
     }
 

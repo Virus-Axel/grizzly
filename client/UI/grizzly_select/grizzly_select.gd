@@ -56,12 +56,14 @@ func _ready():
 
 	get_node("/root/w3").wallet_key = "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm"
 	get_node("/root/w3").get_node("program_handler").setKeys("HJyMW82CKUrsbfTSKaNXdsgqcS1HJm8jAjbVVq3Uj4AN", "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", w3.ID)
+	#get_node("/root/w3").create_account(65);
+	#return
 	#w3.create_account(33)
 	#return
 	#var nft_keys = await w3.get_nft_keys(w3.wallet_key)
 	var nft_keys = await get_node("/root/w3").get_nft_keys("9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm")
 	for map in nft_keys:
-		add_selectable_bear(map)
+		await add_selectable_bear(map)
 	
 	fade_base(1.0)
 	update_arrows()
@@ -71,6 +73,7 @@ func _ready():
 	#w3.mint_nft(w3.wallet_key)
 	else:
 		$CanvasLayer/MarginContainer/Button.disabled = false
+		$CanvasLayer/key.text = keys[0][0]
 	#print(nft_keys)
 	pass # Replace with function body.
 
@@ -107,14 +110,20 @@ func _input(event):
 			
 
 func on_swipe_left():
+	if $SubViewportContainer/SubViewport/bears.get_child_count() == 0:
+		return
 	selected_index -= 1
 	if selected_index < 0:
 		selected_index += $SubViewportContainer/SubViewport/bears.get_child_count()
+	$CanvasLayer/key.text = keys[selected_index][0]
 	update_arrows()
 
 	
 func on_swipe_right():
+	if $SubViewportContainer/SubViewport/bears.get_child_count() == 0:
+		return
 	selected_index = (selected_index + 1) % $SubViewportContainer/SubViewport/bears.get_child_count()
+	$CanvasLayer/key.text = keys[selected_index][0]
 	update_arrows()
 
 func _on_button_pressed():
@@ -127,6 +136,7 @@ func fade_base(strength):
 	$SubViewportContainer.modulate = Color(strength, strength, strength)
 	$CanvasLayer/MarginContainer.modulate = Color(strength, strength, strength)
 	$Control.modulate = Color(strength, strength, strength)
+	$CanvasLayer/key.modulate = Color(strength, strength, strength)
 
 func show_buy_buttons(vis = true):
 	$CanvasLayer/Button4.visible = vis
@@ -158,7 +168,8 @@ func _on_mint_button():
 		$CanvasLayer/loading_indicator.visible = true
 		var bear_name = $CanvasLayer/TextEdit.text
 		var w3 = get_node("/root/w3")
-		#await w3.mint_nft(w3.wallet_key, bear_name)
+		await w3.mint_nft(w3.wallet_key, bear_name)
+		
 		$CanvasLayer/loading_indicator.visible = false
 		show_buy_buttons(false)
 		fade_base(1.0)

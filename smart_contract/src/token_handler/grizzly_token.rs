@@ -27,9 +27,14 @@ use mpl_token_metadata::instruction::{
     sign_metadata,
 };
 
-use crate::data_structures::grizzly_structure;
-
-use crate::account_security::{verify_bank_account, verify_and_get_mut_data};
+use crate::{
+    data_structures::grizzly_structure,
+    NATIVE_TOKEN_ID,
+    account_security::{
+        verify_bank_account,
+        verify_and_get_mut_data
+    },
+};
 
 pub const AUTHORITY_SEED: &[u8] = b"cryptoforts_mint_seed";
 const NFT_COST: u64 = 100000000;
@@ -76,8 +81,8 @@ pub fn create_grizzly_token<'a>(
     let grizzly_account = next_account_info(accounts_iter)?;
 
     // Accounts for native currency
-    let native_token = next_account_info(accounts_iter)?;
     let native_mint = next_account_info(accounts_iter)?;
+    let native_token = next_account_info(accounts_iter)?;
  //   let grizzly_program = next_account_info(accounts_iter)?;
 
     // Verify native mint
@@ -85,7 +90,7 @@ pub fn create_grizzly_token<'a>(
         return Err(ProgramError::IllegalOwner);
     }
 
-    msg!("Trying to create mapping account: {}", &mapping_account.key.to_string());
+    //msg!("Trying to create mapping account: {}", &mapping_account.key.to_string());
     // Create Mapping account and grizzly account
     invoke(
         &create_account(
@@ -103,7 +108,7 @@ pub fn create_grizzly_token<'a>(
     )?;
 
 
-    msg!("Creating grizzly account {}", grizzly_account.key.to_string());
+    //msg!("Creating grizzly account {}", grizzly_account.key.to_string());
     invoke(
         &create_account(
             &sender_account.key,
@@ -121,16 +126,16 @@ pub fn create_grizzly_token<'a>(
     //let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
     //grizzly_data[grizzly_structure::HEART_SIZE].copy_from_slice(&1_u32.to_le_bytes());
 
-    msg!("Verifying mapping accounts");
+    //msg!("Verifying mapping accounts");
 
     // Verify mapping accounts and set internal keys
     let mut mapping_data = verify_and_get_mut_data(program_id, mapping_account)?;
     set_mapping_keys(&mut mapping_data, mint.key, grizzly_account.key);
 
-    msg!("Verifying bank account");
+    //msg!("Verifying bank account");
     verify_bank_account(program_id, bank_account)?;
 
-    msg!("Verifying that mint authority is PDA");
+    //msg!("Verifying that mint authority is PDA");
     let (expected_mint_authority, bump) = Pubkey::find_program_address(
         &[AUTHORITY_SEED, program_id.as_ref()],
         &program_id
@@ -140,7 +145,7 @@ pub fn create_grizzly_token<'a>(
         return Err(ProgramError::InvalidArgument);
     }
 
-    msg!("Creating mint with payer: {}", mint_authority.key.to_string());
+    //msg!("Creating mint with payer: {}", mint_authority.key.to_string());
     invoke_signed(
         &create_account(
             &mint_authority.key,
@@ -191,22 +196,24 @@ pub fn create_grizzly_token<'a>(
         ],
     )?;
 
-    msg!("Creating associated native account");
-    invoke(
-        &create_associated_token_account(
-            &sender_account.key,
-            &sender_account.key,
-            &native_mint.key,
-            &spl_token::id()
-        ),
-        &[
-            native_mint.clone(),
-            native_token.clone(),
-            sender_account.clone(),
-            token_program.clone(),
-            associated_token_program.clone(),
-        ],
-    )?;
+    if instruction_data[2] == 1{
+        msg!("Creating associated native account");
+        invoke(
+            &create_associated_token_account(
+                &sender_account.key,
+                &sender_account.key,
+                &native_mint.key,
+                &spl_token::id()
+            ),
+            &[
+                native_mint.clone(),
+                native_token.clone(),
+                sender_account.clone(),
+                token_program.clone(),
+                associated_token_program.clone(),
+            ],
+        )?;
+    }
 
     msg!("Minting a token");
     invoke_signed(

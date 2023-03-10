@@ -1,0 +1,69 @@
+[gd_scene load_steps=4 format=3 uid="uid://cyhddb4ikgf5b"]
+
+[ext_resource type="Script" path="res://store/store.gd" id="1_nok8k"]
+[ext_resource type="Texture2D" uid="uid://cffn3b5ycdbrj" path="res://images/sol.png" id="3_vvqf2"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7nvsf"]
+bg_color = Color(0.490196, 0.498039, 0.486275, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[node name="Panel" type="Panel"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -503.5
+offset_top = -384.0
+offset_right = 503.5
+offset_bottom = 384.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_7nvsf")
+script = ExtResource("1_nok8k")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 13
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -467.5
+offset_top = 81.0
+offset_right = 477.5
+offset_bottom = -23.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -69.5
+offset_top = 10.0
+offset_right = 69.5
+offset_bottom = 63.0
+grow_horizontal = 2
+
+[node name="TextureRect2" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("3_vvqf2")
+expand_mode = 2
+
+[node name="CheckButton" type="CheckButton" parent="HBoxContainer"]
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("3_vvqf2")
+expand_mode = 2
+
+[connection signal="toggled" from="HBoxContainer/CheckButton" to="." method="_on_check_button_toggled"]
