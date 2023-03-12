@@ -96,9 +96,9 @@ func toggle_native():
 
 func display_prize():
 	if native:
-		$rate.text = str(prize / LAMPORTS_PER_NATIVE)
-	else:
 		$rate.text = str(prize)
+	else:
+		$rate.text = str(prize * LAMPORTS_PER_NATIVE)
 
 func set_prize(new_prize):
 	prize = new_prize
@@ -118,15 +118,16 @@ func _process(delta):
 
 
 func _on_buy_pressed():
-	get_node("/root/w3").trade_ability_token(index, false, native)
-	pass # Replace with function body.
+	await get_node("/root/w3").trade_ability_token(index, false, native)
 
 
 func _on_sell_pressed():
-	get_node("/root/w3").trade_ability_token(index, true, native)
-	pass # Replace with function body.
+	await get_node("/root/w3").trade_ability_token(index, true, native)
 
 
 func _on_merge_pressed():
-	get_node("/root/w3").merge_ability_tokens(index)
-	pass # Replace with function body.
+	await get_node("/root/w3").merge_ability_tokens(index)
+
+
+func _on_equip_pressed():
+	await get_node("/root/w3").equip_ability_token(index)

@@ -162,7 +162,7 @@ pub fn create_grizzly_token<'a>(
         &[&[AUTHORITY_SEED, program_id.as_ref(), &[bump]]]
     )?;
 
-    msg!("Initializing mint");
+    //msg!("Initializing mint");
     invoke(
         &initialize_mint(
             &token_program.key,
@@ -179,7 +179,7 @@ pub fn create_grizzly_token<'a>(
         ],
     )?;
 
-    msg!("Creating associated token account");
+    //msg!("Creating associated token account");
     invoke(
         &create_associated_token_account(
             &sender_account.key,
@@ -197,7 +197,7 @@ pub fn create_grizzly_token<'a>(
     )?;
 
     if instruction_data[2] == 1{
-        msg!("Creating associated native account");
+        //msg!("Creating associated native account");
         invoke(
             &create_associated_token_account(
                 &sender_account.key,
@@ -215,7 +215,7 @@ pub fn create_grizzly_token<'a>(
         )?;
     }
 
-    msg!("Minting a token");
+    //msg!("Minting a token");
     invoke_signed(
         &mint_to(
             &token_program.key,
@@ -235,7 +235,7 @@ pub fn create_grizzly_token<'a>(
         &[&[AUTHORITY_SEED, program_id.as_ref(), &[bump]]]
     )?;
 
-    msg!("Paying bank for token");
+    //msg!("Paying bank for token");
     // Pay for token.
     invoke(
         &system_instruction::transfer(sender_account.key, bank_account.key, NFT_COST),
@@ -253,7 +253,7 @@ pub fn create_grizzly_token<'a>(
         share: 100,
     }]);
 
-    msg!("Creating metadata accounts");
+    //msg!("Creating metadata accounts");
     // Create metadata account.
     invoke_signed(
         &create_metadata_accounts_v3(
@@ -287,7 +287,7 @@ pub fn create_grizzly_token<'a>(
     )?;
 
     // Create master edition.
-    msg!("Creating master edition");
+    //msg!("Creating master edition");
     invoke_signed(
         &create_master_edition_v3(
             *metadata_program.key,
@@ -311,7 +311,7 @@ pub fn create_grizzly_token<'a>(
     )?;
 
     // Sign this metadata to prove it is legit.
-    msg!("Signing metadata");
+    //msg!("Signing metadata");
     invoke_signed(
         &sign_metadata(
             *metadata_program.key,

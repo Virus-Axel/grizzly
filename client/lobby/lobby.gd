@@ -6,6 +6,10 @@ var fridge_shown: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
+	$bear.get_node("AnimationPlayer").animation_finished.connect(Callable(self, "replay"))
+	$bear.get_node("AnimationPlayer").play("ArmatureAction")
+	#get_node("/root/w3").create_account(33 + 32*8);
+	#await _on_shop_update_timeout()
 	#var ID = get_node("/root/w3").ID
 	
 	#get_node("/root/w3").wallet_key = "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm"
@@ -16,11 +20,7 @@ func _ready():
 	#get_node("/root/w3").equip_ability_token(2)
 	return
 	# Try to reveal secret
-	var w3 = get_node("/root/w3")
-	var ability_tokens = await w3.get_ability_tokens()
-	var children = $CanvasLayer/VBoxContainer.get_children()
-	for i in children.size():
-		children[i].text = str(ability_tokens[i])
+	
 
 	
 	#w3.equip_ability_token(1)
@@ -108,3 +108,28 @@ func _on_rank_button_pressed():
 	$AnimationPlayer.play("fridge_view")
 	$ui_player.play("hide_buttons")
 	fridge_shown = true
+
+func update_native_balance(new_balance):
+	$CanvasLayer/VBoxContainer/HBoxContainer2/Label.text = str(new_balance)
+
+func update_shop():
+	var w3 = get_node("/root/w3")
+	var ability_tokens = await w3.get_ability_tokens()
+	var children = $CanvasLayer/VBoxContainer.get_children()
+	for i in children.size():
+		children[i].set_ability_tokens[i]
+
+func _on_shop_update_timeout():
+	var w3 = get_node("/root/w3")
+	var native_balance = await w3.get_native_balance()
+	update_native_balance(native_balance)
+
+	await $CanvasLayer/Panel.update_supplies()
+	#w3.get_ability_rates()
+	await $CanvasLayer/Panel.update_prizes()
+
+func _on_button_pressed():
+	get_tree().change_scene_to_file("res://UI/grizzly_select/grizzly_select.tscn")
+
+func replay(name):
+	$bear.get_node("AnimationPlayer").play("ArmatureAction")

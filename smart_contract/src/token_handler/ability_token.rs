@@ -453,12 +453,8 @@ pub fn trade_ability_token<'a>(
         grizzly_data[grizzly_structure::AB.start] = 0;
     }
 
-    // Verify ability token
-    //msg!("Verify ability token");
-    verify_ability_token(sender_account, ability_mint, ability_token)?;
-
     //msg!("Verifying mint authority");
-    let (expected_mint_authority, bump) =
+    let (expected_mint_authority, _bump) =
         Pubkey::find_program_address(&[AUTHORITY_SEED, program_id.as_ref()], &program_id);
 
     if *mint_authority.key != expected_mint_authority {
@@ -479,6 +475,10 @@ pub fn trade_ability_token<'a>(
 
     // Sell
     if instruction_data[3] == 0{
+        // Verify ability token
+        //msg!("Verify ability token");
+        verify_ability_token(sender_account, ability_mint, ability_token)?;
+
         msg!("Burning this token {} {}", ability_token.key, ability_mint.key);
         msg!("token program is {}", token_program.key.to_string());
         invoke(
@@ -500,7 +500,8 @@ pub fn trade_ability_token<'a>(
         )?;
         // User wants to get native tokens
         if instruction_data[4] == 0{
-            give_native_token(program_id, sender_account, native_mint, native_token, token_program, associated_token_program, mint_authority, rent, system_program, (LAMPORTS_PER_NATIVE - 5000) * prize_rate)?;
+            msg!("native token {}", native_token.key.to_string());
+            give_native_token(program_id, sender_account, native_mint, native_token, token_program, associated_token_program, mint_authority, rent, system_program, prize_rate)?;
         }
         // User wants to get solana
         else{
@@ -516,7 +517,9 @@ pub fn trade_ability_token<'a>(
             **sender_lamports += LAMPORTS_PER_NATIVE * prize_rate;
         }
         // Decrease rates
-        arena_data[arena_structure::PRIZES + 8 * ability_index as usize..arena_structure::PRIZES + 8 + 8 * ability_index as usize].copy_from_slice(&(prize_rate - 1).to_le_bytes());
+        if prize_rate > 0{
+            arena_data[arena_structure::PRIZES + 8 * ability_index as usize..arena_structure::PRIZES + 8 + 8 * ability_index as usize].copy_from_slice(&(prize_rate - 1).to_le_bytes());
+        }
     }
     // Buy
     else {
@@ -553,6 +556,10 @@ pub fn trade_ability_token<'a>(
        
         // Increase rates
         arena_data[arena_structure::PRIZES + 8 * ability_index as usize..arena_structure::PRIZES + 8 + 8 * ability_index as usize].copy_from_slice(&(prize_rate + 1).to_le_bytes());
+
+        // Verify ability token
+        //msg!("Verify ability token");
+        verify_ability_token(sender_account, ability_mint, ability_token)?;
 
     }
 

@@ -28,7 +28,7 @@ use token_handler::{
 };
 
 pub fn arena_queue_id() -> Pubkey{
-    Pubkey::new(bs58::decode("7J749nqtZXHVjw2uvFUQv5jwqRCQdjUjxaVAyvaPN9u4").into_vec().as_ref().unwrap())
+    Pubkey::new(bs58::decode("5YDuhr5AWq6JT7ZtWioX5ynkt4t8y3c2ZDp6X22uyMkj").into_vec().as_ref().unwrap())
 }
 
 pub fn bank_account_id() -> Pubkey{

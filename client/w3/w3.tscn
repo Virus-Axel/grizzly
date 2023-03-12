@@ -8,7 +8,6 @@
 script = ExtResource("1_lgi08")
 
 [node name="get_latest_block_hash" type="HTTPRequest" parent="."]
-use_threads = true
 
 [node name="program_handler" type="HTTPRequest" parent="."]
 
@@ -26,6 +25,6 @@ wait_time = 0.5
 [node name="primes" type="Node" parent="."]
 script = ExtResource("3_6qfi7")
 
-[connection signal="request_completed" from="get_latest_block_hash" to="." method="_on_get_latest_block_hash_request_completed"]
+[connection signal="request_completed" from="get_latest_block_hash" to="." method="set_response_data"]
 [connection signal="timeout" from="connect_check" to="." method="_on_connect_check_timeout"]
 [connection signal="timeout" from="send_transaction_check" to="." method="_on_send_transaction_check_timeout"]

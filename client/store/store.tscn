@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://cyhddb4ikgf5b"]
+[gd_scene load_steps=5 format=3 uid="uid://cyhddb4ikgf5b"]
 
 [ext_resource type="Script" path="res://store/store.gd" id="1_nok8k"]
+[ext_resource type="Texture2D" uid="uid://0oydpukoy3qj" path="res://store/grizzly_token.png" id="2_fr42f"]
 [ext_resource type="Texture2D" uid="uid://cffn3b5ycdbrj" path="res://images/sol.png" id="3_vvqf2"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_7nvsf"]
@@ -31,9 +32,9 @@ anchors_preset = 13
 anchor_left = 0.5
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -467.5
+offset_left = -486.5
 offset_top = 81.0
-offset_right = 477.5
+offset_right = 495.5
 offset_bottom = -23.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -55,7 +56,7 @@ grow_horizontal = 2
 
 [node name="TextureRect2" type="TextureRect" parent="HBoxContainer"]
 layout_mode = 2
-texture = ExtResource("3_vvqf2")
+texture = ExtResource("2_fr42f")
 expand_mode = 2
 
 [node name="CheckButton" type="CheckButton" parent="HBoxContainer"]
@@ -65,5 +66,32 @@ layout_mode = 2
 layout_mode = 2
 texture = ExtResource("3_vvqf2")
 expand_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -84.5
+offset_top = 12.0
+offset_right = -24.5
+offset_bottom = 72.0
+grow_horizontal = 0
+texture = ExtResource("2_fr42f")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -84.5
+offset_top = 12.0
+offset_right = -24.5
+offset_bottom = 72.0
+grow_horizontal = 0
+texture = ExtResource("3_vvqf2")
+expand_mode = 1
 
 [connection signal="toggled" from="HBoxContainer/CheckButton" to="." method="_on_check_button_toggled"]

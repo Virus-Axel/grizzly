@@ -56,7 +56,7 @@ func _ready():
 
 	get_node("/root/w3").wallet_key = "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm"
 	get_node("/root/w3").get_node("program_handler").setKeys("HJyMW82CKUrsbfTSKaNXdsgqcS1HJm8jAjbVVq3Uj4AN", "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", w3.ID)
-	#get_node("/root/w3").create_account(65);
+	
 	#return
 	#w3.create_account(33)
 	#return
@@ -70,6 +70,7 @@ func _ready():
 	
 	if $SubViewportContainer/SubViewport/bears.get_child_count() == 0:
 		$CanvasLayer/error_prompt.show_no_bears()
+		$CanvasLayer/loading_indicator.visible = false
 	#w3.mint_nft(w3.wallet_key)
 	else:
 		$CanvasLayer/MarginContainer/Button.disabled = false

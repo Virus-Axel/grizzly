@@ -7,7 +7,7 @@ const MPL_TOKEN = "6sk5uQWhBTwWN2tLzLpE4jDD9rRd8H6ucQgAjocWkTcm";
 #const MPL_TOKEN = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
 const BANK_ID = "ANdidaLBCN3KrDFyraGtPVQhpaQr2oAqpPqN2DJL4CXv";
 
-const ARENA_ID = "7J749nqtZXHVjw2uvFUQv5jwqRCQdjUjxaVAyvaPN9u4"
+const ARENA_ID = "5YDuhr5AWq6JT7ZtWioX5ynkt4t8y3c2ZDp6X22uyMkj"
 
 const SYSTEM_PROGRAM = "11111111111111111111111111111111"
 
@@ -33,6 +33,8 @@ const ABILITY_MINTS = [
 	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
 ]
 
+const NO_ABILITIES: int = 32
+
 var response_data
 var body_data
 var signature
@@ -52,6 +54,12 @@ signal send_transaction_response
 signal disconnected
 signal bears_loaded
 signal phantom_error
+
+func int_from_array(arr: PackedByteArray) -> int:
+	var ret: int = 0
+	for i in arr.size():
+		ret += arr[i] * (1 << (i))
+	return ret
 
 func int_to_array(val):
 	var ret := PackedByteArray()
@@ -234,15 +242,23 @@ func get_bear_data(key):
 		],
 	})
 	
-	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	var request_handler = HTTPRequest.new()
+	add_child(request_handler)
+	request_handler.request_completed.connect(Callable(self, "set_response_data"))
+	var error = request_handler.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
-	await $get_latest_block_hash.request_completed
+	await request_handler.request_completed
+	
+	remove_child(request_handler)
 	if response_data.has("result"):
 		if response_data["result"]["value"] == null:
 			print("value is null")
 			return ""
-		return response_data["result"]["value"]["data"][0]
+		if response_data["result"]["value"].has("data"):
+			return response_data["result"]["value"]["data"][0]
+		else:
+			return ""
 	else:
 		print(response_data)
 		return ""
@@ -339,10 +355,16 @@ func send_transaction(transaction):
 			transaction,
 		]
 	})
-	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	var request_handler = HTTPRequest.new()
+	add_child(request_handler)
+	request_handler.request_completed.connect(Callable(self, "set_response_data"))
+	
+	var error = request_handler.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
-	await $get_latest_block_hash.request_completed
+	await request_handler.request_completed
+	
+	remove_child(request_handler)
 	return response_data
 
 func mint_nft(owner, name):
@@ -392,6 +414,8 @@ func mint_nft(owner, name):
 	$program_handler.addExistingAccount(NATIVE_MINT, ID);
 	$program_handler.addAssociatedTokenAccount(NATIVE_MINT, wallet_key);
 	
+	var native_token = $program_handler.getAccountAt(15);
+	
 	var send_data = PackedByteArray();
 	if name.to_utf8_buffer().size() > 255:
 		print("Name length is too long")
@@ -399,15 +423,14 @@ func mint_nft(owner, name):
 	send_data.resize(3)
 	send_data[0] = 1
 	send_data[1] = name.to_utf8_buffer().size()
-	if await has_token_account(NATIVE_MINT):
+	if await has_token_account(native_token):
 		send_data[2] = 0
+		return
 	else:
 		send_data[2] = 1
 	
 	send_data.append_array(name.to_utf8_buffer())
-	get_latest_block_hash()
-	await $get_latest_block_hash.request_completed
-	var latest_blockhash = response_data['result']['value']['blockhash']
+	var latest_blockhash = await get_latest_block_hash()
 	var transaction
 	if CLUSTER == "localhost":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
@@ -463,10 +486,8 @@ func equip_ability_token(ability_index):
 	$program_handler.addExistingAccount(SYSTEM_PROGRAM, ID)
 
 
-	get_latest_block_hash()
-	await $get_latest_block_hash.request_completed
-	var latest_blockhash = response_data['result']['value']['blockhash']
-	
+	var latest_blockhash = await get_latest_block_hash()
+
 	var transaction
 	if CLUSTER == "localhost":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
@@ -488,10 +509,8 @@ func clear_bear_data():
 	$program_handler.addExistingAccount(nft_map[1], ID)
 	$program_handler.addExistingAccount(ARENA_ID, ID)
 	
-	get_latest_block_hash()
-	await $get_latest_block_hash.request_completed
-	var latest_blockhash = response_data['result']['value']['blockhash']
-	
+	var latest_blockhash = await get_latest_block_hash()
+
 	var transaction
 	if CLUSTER == "localhost":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
@@ -551,10 +570,7 @@ func reveal_secret():
 	$program_handler.addExistingAccount(target_bear[0], ID)
 	$program_handler.addExistingAccount(ARENA_ID, ID)
 	
-	get_latest_block_hash()
-	await $get_latest_block_hash.request_completed
-	var latest_blockhash = response_data['result']['value']['blockhash']
-	
+	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
 	if CLUSTER == "localhost":
@@ -588,9 +604,7 @@ func create_ability_token():
 	send_data.resize(1)
 	send_data[0] = 5
 
-	get_latest_block_hash()
-	await $get_latest_block_hash.request_completed
-	var latest_blockhash = response_data['result']['value']['blockhash']
+	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
 	if CLUSTER == "localhost":
@@ -635,10 +649,8 @@ func battle(moveset):
 		print("added ", challenging_bear)
 		$program_handler.addExistingAccount(challenging_bear, ID)
 	
-	get_latest_block_hash()
-	await $get_latest_block_hash.request_completed
-	var latest_blockhash = response_data['result']['value']['blockhash']
-	
+	var latest_blockhash = await get_latest_block_hash()
+
 	var send_data = PackedByteArray();
 	var prime = $primes.primes[randi() % $primes.primes.size()]
 
@@ -730,10 +742,8 @@ func _ready():
 	pass
 	
 func signup_for_battle_not_used():
-	get_latest_block_hash()
-	await $get_latest_block_hash.request_completed
-	var blockhash = response_data['result']['value']['blockhash']
-	
+	var blockhash = await get_latest_block_hash()
+
 	$program_handler.generateKeypair()
 	var publicKey = $program_handler.pubkey()
 	var privateKey = $program_handler.secret()
@@ -750,10 +760,8 @@ func signup_for_battle_not_used():
 	pass # Replace with function body.
 
 func create_account(account_size, pubkey=""):
-	get_latest_block_hash()
-	await $get_latest_block_hash.request_completed
-	var blockhash = response_data['result']['value']['blockhash']
-	
+	var blockhash = await get_latest_block_hash()
+
 	$program_handler.generateKeypair()
 	var publicKey = $program_handler.pubkey()
 	var privateKey = $program_handler.secret()
@@ -791,6 +799,18 @@ func get_token_account(mint):
 	else:
 		return response_data["result"]["value"][0]["pubkey"]
 
+func get_ability_rates():
+	var encoded_data = await get_bear_data(ARENA_ID)
+	var decoded_data = await bs64.decode(encoded_data)
+	
+	var ret = []
+	
+	const RATES_OFFSET: int = 33
+	for i in range(NO_ABILITIES):
+		ret.push_back(int_from_array(decoded_data.slice(RATES_OFFSET + i * 8, RATES_OFFSET + 8 + i * 8)))
+	
+	return ret
+
 func get_ability_balance(index):
 	var token_account = await get_token_account(ABILITY_MINTS[index])
 	if token_account == "":
@@ -804,10 +824,41 @@ func get_ability_balance(index):
 			token_account
 		]
 	})
-	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	
+	var request_handler = HTTPRequest.new()
+	request_handler.request_completed.connect(Callable(self, "set_response_data"))
+	
+	add_child(request_handler)
+	var error = request_handler.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
-	await $get_latest_block_hash.request_completed
+	await request_handler.request_completed
+	
+	remove_child(request_handler)
+	return response_data["result"]["value"]["uiAmount"]
+
+func get_native_balance():
+	var token_account = await get_token_account(NATIVE_MINT)
+	if token_account == "":
+		return 0
+	
+	var body = JSON.new().stringify({
+		"id":1,
+		"jsonrpc":"2.0",
+		"method":"getTokenAccountBalance",
+		"params":[
+			token_account
+		]
+	})
+	var request_handler = HTTPRequest.new()
+	request_handler.request_completed.connect(Callable(self, "set_response_data"))
+	add_child(request_handler)
+	var error = request_handler.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	if error != OK:
+		push_error("An error occurred in the HTTP request.")
+	await request_handler.request_completed
+	
+	remove_child(request_handler)
 	return response_data["result"]["value"]["uiAmount"]
 
 
@@ -837,10 +888,19 @@ func get_latest_block_hash():
 			}
 		]
 	})
-	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	var request_handler = HTTPRequest.new()
+	add_child(request_handler)
+	request_handler.request_completed.connect(Callable(self, "set_response_data"))
+	var error = request_handler.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
-	pass
+	
+	await request_handler.request_completed
+
+	var latest_blockhash = response_data['result']['value']['blockhash']
+	remove_child(request_handler)
+	
+	return latest_blockhash
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -855,21 +915,6 @@ func _http_request_completed(result, response_code, headers, body):
 
 	# Will print the user agent string used by the HTTPRequest node (as recognized by httpbin.org).
 	print(response.headers["User-Agent"])
-
-
-func _on_get_latest_block_hash_request_completed(result, response_code, headers, body):
-	#print(result)
-	#print(response_code)
-	#print(headers)
-	#print(body)
-	body_data = body.get_string_from_utf8()
-	#print(body_data)
-	
-	var json = JSON.new()
-	json.parse(body.get_string_from_utf8())
-	response_data = json.get_data();
-	var response = json.get_data()
-	#print(response)
 
 
 func _on_connect_check_timeout():
@@ -938,9 +983,8 @@ func trade_ability_token(index, sell, native):
 	else:
 		send_data[4] = 1
 		
-	get_latest_block_hash()
-	await $get_latest_block_hash.request_completed
-	var latest_blockhash = response_data['result']['value']['blockhash']
+	var latest_blockhash = await get_latest_block_hash()
+	print("latest blockhash: ", latest_blockhash)
 	
 	var transaction
 	if CLUSTER == "localhost":
@@ -984,10 +1028,8 @@ func merge_ability_tokens(index):
 		send_data[1] = 1
 	send_data[2] = index
 
-	get_latest_block_hash()
-	await $get_latest_block_hash.request_completed
-	var latest_blockhash = response_data['result']['value']['blockhash']
-	
+	var latest_blockhash = await get_latest_block_hash()
+
 	var transaction
 	if CLUSTER == "localhost":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
@@ -998,3 +1040,17 @@ func merge_ability_tokens(index):
 		
 	$program_handler.clearAccountVector();
 	
+
+func set_response_data(result, response_code, headers, body):
+	#print(result)
+	#print(response_code)
+	#print(headers)
+	#print(body)
+	body_data = body.get_string_from_utf8()
+	#print(body_data)
+	
+	var json = JSON.new()
+	json.parse(body.get_string_from_utf8())
+	response_data = json.get_data();
+	var response = json.get_data()
+	#print(response)
