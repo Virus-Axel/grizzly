@@ -47,13 +47,12 @@ const SECONDS_UNTIL_PRIZE_REDUCTION: usize = 20;
         past_challenger_bear (If there is one),
         challenging_bear (If there is one)
     instruction_data: Data should consist of:
-        instruction type - offset 0, length 1
-        allocate_space - offset 1, length 1
-        moveset - offset 2, length 5
-        P -
-        G -
-        AB -
-        (shared_secret - if instruction_type is 1)
+        instruction type - length 1, already used
+        allocate_space - length 1, 1 to create associated token account for reward ability
+        moveset - length 5, five ability indices of the desired moveset
+        P - Primitive root
+        G - Prime
+        AB - Primitive root to the power of a secret modulus the prime
 
 */
 pub fn arena_signup<'a>(
@@ -90,7 +89,7 @@ pub fn arena_signup<'a>(
     msg!("Validating bear nft");
     match validate_bear_nft(program_id, sender_account, mint_account, token_account, metadata_account, grizzly_account, mapping_account){
         Ok(_) => (),
-        Err(e) => return Err(ProgramError::IllegalOwner),
+        Err(_) => return Err(ProgramError::IllegalOwner),
     }
 
     msg!("Checking arena account");
@@ -108,7 +107,7 @@ pub fn arena_signup<'a>(
     }
 
 
-    // TODO: Give native tokens
+    // TODO: Give native tokens to cover fee
 
     msg!("Verifying grizzly owner");
     let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
@@ -165,7 +164,9 @@ pub fn arena_signup<'a>(
     msg!("Updating moveset");
     for i in 0..5{
         const MOVESET_OFFSET: usize = 2;
-        if grizzly_data[instruction_data[MOVESET_OFFSET + i] as usize] > 0{
+
+        // Check if ability is learned
+        if grizzly_data[grizzly_structure::ABILITY_LEVELS + instruction_data[MOVESET_OFFSET + i] as usize] > 0{
             grizzly_data[grizzly_structure::EQUIPPED_ABILITIES + i] = instruction_data[MOVESET_OFFSET + i];
         }
         else{
@@ -265,7 +266,6 @@ pub fn arena_signup<'a>(
 pub fn clear_bear_data<'a>(
     program_id: &Pubkey,
     accounts: &'a [AccountInfo<'a>],
-    instruction_data: &[u8],
 ) -> ProgramResult {
     let accounts_iter = &mut accounts.iter();
 

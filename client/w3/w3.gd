@@ -850,7 +850,7 @@ func get_native_balance():
 			token_account
 		]
 	})
-	var request_handler = HTTPRequest.new()
+	var request_handler =uxayy HTTPRequest.new()
 	request_handler.request_completed.connect(Callable(self, "set_response_data"))
 	add_child(request_handler)
 	var error = request_handler.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)

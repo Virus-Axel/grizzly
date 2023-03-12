@@ -4,20 +4,13 @@ use solana_program::{
     msg,
     program_error::ProgramError,
     pubkey::Pubkey,
-    sysvar::{clock::Clock, Sysvar},
 };
 
 use crate::{
     account_security::verify_and_get_mut_data,
-    arena::fight_system::{
-        evaluate_winner,
-        is_battle_aborted,
-    },
-    arena_queue_id,
-    data_structures::{arena_structure, grizzly_structure},
+    arena::fight_system::evaluate_winner,
+    data_structures::grizzly_structure,
 };
-
-use crate::token_handler::ability_token::give_ability_token;
 
 use mod_exp::mod_exp;
 
@@ -46,7 +39,6 @@ pub fn reveal_secret_instruction<'a>(
     accounts: &'a [AccountInfo<'a>],
     instruction_data: &[u8],
 ) -> ProgramResult {
-    let accounts_copy = accounts.clone();
     let accounts_iter = &mut accounts.iter();
 
     // Get the accounts
@@ -62,6 +54,8 @@ pub fn reveal_secret_instruction<'a>(
     let mut mapping_data = verify_and_get_mut_data(program_id, mapping_account)?;
     let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
     let mut other_grizzly_data = verify_and_get_mut_data(program_id, other_grizzly_account)?;
+
+    // Todo: Verify that user has bear token
 
     // Check if we are challenging or not
     msg!("Checking if we are in challenging state");

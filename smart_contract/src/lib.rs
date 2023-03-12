@@ -50,7 +50,7 @@ pub fn process_instruction<'a>(
         0 => arena_signup_instruction::arena_signup(program_id, &accounts, &instruction_data),
         1 => create_grizzly_token(program_id, &accounts, &instruction_data),
         2 => reveal_secret_instruction(program_id, &accounts, &instruction_data),
-        3 => arena_signup_instruction::clear_bear_data(program_id, &accounts, &instruction_data),
+        3 => arena_signup_instruction::clear_bear_data(program_id, &accounts),
         4 => equip_ability_token(program_id, &accounts, &instruction_data),
         5 => create_ability_token(program_id, &accounts),
         6 => merge_ability_tokens(program_id, &accounts, &instruction_data),

@@ -3,7 +3,6 @@ use std::ops::Range;
 pub const STATE_NO_FIGHT: u8 = 0;
 pub const STATE_CHALLENGING: u8 = 1;
 pub const STATE_ACCEPTED_CHALLENGE: u8 = 2;
-pub const STATE_CONFIRMED_CHALLENGE: u8 = 3;
 
 pub const MAX_EQUIPPED_ABILITIES: usize = 5;
 pub const AMOUNT_OF_ABILITIES: usize = 32;

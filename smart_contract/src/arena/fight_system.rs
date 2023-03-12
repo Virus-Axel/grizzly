@@ -1,5 +1,4 @@
 use solana_program::{
-    entrypoint::ProgramResult,
     msg,
     sysvar::{clock::Clock, Sysvar},
 };
@@ -17,13 +16,10 @@ use crate::{
 
 use super::abilities;
 
-use crate::token_handler::ability_token::give_ability_token;
-
 const MAX_FIGHT_ROUNDS: usize = 10;
 const FIGHT_CONFIRMATION_TIME: i64 = 10;
 const STAMINA_RECOVERY: f32 = 0.015;
 const HEART_STAMINA_FACTOR: f32 = 0.1;
-const PROGRESSION_FACTOR: f32 = 0.001;
 
 
 pub fn is_battle_aborted(bear_data: &[u8]) -> bool {
