@@ -1,0 +1,24 @@
+[package]
+name = "grizzly_arena"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[features]
+no-entrypoint = []
+
+[dependencies]
+bs58 = "*"
+borsh = "*"
+borsh-derive = "*"
+solana-program = "1.14.*"
+mod_exp = "*"
+oorandom = "*"
+mpl-token-metadata = {version = "1.8.5", features = ["no-entrypoint"]}
+spl-token-2022 = {version = "*", features = ["no-entrypoint"]}
+spl-associated-token-account = {version = "*", features = ["no-entrypoint"]}
+
+[lib]
+name = "grizzly_arena"
+crate-type = ["cdylib", "lib"]

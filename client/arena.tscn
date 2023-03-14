@@ -1,0 +1,163 @@
+[gd_scene load_steps=6 format=3 uid="uid://bsabauhycew5b"]
+
+[ext_resource type="Script" path="res://arena/Camera3D.gd" id="1_dlcvc"]
+[ext_resource type="Script" path="res://arena.gd" id="1_vmoyd"]
+[ext_resource type="PackedScene" uid="uid://ho0kohq1wu5k" path="res://grizzly_bear/bear.glb" id="3_1lf1j"]
+[ext_resource type="PackedScene" uid="uid://fxwvh5nt1v0" path="res://arena/arena.glb" id="3_je1uo"]
+[ext_resource type="AnimationNodeBlendTree" uid="uid://dukyyenkisjco" path="res://arena/bear_tree.tres" id="5_jms7p"]
+
+[node name="arena" type="Node3D"]
+script = ExtResource("1_vmoyd")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.911324, 0.411689, 0, -0.411689, 0.911324, 1.60794, 0.446468, 3.75886)
+current = true
+script = ExtResource("1_dlcvc")
+
+[node name="arena" parent="." instance=ExtResource("3_je1uo")]
+transform = Transform3D(0.361811, 0, 0, 0, 0.361811, 0, 0, 0, 0.361811, 1.45619, -0.961492, 2.02884)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.504226, 0.863572, 0, -0.863572, 0.504226, 0, 3, 0)
+shadow_enabled = true
+shadow_opacity = 0.3
+
+[node name="bear" parent="." instance=ExtResource("3_1lf1j")]
+transform = Transform3D(-0.00516508, 0, 0.102777, 0, 0.102906, 0, -0.102777, 0, -0.00516508, -0.64797, -0.902, 2.246)
+
+[node name="Skeleton3D" parent="bear/Armature" index="0"]
+bones/0/rotation = Quaternion(0.790954, 1.45882e-07, 1.88578e-07, 0.611876)
+bones/1/rotation = Quaternion(-0.190276, 0.00220806, 0.0353311, 0.981092)
+bones/2/rotation = Quaternion(0.0177676, 0.00386739, 0.00021992, 0.999835)
+bones/3/rotation = Quaternion(0.184767, 6.38325e-13, 5.72675e-07, 0.982782)
+bones/4/rotation = Quaternion(0.822287, 0.277387, -0.24375, 0.432997)
+bones/5/rotation = Quaternion(-0.405832, -0.0644652, 0.37406, 0.831398)
+bones/6/rotation = Quaternion(-0.091545, 0.00406432, 0.0612225, 0.993909)
+bones/7/rotation = Quaternion(-0.379643, 0.072557, 0.0264559, 0.921904)
+bones/8/rotation = Quaternion(0.876795, -0.376026, 0.132901, 0.268648)
+bones/9/rotation = Quaternion(-0.286261, -0.0763432, -0.29055, 0.909839)
+bones/10/rotation = Quaternion(0.114815, -0.0158131, -0.061432, 0.991359)
+bones/11/rotation = Quaternion(-0.597445, -0.105699, -0.0162669, 0.794746)
+bones/12/rotation = Quaternion(-0.0560913, -0.167293, 0.944931, -0.275631)
+bones/13/rotation = Quaternion(-0.102433, 0.0228775, -0.280349, 0.954143)
+bones/14/rotation = Quaternion(-0.165814, -6.69077e-09, -8.73739e-07, 0.986157)
+bones/15/rotation = Quaternion(0.518383, 0.0409495, -0.0672628, 0.851515)
+bones/16/rotation = Quaternion(-0.063572, 0.192947, 0.940028, 0.274003)
+bones/17/rotation = Quaternion(-0.0181884, -0.012507, 0.281003, 0.959453)
+bones/18/rotation = Quaternion(-0.0836277, -1.65376e-09, -4.47368e-07, 0.996497)
+bones/19/rotation = Quaternion(0.645181, -0.0509663, 0.0600363, 0.75996)
+
+[node name="bear2" parent="." instance=ExtResource("3_1lf1j")]
+transform = Transform3D(0.00111892, 0, -0.1029, 0, 0.102906, 0, 0.1029, 0, 0.00111892, 4.40207, -0.901742, 2.24598)
+
+[node name="Skeleton3D" parent="bear2/Armature" index="0"]
+bones/0/rotation = Quaternion(0.790954, 1.45882e-07, 1.88578e-07, 0.611876)
+bones/1/rotation = Quaternion(-0.190276, 0.00220806, 0.0353311, 0.981092)
+bones/2/rotation = Quaternion(0.0177676, 0.00386739, 0.00021992, 0.999835)
+bones/3/rotation = Quaternion(0.184767, 6.38325e-13, 5.72675e-07, 0.982782)
+bones/4/rotation = Quaternion(0.822287, 0.277387, -0.24375, 0.432997)
+bones/5/rotation = Quaternion(-0.405832, -0.0644652, 0.37406, 0.831398)
+bones/6/rotation = Quaternion(-0.091545, 0.00406432, 0.0612225, 0.993909)
+bones/7/rotation = Quaternion(-0.379643, 0.072557, 0.0264559, 0.921904)
+bones/8/rotation = Quaternion(0.876795, -0.376026, 0.132901, 0.268648)
+bones/9/rotation = Quaternion(-0.286261, -0.0763432, -0.29055, 0.909839)
+bones/10/rotation = Quaternion(0.114815, -0.0158131, -0.061432, 0.991359)
+bones/11/rotation = Quaternion(-0.597445, -0.105699, -0.0162669, 0.794746)
+bones/12/rotation = Quaternion(-0.0560913, -0.167293, 0.944931, -0.275631)
+bones/13/rotation = Quaternion(-0.102433, 0.0228775, -0.280349, 0.954143)
+bones/14/rotation = Quaternion(-0.165814, -6.69077e-09, -8.73739e-07, 0.986157)
+bones/15/rotation = Quaternion(0.518383, 0.0409495, -0.0672628, 0.851515)
+bones/16/rotation = Quaternion(-0.063572, 0.192947, 0.940028, 0.274003)
+bones/17/rotation = Quaternion(-0.0181884, -0.012507, 0.281003, 0.959453)
+bones/18/rotation = Quaternion(-0.0836277, -1.65376e-09, -4.47368e-07, 0.996497)
+bones/19/rotation = Quaternion(0.645181, -0.0509663, 0.0600363, 0.75996)
+
+[node name="your_animation_tree" type="AnimationTree" parent="."]
+tree_root = ExtResource("5_jms7p")
+anim_player = NodePath("../bear/AnimationPlayer")
+active = true
+parameters/bite/active = false
+parameters/bite/request = 0
+parameters/comfort_cry/active = false
+parameters/comfort_cry/request = 0
+parameters/double_slap/active = false
+parameters/double_slap/request = 0
+parameters/horror_combo/active = false
+parameters/horror_combo/request = 0
+parameters/hyper_boxing/active = false
+parameters/hyper_boxing/request = 0
+parameters/meditate/active = false
+parameters/meditate/request = 0
+parameters/power_hit/active = false
+parameters/power_hit/request = 0
+parameters/roar/active = false
+parameters/roar/request = 0
+parameters/slam/active = false
+parameters/slam/request = 0
+parameters/stand/active = false
+parameters/stand/request = 0
+parameters/stand_blend/blend_amount = 1.0
+parameters/tackle/active = false
+parameters/tackle/request = 0
+parameters/takedown_hit/active = false
+parameters/takedown_hit/request = 0
+parameters/trick_kick/active = false
+parameters/trick_kick/request = 0
+parameters/weak_kick/active = false
+parameters/weak_kick/request = 0
+parameters/weak_magic/active = false
+parameters/weak_magic/request = 0
+parameters/weak_punch/active = false
+parameters/weak_punch/request = 0
+parameters/weak_slap/active = false
+parameters/weak_slap/request = 0
+
+[node name="other_animation_tree" type="AnimationTree" parent="."]
+tree_root = ExtResource("5_jms7p")
+anim_player = NodePath("../bear2/AnimationPlayer")
+active = true
+parameters/bite/active = false
+parameters/bite/request = 0
+parameters/comfort_cry/active = false
+parameters/comfort_cry/request = 0
+parameters/double_slap/active = false
+parameters/double_slap/request = 0
+parameters/horror_combo/active = false
+parameters/horror_combo/request = 0
+parameters/hyper_boxing/active = false
+parameters/hyper_boxing/request = 0
+parameters/meditate/active = false
+parameters/meditate/request = 0
+parameters/power_hit/active = false
+parameters/power_hit/request = 0
+parameters/roar/active = false
+parameters/roar/request = 0
+parameters/slam/active = false
+parameters/slam/request = 0
+parameters/stand/active = false
+parameters/stand/request = 0
+parameters/stand_blend/blend_amount = 1.0
+parameters/tackle/active = false
+parameters/tackle/request = 0
+parameters/takedown_hit/active = false
+parameters/takedown_hit/request = 0
+parameters/trick_kick/active = false
+parameters/trick_kick/request = 0
+parameters/weak_kick/active = false
+parameters/weak_kick/request = 0
+parameters/weak_magic/active = false
+parameters/weak_magic/request = 0
+parameters/weak_punch/active = false
+parameters/weak_punch/request = 0
+parameters/weak_slap/active = false
+parameters/weak_slap/request = 0
+
+[node name="calm_before_the_storm" type="Timer" parent="."]
+wait_time = 3.0
+
+[connection signal="animation_finished" from="your_animation_tree" to="." method="_on_your_animation_tree_animation_finished"]
+[connection signal="animation_finished" from="other_animation_tree" to="." method="_on_other_animation_tree_animation_finished"]
+[connection signal="timeout" from="calm_before_the_storm" to="." method="_on_calm_before_the_storm_timeout"]
+
+[editable path="bear"]
+[editable path="bear2"]

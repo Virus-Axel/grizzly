@@ -1,0 +1,47 @@
+[gd_scene load_steps=5 format=3 uid="uid://xebxovqnhbd6"]
+
+[ext_resource type="Theme" uid="uid://g2udyqfqc7q4" path="res://UI/start/phantom_theme.tres" id="1_421vv"]
+[ext_resource type="Script" path="res://UI/start/error_prompt.gd" id="2_huub7"]
+[ext_resource type="Texture2D" uid="uid://cqsv7ylkcsblt" path="res://UI/shade_line.png" id="2_unyfd"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_fhgt6"]
+texture = ExtResource("2_unyfd")
+
+[node name="error_prompt" type="MarginContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 323.0
+offset_bottom = -521.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_421vv")
+script = ExtResource("2_huub7")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_fhgt6")
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Phantom Error
+
+Failed to connect to phantom
+wallet. Make sure phantom is
+installed and try again."
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 22
+theme_override_constants/margin_right = 22
+
+[node name="Panel2" type="Panel" parent="VBoxContainer/MarginContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_fhgt6")

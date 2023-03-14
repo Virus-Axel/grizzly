@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://cd83eul18lnq8"]
+
+[ext_resource type="PackedScene" uid="uid://cq676xeucr7ac" path="res://grizzly_bear/grizzly.dae" id="1_7veov"]
+
+[node name="grizzly" instance=ExtResource("1_7veov")]

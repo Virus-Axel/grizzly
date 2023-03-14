@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" uid="uid://cq676xeucr7ac" path="res://grizzly_bear/grizzly.dae" id="1_d0xcq"]
+
+[node name="Node3D" type="MeshInstance3D"]
+
+[node name="grizzly" parent="." instance=ExtResource("1_d0xcq")]
+transform = Transform3D(0.453655, 0, 0, 0, 0.453655, 0, 0, 0, 0.453655, 0.095944, 0, 0.215175)

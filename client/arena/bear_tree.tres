@@ -1,0 +1,173 @@
+[gd_resource type="AnimationNodeBlendTree" load_steps=38 format=3 uid="uid://dukyyenkisjco"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_h8wo0"]
+animation = &"power_hit"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_wdvmm"]
+animation = &"roar"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_cxcr6"]
+animation = &"tackle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_3u233"]
+animation = &"takedown_hit"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_qousl"]
+animation = &"trick_kick"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_uw7su"]
+animation = &"weak_kick"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gjhll"]
+animation = &"weak_magic"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_gja1c"]
+animation = &"weak_punch"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_v7iq0"]
+animation = &"weak_slap"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_uny5n"]
+animation = &"stand"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_2hwed"]
+animation = &"walk"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_26aio"]
+animation = &"double_slap"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_dqofg"]
+animation = &"slam"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_htl63"]
+animation = &"bite"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_0nhd1"]
+animation = &"comfort_cry"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_en7wf"]
+animation = &"horror_combo"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_j8ig8"]
+animation = &"hyper_boxing"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_x714e"]
+animation = &"meditate"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ra5ic"]
+animation = &"idle001"
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_4tn7g"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_3qcg5"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_ijdpb"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_37xay"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_88odx"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_lda8m"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_ys3n1"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_emymj"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_smqc7"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_voxxi"]
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_xykm5"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_ndeud"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_a57r3"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_unq8m"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_p8jxi"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_yvxcx"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_2qfqp"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_yuea0"]
+
+[resource]
+graph_offset = Vector2(-2362.2, 158.638)
+nodes/Animation/node = SubResource("AnimationNodeAnimation_ra5ic")
+nodes/Animation/position = Vector2(-2160, 180)
+"nodes/Animation 10/node" = SubResource("AnimationNodeAnimation_h8wo0")
+"nodes/Animation 10/position" = Vector2(300, 640)
+"nodes/Animation 11/node" = SubResource("AnimationNodeAnimation_wdvmm")
+"nodes/Animation 11/position" = Vector2(480, 620)
+"nodes/Animation 12/node" = SubResource("AnimationNodeAnimation_cxcr6")
+"nodes/Animation 12/position" = Vector2(740, 620)
+"nodes/Animation 13/node" = SubResource("AnimationNodeAnimation_3u233")
+"nodes/Animation 13/position" = Vector2(920, 720)
+"nodes/Animation 14/node" = SubResource("AnimationNodeAnimation_qousl")
+"nodes/Animation 14/position" = Vector2(1080, 840)
+"nodes/Animation 15/node" = SubResource("AnimationNodeAnimation_uw7su")
+"nodes/Animation 15/position" = Vector2(1220, 960)
+"nodes/Animation 16/node" = SubResource("AnimationNodeAnimation_gjhll")
+"nodes/Animation 16/position" = Vector2(1420, 1080)
+"nodes/Animation 17/node" = SubResource("AnimationNodeAnimation_gja1c")
+"nodes/Animation 17/position" = Vector2(1600, 1200)
+"nodes/Animation 18/node" = SubResource("AnimationNodeAnimation_v7iq0")
+"nodes/Animation 18/position" = Vector2(1780, 1340)
+"nodes/Animation 19/node" = SubResource("AnimationNodeAnimation_uny5n")
+"nodes/Animation 19/position" = Vector2(-2400, 600)
+"nodes/Animation 2/node" = SubResource("AnimationNodeAnimation_2hwed")
+"nodes/Animation 2/position" = Vector2(-2360, 380)
+"nodes/Animation 3/node" = SubResource("AnimationNodeAnimation_26aio")
+"nodes/Animation 3/position" = Vector2(-1260, 640)
+"nodes/Animation 4/node" = SubResource("AnimationNodeAnimation_dqofg")
+"nodes/Animation 4/position" = Vector2(-980, 680)
+"nodes/Animation 5/node" = SubResource("AnimationNodeAnimation_htl63")
+"nodes/Animation 5/position" = Vector2(-740, 720)
+"nodes/Animation 6/node" = SubResource("AnimationNodeAnimation_0nhd1")
+"nodes/Animation 6/position" = Vector2(-540, 740)
+"nodes/Animation 7/node" = SubResource("AnimationNodeAnimation_en7wf")
+"nodes/Animation 7/position" = Vector2(-360, 740)
+"nodes/Animation 8/node" = SubResource("AnimationNodeAnimation_j8ig8")
+"nodes/Animation 8/position" = Vector2(-160, 740)
+"nodes/Animation 9/node" = SubResource("AnimationNodeAnimation_x714e")
+"nodes/Animation 9/position" = Vector2(120, 740)
+nodes/bite/node = SubResource("AnimationNodeOneShot_4tn7g")
+nodes/bite/position = Vector2(-480, 380)
+nodes/comfort_cry/node = SubResource("AnimationNodeOneShot_3qcg5")
+nodes/comfort_cry/position = Vector2(-260, 340)
+nodes/double_slap/node = SubResource("AnimationNodeOneShot_ijdpb")
+nodes/double_slap/position = Vector2(-1000, 400)
+nodes/horror_combo/node = SubResource("AnimationNodeOneShot_37xay")
+nodes/horror_combo/position = Vector2(-60, 360)
+nodes/hyper_boxing/node = SubResource("AnimationNodeOneShot_88odx")
+nodes/hyper_boxing/position = Vector2(120, 400)
+nodes/meditate/node = SubResource("AnimationNodeOneShot_lda8m")
+nodes/meditate/position = Vector2(320, 360)
+nodes/output/position = Vector2(2340, 1200)
+nodes/power_hit/node = SubResource("AnimationNodeOneShot_ys3n1")
+nodes/power_hit/position = Vector2(520, 320)
+nodes/roar/node = SubResource("AnimationNodeOneShot_emymj")
+nodes/roar/position = Vector2(740, 380)
+nodes/slam/node = SubResource("AnimationNodeOneShot_smqc7")
+nodes/slam/position = Vector2(-740, 420)
+nodes/stand/node = SubResource("AnimationNodeOneShot_voxxi")
+nodes/stand/position = Vector2(-2120, 420)
+nodes/stand_blend/node = SubResource("AnimationNodeBlend2_xykm5")
+nodes/stand_blend/position = Vector2(-1840, 140)
+nodes/tackle/node = SubResource("AnimationNodeOneShot_ndeud")
+nodes/tackle/position = Vector2(940, 460)
+nodes/takedown_hit/node = SubResource("AnimationNodeOneShot_a57r3")
+nodes/takedown_hit/position = Vector2(1120, 580)
+nodes/trick_kick/node = SubResource("AnimationNodeOneShot_unq8m")
+nodes/trick_kick/position = Vector2(1320, 700)
+nodes/weak_kick/node = SubResource("AnimationNodeOneShot_p8jxi")
+nodes/weak_kick/position = Vector2(1540, 840)
+nodes/weak_magic/node = SubResource("AnimationNodeOneShot_yvxcx")
+nodes/weak_magic/position = Vector2(1740, 920)
+nodes/weak_punch/node = SubResource("AnimationNodeOneShot_2qfqp")
+nodes/weak_punch/position = Vector2(1940, 1060)
+nodes/weak_slap/node = SubResource("AnimationNodeOneShot_yuea0")
+nodes/weak_slap/position = Vector2(2160, 1280)
+node_connections = [&"output", 0, &"weak_slap", &"bite", 0, &"slam", &"bite", 1, &"Animation 5", &"comfort_cry", 0, &"bite", &"comfort_cry", 1, &"Animation 6", &"double_slap", 0, &"stand_blend", &"double_slap", 1, &"Animation 3", &"horror_combo", 0, &"comfort_cry", &"horror_combo", 1, &"Animation 7", &"hyper_boxing", 0, &"horror_combo", &"hyper_boxing", 1, &"Animation 8", &"meditate", 0, &"hyper_boxing", &"meditate", 1, &"Animation 9", &"power_hit", 0, &"meditate", &"power_hit", 1, &"Animation 10", &"roar", 0, &"power_hit", &"roar", 1, &"Animation 11", &"slam", 0, &"double_slap", &"slam", 1, &"Animation 4", &"stand", 0, &"Animation 2", &"stand", 1, &"Animation 19", &"stand_blend", 0, &"Animation", &"stand_blend", 1, &"stand", &"tackle", 0, &"roar", &"tackle", 1, &"Animation 12", &"takedown_hit", 0, &"tackle", &"takedown_hit", 1, &"Animation 13", &"trick_kick", 0, &"takedown_hit", &"trick_kick", 1, &"Animation 14", &"weak_kick", 0, &"trick_kick", &"weak_kick", 1, &"Animation 15", &"weak_magic", 0, &"weak_kick", &"weak_magic", 1, &"Animation 16", &"weak_punch", 0, &"weak_magic", &"weak_punch", 1, &"Animation 17", &"weak_slap", 0, &"weak_punch", &"weak_slap", 1, &"Animation 18"]

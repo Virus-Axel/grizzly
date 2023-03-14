@@ -1,0 +1,139 @@
+[gd_scene load_steps=9 format=3 uid="uid://ighvbtccwo0a"]
+
+[ext_resource type="Texture2D" uid="uid://cffn3b5ycdbrj" path="res://images/sol.png" id="1_6wc0c"]
+[ext_resource type="Script" path="res://store/store_item.gd" id="1_i4o4w"]
+[ext_resource type="Texture2D" uid="uid://bael3jkkrk0ke" path="res://store/12.png" id="2_3byjj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xycnl"]
+bg_color = Color(0.447059, 0.447059, 0.447059, 1)
+corner_radius_top_left = 65
+corner_radius_bottom_left = 75
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_lfvf1"]
+bg_color = Color(1, 0.847059, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3m44n"]
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0, 0, 0, 0.478431)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dy38r"]
+bg_color = Color(0, 0, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_io1c7"]
+bg_color = Color(0, 0.984314, 0.905882, 1)
+
+[node name="Panel" type="Panel"]
+custom_minimum_size = Vector2(0, 120)
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+size_flags_horizontal = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_xycnl")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(0, 120)
+layout_direction = 3
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_i4o4w")
+
+[node name="rate" type="Label" parent="HBoxContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+horizontal_alignment = 1
+autowrap_mode = 1
+
+[node name="Control" type="Control" parent="HBoxContainer"]
+visible = false
+layout_mode = 2
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer/Control"]
+visible = false
+z_index = 1
+layout_mode = 0
+offset_left = -7.0
+offset_top = 21.0
+offset_right = 33.0
+offset_bottom = 61.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_6wc0c")
+expand_mode = 2
+
+[node name="TextureRect2" type="TextureRect" parent="HBoxContainer/Control"]
+visible = false
+z_index = 1
+layout_mode = 0
+offset_left = 139.0
+offset_top = 21.0
+offset_right = 179.0
+offset_bottom = 61.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_6wc0c")
+expand_mode = 2
+
+[node name="buy" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_lfvf1")
+text = "Buy"
+
+[node name="sell" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_3m44n")
+text = "Sell"
+
+[node name="merge" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_dy38r")
+text = "Merge"
+
+[node name="equip" type="Button" parent="HBoxContainer"]
+custom_minimum_size = Vector2(120, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("StyleBoxFlat_io1c7")
+text = "Equip"
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "Weak Thunder"
+
+[node name="amount" type="Label" parent="HBoxContainer"]
+layout_direction = 2
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "0"
+
+[node name="TextureRect" type="TextureRect" parent="HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+texture = ExtResource("2_3byjj")
+expand_mode = 2
+
+[connection signal="pressed" from="HBoxContainer/buy" to="HBoxContainer" method="_on_buy_pressed"]
+[connection signal="pressed" from="HBoxContainer/sell" to="HBoxContainer" method="_on_sell_pressed"]
+[connection signal="pressed" from="HBoxContainer/merge" to="HBoxContainer" method="_on_merge_pressed"]
+[connection signal="pressed" from="HBoxContainer/equip" to="HBoxContainer" method="_on_equip_pressed"]

@@ -1,0 +1,87 @@
+[gd_scene load_steps=7 format=3 uid="uid://buwc1q3cx48t"]
+
+[ext_resource type="Script" path="res://UI/start.gd" id="1_tqii2"]
+[ext_resource type="Texture2D" uid="uid://buxbh3san4spu" path="res://images/start_background.png" id="2_ovl8e"]
+[ext_resource type="Script" path="res://tweetnacl.gd" id="3_4gmoi"]
+[ext_resource type="Theme" uid="uid://g2udyqfqc7q4" path="res://UI/start/phantom_theme.tres" id="5_ahuom"]
+[ext_resource type="PackedScene" uid="uid://xebxovqnhbd6" path="res://UI/start/error_prompt.tscn" id="5_ljyf0"]
+[ext_resource type="PackedScene" uid="uid://dvlrtmckj5deu" path="res://UI/loading_indicator.tscn" id="5_qg6j5"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tqii2")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+pivot_offset = Vector2(540, 0)
+texture = ExtResource("2_ovl8e")
+
+[node name="Node" type="Node" parent="."]
+script = ExtResource("3_4gmoi")
+
+[node name="nacl" type="Node" parent="."]
+script = ExtResource("3_4gmoi")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 50
+theme_override_constants/margin_top = 100
+theme_override_constants/margin_right = 50
+theme_override_constants/margin_bottom = 100
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme = ExtResource("5_ahuom")
+alignment = 2
+
+[node name="connect_phantom_button" type="Button" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(850, 200)
+layout_mode = 2
+size_flags_horizontal = 4
+focus_mode = 0
+theme = ExtResource("5_ahuom")
+expand_icon = true
+
+[node name="error_prompt" parent="." instance=ExtResource("5_ljyf0")]
+visible = false
+layout_mode = 1
+anchors_preset = 14
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -144.0
+offset_bottom = 144.0
+
+[node name="loading_indicator" parent="." instance=ExtResource("5_qg6j5")]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[connection signal="resized" from="." to="." method="_on_resized"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/connect_phantom_button" to="." method="_on_connect_phantom_button_pressed"]
