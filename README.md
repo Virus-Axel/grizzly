@@ -1,5 +1,5 @@
-# grizzly
-Arena blockchain game for grizzlython
+# Summary
+This is an arena blockchain game for grizzlython. The game is executed on the Solana blockchain and can be played on Android platform. The game is a strategy game, where you can spend and earn Solana or the bear currency token of the game. The arena battles are automatically played. Fighting makes your bear stronger. Beat more bears to increase your rank.
 
 # Game
 
@@ -36,3 +36,23 @@ Algorithms behind the scenes and you will be redirected to the forest arena. Wat
 <p align="center">
 <img src="https://github.com/Virus-Axel/grizzly/blob/master/screenshots/arena.png"  width="25%" height="25%">
 </p>
+
+# Building the Smart Contract
+The smart contract is deployed on the testnet with program ID Gb8JJHRC7jrhnBQHJYxabPnKgKjj1RU1A7SB4iwchkeQ. Building the smart contract is straight forward. To build and deploy run:
+```
+cargo update
+cargo build-sbf
+solana program deploy target/deploy/grizzly_arena.so
+```
+
+# Building Android App
+Building the android app requires export templates for the Godot 4 game engine. These export templates are modified to include Web3 support. The export templates exceed github's 100 MB size limit. Prebuild export templates and the prebuild android app might be hosted online in the future. For now they can be transmitted by request.
+
+# Grizzlython
+This is my submission for the Solana grizzlython 2023. Due to very complex build instructions for the app, and exceeding data limits, a prebuild android app should be transmitted in order to test the fighting system. Note that the game is a prototype and has some issues before going live on the Solana mainnet.
+
+# Future Work
+The known issues before deploying to mainnet is:
+- NFT Metadata hosting, metadata is currently disabled
+- Code coverage, Code has zero percentage test coverage.
+- Automatic staking, the program assumes that NFT sales income is staked and returns are manually pushed back into the game.
