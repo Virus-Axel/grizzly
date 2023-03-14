@@ -27,6 +27,7 @@ const REDIRECTION_LINK = "client%3A%2F%2Faxel.app%2F"
 
 const CLUSTER = "testnet"
 #const CLUSTER = "localhost"
+const USE_PHANTOM = true
 
 # testnet accs
 const NATIVE_MINT = "5pye17dQFdD7txTYm6b6XJDsKe7SSQvTxNxYmpHx72ww"
@@ -483,7 +484,7 @@ func mint_nft(name):
 	send_data.append_array(name.to_utf8_buffer())
 	var latest_blockhash = await get_latest_block_hash()
 	var transaction
-	if CLUSTER == "localhost" or CLUSTER == "testnet":
+	if not USE_PHANTOM:
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -540,7 +541,7 @@ func equip_ability_token(ability_index):
 	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
-	if CLUSTER == "localhost" or CLUSTER == "testnet":
+	if not USE_PHANTOM:
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -563,7 +564,7 @@ func clear_bear_data():
 	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
-	if CLUSTER == "localhost" or CLUSTER == "testnet":
+	if not USE_PHANTOM:
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -631,7 +632,7 @@ func reveal_secret():
 	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
-	if CLUSTER == "localhost" or CLUSTER == "testnet":
+	if not USE_PHANTOM:
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -665,7 +666,7 @@ func create_ability_token():
 	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
-	if CLUSTER == "localhost" or CLUSTER == "testnet":
+	if not USE_PHANTOM:
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -755,7 +756,7 @@ func battle(moveset):
 	arena_secret = send_data.slice(23, 31)
 	
 	var transaction
-	if CLUSTER == "localhost" or CLUSTER == "testnet":
+	if not USE_PHANTOM:
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -1079,7 +1080,7 @@ func trade_ability_token(index, sell, native):
 	print("latest blockhash: ", latest_blockhash)
 	
 	var transaction
-	if CLUSTER == "localhost" or CLUSTER == "testnet":
+	if not USE_PHANTOM:
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -1123,7 +1124,7 @@ func merge_ability_tokens(index):
 	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
-	if CLUSTER == "localhost" or CLUSTER == "testnet":
+	if not USE_PHANTOM:
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
