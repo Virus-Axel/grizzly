@@ -15,8 +15,8 @@ borsh-derive = "*"
 solana-program = "1.14.*"
 mod_exp = "*"
 oorandom = "*"
-mpl-token-metadata = {version = "*", features = ["no-entrypoint"]}
-spl-token = {version = "*", features = ["no-entrypoint"]}
+mpl-token-metadata = {version = "1.8.5", features = ["no-entrypoint"]}
+spl-token-2022 = {version = "*", features = ["no-entrypoint"]}
 spl-associated-token-account = {version = "*", features = ["no-entrypoint"]}
 
 [lib]

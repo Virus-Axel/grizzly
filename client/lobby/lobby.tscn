@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://rkg8xa2aoxrr"]
+[gd_scene load_steps=29 format=3 uid="uid://rkg8xa2aoxrr"]
 
 [ext_resource type="Script" path="res://lobby/lobby.gd" id="1_oy7wp"]
 [ext_resource type="PackedScene" uid="uid://7ud6q6bvsqan" path="res://lobby/lobby.glb" id="2_mfqke"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://cyhddb4ikgf5b" path="res://store/store.tscn" id="7_lyhj0"]
 [ext_resource type="Texture2D" uid="uid://0oydpukoy3qj" path="res://store/grizzly_token.png" id="8_7okot"]
 [ext_resource type="Texture2D" uid="uid://bglei4uy2pxtv" path="res://lobby/home_button.png" id="9_ksri3"]
+[ext_resource type="PackedScene" uid="uid://du33e85p5am6o" path="res://UI/moveset_select/moveset_select.tscn" id="10_c80fc"]
 [ext_resource type="PackedScene" uid="uid://ho0kohq1wu5k" path="res://grizzly_bear/bear.glb" id="11_87kkt"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_amwoo"]
@@ -366,8 +367,15 @@ layout_mode = 2
 icon = ExtResource("9_ksri3")
 expand_icon = true
 
-[node name="poll_timer" type="Timer" parent="."]
-wait_time = 3.0
+[node name="moveset_select" parent="CanvasLayer" instance=ExtResource("10_c80fc")]
+visible = false
+
+[node name="Button" type="Button" parent="CanvasLayer"]
+offset_left = 849.0
+offset_top = 28.0
+offset_right = 1051.0
+offset_bottom = 112.0
+text = "Clear data"
 
 [node name="lobby" parent="." instance=ExtResource("2_mfqke")]
 transform = Transform3D(-0.330923, 0, -2.89302e-08, 0, 0.330923, 0, 2.89302e-08, 0, -0.330923, 2.03754, 0, -0.418512)
@@ -387,7 +395,8 @@ libraries = {
 }
 
 [node name="shop_update" type="Timer" parent="."]
-wait_time = 5.0
+wait_time = 10.0
+one_shot = true
 autostart = true
 
 [node name="bear" parent="." instance=ExtResource("11_87kkt")]
@@ -399,7 +408,7 @@ transform = Transform3D(0.151542, 0, 0.0758301, 0, 0.169455, 0, -0.0758301, 0, 0
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/store_button" to="." method="_on_store_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/HBoxContainer/rank_button" to="." method="_on_rank_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/VBoxContainer/Button" to="." method="_on_button_pressed"]
-[connection signal="timeout" from="poll_timer" to="." method="_on_poll_timer_timeout"]
+[connection signal="pressed" from="CanvasLayer/Button" to="." method="clear_data_remove"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
 [connection signal="animation_finished" from="ui_player" to="." method="_on_animation_player_animation_finished"]
 [connection signal="timeout" from="shop_update" to="." method="_on_shop_update_timeout"]

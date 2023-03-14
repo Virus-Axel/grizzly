@@ -9,7 +9,7 @@ use solana_program::{
 use crate::{
     account_security::verify_and_get_mut_data,
     arena::fight_system::evaluate_winner,
-    data_structures::grizzly_structure,
+    data_structures::grizzly_structure::{self, AMOUNT_OF_ABILITIES},
 };
 
 use mod_exp::mod_exp;
@@ -89,11 +89,11 @@ pub fn reveal_secret_instruction<'a>(
     };
 
     if result >= 65536{
-        other_grizzly_data[grizzly_structure::AB.start] = ((result % 65536) as f32).sqrt() as u8;
+        other_grizzly_data[grizzly_structure::AB.start] = 1 + (((((result % 65536) as f32) / 65536.0).sqrt()).round() * (AMOUNT_OF_ABILITIES as f32)) as u8;
         grizzly_data[grizzly_structure::AB.start] = 0;
     }
     else{
-        grizzly_data[grizzly_structure::AB.start] = ((result % 65536) as f32).sqrt() as u8;
+        grizzly_data[grizzly_structure::AB.start] = 1 + (((((result % 65536) as f32) / 65536.0).sqrt()).round() * (AMOUNT_OF_ABILITIES as f32)) as u8;
         other_grizzly_data[grizzly_structure::AB.start] = 0;
     }
 

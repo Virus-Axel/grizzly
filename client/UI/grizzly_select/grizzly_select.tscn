@@ -109,8 +109,8 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -1300.0
-offset_right = 12740.0
-offset_bottom = 14040.0
+offset_right = 24013.3
+offset_bottom = 24840.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_2h3ua")
@@ -309,6 +309,11 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 24
 
+[node name="Button2" type="Button" parent="CanvasLayer"]
+offset_right = 323.0
+offset_bottom = 359.0
+text = "create ability"
+
 [node name="swipe_timer" type="Timer" parent="."]
 wait_time = 0.4
 one_shot = true
@@ -318,12 +323,12 @@ libraries = {
 "": SubResource("AnimationLibrary_usx60")
 }
 
-[connection signal="resized" from="Control" to="." method="_on_control_resized"]
 [connection signal="pressed" from="CanvasLayer/Button4" to="." method="_on_button_4_pressed"]
 [connection signal="pressed" from="CanvasLayer/Button" to="." method="_on_mint_button"]
 [connection signal="pressed" from="CanvasLayer/refresh" to="." method="_on_refresh_pressed"]
 [connection signal="pressed" from="CanvasLayer/MarginContainer/Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="CanvasLayer/MarginContainer/Button2" to="." method="_on_button_2_pressed"]
 [connection signal="pressed" from="CanvasLayer/MarginContainer/Button3" to="." method="_on_button_3_pressed"]
+[connection signal="pressed" from="CanvasLayer/Button2" to="." method="create_ability_remove"]
 
 [editable path="CanvasLayer/loading_indicator"]

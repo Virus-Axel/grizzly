@@ -15,23 +15,18 @@ func _ready():
 	#get_node("/root/w3").wallet_key = "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm"
 	#get_node("/root/w3").get_node("program_handler").setKeys("HJyMW82CKUrsbfTSKaNXdsgqcS1HJm8jAjbVVq3Uj4AN", "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", ID)
 
-	#get_node("/root/w3").clear_bear_data()
 	#get_node("/root/w3").create_ability_token()
 	#get_node("/root/w3").equip_ability_token(2)
-	return
 	# Try to reveal secret
 	
 
 	
 	#w3.equip_ability_token(1)
-	return
-	
-	if await w3.is_opponent_ready(w3.nft_map[1]):
-		if await w3.reveal_secret():
-			print("Commited to previous battle")
-		else:
-			print("Failed to commmit to last battle")
-
+	var w3 = get_node("/root/w3")
+	var bear_data = await w3.get_bear_data(w3.nft_map[1])
+	var decoded_data = bs64.decode(bear_data)
+	if decoded_data[0] != 0:
+		get_tree().change_scene_to_file("res://UI/moveset_select/queue.tscn")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -39,22 +34,11 @@ func _process(delta):
 
 
 
-func _on_poll_timer_timeout():
-	var w3 = get_node("/root/w3")
-	if await w3.is_opponent_ready(w3.nft_map[1]):
-		if await w3.reveal_secret():
-			$poll_timer.stop()
-			print("Commited to previous battle")
-		else:
-			print("Failed to commmit to last battle")
-
 
 func send_bear_to_battle():
 	var w3 = get_node("/root/w3")
-	w3.battle()
-	var challenging_bear = await w3.get_challenging_bear()
-	if challenging_bear == "":
-		$poll_timer.start()
+	$CanvasLayer/moveset_select.visible = true
+	#w3.battle()
 
 
 func _on_battle_button_pressed():
@@ -127,9 +111,15 @@ func _on_shop_update_timeout():
 	await $CanvasLayer/Panel.update_supplies()
 	#w3.get_ability_rates()
 	await $CanvasLayer/Panel.update_prizes()
+	$shop_update.start()
 
 func _on_button_pressed():
 	get_tree().change_scene_to_file("res://UI/grizzly_select/grizzly_select.tscn")
 
 func replay(name):
 	$bear.get_node("AnimationPlayer").play("ArmatureAction")
+
+
+func clear_data_remove():
+	get_node("/root/w3").clear_bear_data()
+	pass # Replace with function body.

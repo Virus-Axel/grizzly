@@ -10,13 +10,12 @@ use solana_program::{
     entrypoint::ProgramResult,
     pubkey::Pubkey,
     program_error::ProgramError,
-    msg, config::program,
+    msg,
 };
 
 use instruction::{
     arena_signup_instruction,
-    reveal_secret_instruction::{self, reveal_secret_instruction},
-    
+    reveal_secret_instruction::reveal_secret_instruction,
 };
 
 use token_handler::{
@@ -27,15 +26,18 @@ use token_handler::{
     }
 };
 
-pub fn arena_queue_id() -> Pubkey{
-    Pubkey::new(bs58::decode("5YDuhr5AWq6JT7ZtWioX5ynkt4t8y3c2ZDp6X22uyMkj").into_vec().as_ref().unwrap())
-}
-
 pub fn bank_account_id() -> Pubkey{
-    Pubkey::new(bs58::decode("ANdidaLBCN3KrDFyraGtPVQhpaQr2oAqpPqN2DJL4CXv").into_vec().as_ref().unwrap())
+    Pubkey::new(bs58::decode("HbdhoAtFHfM8XuiHrMviJmynUvWnypGcs8o63wxGKSvp").into_vec().as_ref().unwrap())
 }
 
-const NATIVE_TOKEN_ID: &str = "ABoFjoNoA5b2CM2iKzYE8RttpWgSwY7ZDnvWpaTg3igA";
+pub fn arena_queue_id() -> Pubkey{
+    Pubkey::new(bs58::decode("BF8qnnYyoACeJwn8gAC8GbUpwH4scjved9B7wmpbyPtD").into_vec().as_ref().unwrap())
+}
+
+const ENABLE_METADATA: bool = false;
+
+const NATIVE_TOKEN_ID: &str = "5pye17dQFdD7txTYm6b6XJDsKe7SSQvTxNxYmpHx72ww";
+//const NATIVE_TOKEN_ID: &str = "ABoFjoNoA5b2CM2iKzYE8RttpWgSwY7ZDnvWpaTg3igA";
 
 // Declare and export the program's entrypoint
 entrypoint!(process_instruction);

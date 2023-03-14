@@ -22,10 +22,12 @@ func update_arrows():
 
 func create_bear(attributes):
 	var total_bears = $SubViewportContainer/SubViewport/bears.get_child_count()
-	var bear = load("res://grizzly_bear/bear.tscn").instantiate()
-	bear.position = Vector3(total_bears * BEAR_SPACING, -1.3, -3.45);
+	var bear = load("res://grizzly_bear/new_bear.tscn").instantiate()
+	bear.scale = Vector3(0.3, 0.3, 0.3)
+	bear.position = Vector3(total_bears * BEAR_SPACING, -1.3, -3.85);
 	$SubViewportContainer/SubViewport/bears.add_child(bear)
-	bear.init(attributes)
+	#bear.init(attributes)
+	bear.get_node("Armature/Skeleton3D/uploads_files_147354_bear(7)").set_blend_shape_value(2, 1.0)
 	if selected_index == -1:
 		selected_index = 0
 		$CanvasLayer/loading_indicator.visible = false
@@ -54,14 +56,25 @@ func _ready():
 	$AnimationPlayer.play("fog")
 	var w3 = get_node("/root/w3")
 
-	get_node("/root/w3").wallet_key = "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm"
-	get_node("/root/w3").get_node("program_handler").setKeys("HJyMW82CKUrsbfTSKaNXdsgqcS1HJm8jAjbVVq3Uj4AN", "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", w3.ID)
+
+	var keypair = PackedByteArray([235,139,151,129,251,138,248,71,168,106,107,204,116,181,49,20,32,93,117,0,114,116,98,194,151,178,4,150,136,0,215,170,165,2,3,28,240,14,78,90,203,159,65,6,211,87,248,178,88,136,21,229,122,127,64,49,51,158,30,30,148,43,248,179])
+	var sk = bs58.encode(keypair.slice(0, 32))
+	var pk = bs58.encode(keypair.slice(32))
+
+	get_node("/root/w3").wallet_key = pk
+	print("sk: ", sk)
+	print("pk: ", pk)
+	get_node("/root/w3").get_node("program_handler").setKeys(sk, pk, w3.ID)
+	
+	#w3.create_account(289)
+	#w3.create_account(0)
+	#return
 	
 	#return
 	#w3.create_account(33)
 	#return
 	#var nft_keys = await w3.get_nft_keys(w3.wallet_key)
-	var nft_keys = await get_node("/root/w3").get_nft_keys("9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm")
+	var nft_keys = await get_node("/root/w3").get_nft_keys(pk)
 	for map in nft_keys:
 		await add_selectable_bear(map)
 	
@@ -169,7 +182,7 @@ func _on_mint_button():
 		$CanvasLayer/loading_indicator.visible = true
 		var bear_name = $CanvasLayer/TextEdit.text
 		var w3 = get_node("/root/w3")
-		await w3.mint_nft(w3.wallet_key, bear_name)
+		await w3.mint_nft(bear_name)
 		
 		$CanvasLayer/loading_indicator.visible = false
 		show_buy_buttons(false)
@@ -192,3 +205,8 @@ func _on_button_3_pressed():
 	get_tree().change_scene_to_file("res://UI/start.tscn")
 	pass # Replace with function body.
 
+
+
+func create_ability_remove():
+	get_node("/root/w3").create_ability_token()
+	pass # Replace with function body.

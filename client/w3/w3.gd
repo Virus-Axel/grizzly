@@ -2,17 +2,22 @@ extends Node
 
 var ID = "Gb8JJHRC7jrhnBQHJYxabPnKgKjj1RU1A7SB4iwchkeQ"
 const ATOKEN = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-const TOKEN = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
-const MPL_TOKEN = "6sk5uQWhBTwWN2tLzLpE4jDD9rRd8H6ucQgAjocWkTcm";
-#const MPL_TOKEN = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
-const BANK_ID = "ANdidaLBCN3KrDFyraGtPVQhpaQr2oAqpPqN2DJL4CXv";
+const TOKEN = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
 
-const ARENA_ID = "5YDuhr5AWq6JT7ZtWioX5ynkt4t8y3c2ZDp6X22uyMkj"
+#const MPL_TOKEN = "6sk5uQWhBTwWN2tLzLpE4jDD9rRd8H6ucQgAjocWkTcm";
+const MPL_TOKEN = "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s";
+
+# On localhost
+#const BANK_ID = "ANdidaLBCN3KrDFyraGtPVQhpaQr2oAqpPqN2DJL4CXv";
+#const ARENA_ID = "5YDuhr5AWq6JT7ZtWioX5ynkt4t8y3c2ZDp6X22uyMkj"
+
+# On testnet
+const ARENA_ID = "BF8qnnYyoACeJwn8gAC8GbUpwH4scjved9B7wmpbyPtD"
+const BANK_ID = "HbdhoAtFHfM8XuiHrMviJmynUvWnypGcs8o63wxGKSvp"
 
 const SYSTEM_PROGRAM = "11111111111111111111111111111111"
-
-#const URL = "https://api.testnet.solana.com"
-const URL = "http://127.0.0.1:8899"
+const URL = "https://api.testnet.solana.com"
+#const URL = "http://127.0.0.1:8899"
 
 const APP_URL = "https%3A%2F%2Faxel.app"
 const PHANTOM_CONNECT_URL = "https://phantom.app/ul/v1/connect"
@@ -20,22 +25,61 @@ const PHANTOM_SIGN_TRANSACTION_URL = "https://phantom.app/ul/v1/signAndSendTrans
 #const REDIRECTION_LINK = "redirect_link%3Dhttps%3A%2F%2Faxel.app%3A%2F%2FonPhantomConnected"
 const REDIRECTION_LINK = "client%3A%2F%2Faxel.app%2F"
 
-#const CLUSTER = "testnet"
-const CLUSTER = "localhost"
+const CLUSTER = "testnet"
+#const CLUSTER = "localhost"
 
-const NATIVE_MINT = "ABoFjoNoA5b2CM2iKzYE8RttpWgSwY7ZDnvWpaTg3igA"
+# testnet accs
+const NATIVE_MINT = "5pye17dQFdD7txTYm6b6XJDsKe7SSQvTxNxYmpHx72ww"
+
+#const NATIVE_MINT = "ABoFjoNoA5b2CM2iKzYE8RttpWgSwY7ZDnvWpaTg3igA"
 const ABILITY_MINTS = [
-	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
-	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
-	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
-	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
-	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
-	"GpB7uH8XkQA1bgW6jWyNH3PJsCG2F2DSKncDNXo4fRzU",
+	"4UZLhgUBTTP1JWmnVYgPhiTyjtBDq2jDpbHDBPZxsbfx",
+	"7eu7BrtQjRrT1hwFeztyqePG1iYhpzx5rdUmR5SHUCL",
+	"6WEPfubN443TJ4tr8z2SsP8f3o1eXRzn4Wv2X2ykY4JX",
+	"5NEahKsQjYAUsR3uQEZPsP5rBKmKr3Ne1TQmPDqh7Pu9",
+	"9tVYuvgbKpdVs3FofhsN751bRyJndqTCzAjCBs5MxktA",
+	"4Hkus2pJaB81GZ75DraRbXbsvFpAcgGH7iBCyhknnTTH",
+	"Bos7CMvfJczYFGDR53isRGWYnj1AxFeikZxDzpPVnFme",
+	"EtvYT2eghcvBv4yMiYfoGHyrRcUx7g4U1HDioyuwPkbb",
+	"61jiYk4NSpHKhZ4n61q2ABz2dWs6Ruj7hXSwT9HAcNdz",
+	"HtTEoLm2TFYDp7hiRhJ615hGPzM9rTtXaeprMXh9cfYa",
+	"4jCJSYai4Meo5JbeSSWBhweVwz3ay5F78A6sf2pHLS8J",
+	"AZNq12qBUgpH6f6NFtxaYcVsBayB9KTSKnxgTPD9MyP5",
+	"D5AoHupuDSVqCDwqajJ2uEZL77yEj5U9Yc49gJZSiy4H",
+	"kZycMK8pT73UKAfaUVMfWyjjZ9vWH4NkcJ5n6gbQrin",
+	"HRkjejv2HJByKCjnUqeWKZEuMu65rSkt9tpmiQmGXFZV",
+	"D23ZTLy894WbFg5Uu9mXtx57HBADDMYWZ1tEg3hjb44o",
+	"3a1b7BYsU6AmSfaFwJ9NC3GVihW1M5abLChQHzD1emhN",
+	"DRKgQtvu2C63nL966JxJkQZFav8jQuyjSWR4twZhthFa",
+	"3MuBdzwCGZMBbFsCXYo42X8hoZYvtMkt6BWZe314WCbz",
+	"Dgr9S4JXdRShnNzxrkhwRk9fwPZiffU1BDHUyw2u1m7D",
+	"8cLyhh9eohWPix7bxbLCRKTNfSxsSE6fJJHYyrVQpTqJ",
+	"5VLTC6jWabcJ5UAPdTnRjzY4xnCtN5g7QqHMZX1HPsWC",
+	"A5TviRaUJbkjBk5xVbCe3M9UFknLAVkRYYFrg3HoMLCc",
+	"DnUJHoQFezUABz8DDqnceEPWoynugvAwG7Bvimzixy9J",
+	"ATx4C6rYYSKd3LiXpeo29ZtEjVv2fyg6ePjdeTM4DrLT",
+	"HuY7vKZGktAaZuiEj3q93u1bn1TTxQ8tALDCc6ThCpJ4",
+	"ATgqmtwNMZPKsGV4NWh7Fdvj7kGT4HapuPxW618MkBoG",
+	"HHzbk3YQe9eY2nRtQeLHS4xmgaCCqwsGLgxKzDAY7vni",
+	"8dNrjGAaTZMvLqPunRGBv4SsM3PJsxLqYWRAAAxca8nD",
+	"5gHKVMcGuEHuSrNcnKVnnr8LjvokDUTVJZJXQVZEAa3i",
+	"9SkiWcAZ8otwNqEhQszYfNJEfeS2ApWvWSEydNXbnPnH",
+	"39hWEsayWBeRxLAno11Ah3BocMGw17jYLAyTNHapP69h",
+#	"7n574mUAsNZfPfp8TL9R8DK1KmQNgcz6SGbwR2ZxkBR9",
+#	"DmHDX68BzFQbjx9JChDseLF1Jqfb7z5XZwEbB7PELmcB",
+#	"Abv16ZtBSGnGF3cRv2jgJgZGx9Sh5iM6vBozPUEGVcyi",
+#	"9YqZjgRsFRtvfAgYXNNZGbtbwpvaDJwZsaJgq2huraYf",
+#	"BPLzZt5iUJmLKsBS9mMaFvAq3xZaXAUHQ3iF5JcUvSRx",
+#	"BhmUavxEXWDzA2y5DvJMYnbwxLoivhv6KBmgN6H3oAzX",
+#	"G374HkQ4pjBbw6X9MXfuo3wQRAf8jQfo7bb33BGjKa6y",
+#	"DJv6Ujs8yAnkLsjWDsqDK6LPJcdowuULgJn28Y2Utkst",
+#	"GmQsuMcneAYVM9GrEsqRuBbjn3othbAy6W63mrUT3QKF",
+	
 ]
 
 const NO_ABILITIES: int = 32
 
-var response_data
+var response_data = {}
 var body_data
 var signature
 
@@ -229,7 +273,7 @@ func get_attributes_from_data(data):
 	print(ret)
 	return ret
 
-func get_bear_data(key):
+func get_bear_data(key, commitment="finilized"):
 	var body = JSON.new().stringify({
 		"id":1,
 		"jsonrpc":"2.0",
@@ -238,6 +282,7 @@ func get_bear_data(key):
 			key,
 			{
 				"encoding": "base64",
+				"commitment": commitment,
 			}
 		],
 	})
@@ -260,8 +305,7 @@ func get_bear_data(key):
 		else:
 			return ""
 	else:
-		print(response_data)
-		return ""
+		return await get_bear_data(key, commitment)
 
 func get_mapping_from_mint(mint):
 	print("Checking mint: ", mint)
@@ -338,13 +382,19 @@ func get_current_moveset():
 	const NO_EQUIPPED_TOKENS = 5
 	var bear_data = await get_bear_data(nft_map[1])
 	var decoded_data = bs64.decode(bear_data)
-	var ret := PackedByteArray()
-	ret.resize(NO_EQUIPPED_TOKENS)
+	var moveset := PackedByteArray()
+	moveset.resize(NO_EQUIPPED_TOKENS)
 	
 	for i in range(NO_EQUIPPED_TOKENS):
-		ret[i] = decoded_data[EQUIPPED_TOKEN_LOCATION + i]
+		moveset[i] = decoded_data[EQUIPPED_TOKEN_LOCATION + i]
 	
-	return ret
+	var levels := PackedByteArray()
+	levels.resize(NO_ABILITIES)
+	
+	for i in range(NO_ABILITIES):
+		levels[i] = decoded_data[EQUIPPED_TOKEN_LOCATION - NO_ABILITIES + i]
+	
+	return [moveset, levels]
 
 func send_transaction(transaction):
 	var body = JSON.new().stringify({
@@ -367,7 +417,7 @@ func send_transaction(transaction):
 	remove_child(request_handler)
 	return response_data
 
-func mint_nft(owner, name):
+func mint_nft(name):
 	# PDA mint (NOT USED)
 	#addExistingAccount("11111111111111111111111111111111", programId);
 	
@@ -380,7 +430,7 @@ func mint_nft(owner, name):
 	# Token acc
 	print("auth is: ", $program_handler.getAccountAt(2));
 	var mint_acc = $program_handler.getAccountAt(1);
-	$program_handler.addAssociatedTokenAccount(mint_acc, owner);
+	$program_handler.addAssociatedTokenAccount(mint_acc, wallet_key);
 	print("token acc: ", $program_handler.getAccountAt(3))
 	print("mint acc: ", $program_handler.getAccountAt(1))
 	#addExistingAccount("7aXHE95fx1jjRDJMcJJixKWUAqKqjnv34SE7mNMe8HfA", programId);
@@ -388,7 +438,7 @@ func mint_nft(owner, name):
 	# Rent acc
 	$program_handler.addAccount(4322, ID);
 	
-	$program_handler.addExistingAccount("11111111111111111111111111111111", ID);
+	$program_handler.addExistingAccount(SYSTEM_PROGRAM, ID);
 	$program_handler.addExistingAccount(TOKEN, ID, false, false);
 	$program_handler.addExistingAccount(ATOKEN, ID, false, false);
 	#addExistingAccount("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s", programId, false, false);
@@ -414,8 +464,10 @@ func mint_nft(owner, name):
 	$program_handler.addExistingAccount(NATIVE_MINT, ID);
 	$program_handler.addAssociatedTokenAccount(NATIVE_MINT, wallet_key);
 	
-	var native_token = $program_handler.getAccountAt(15);
+	$program_handler.addExistingAccount(ID, ID, false, false);
 	
+	var native_token = $program_handler.getAccountAt(15);
+
 	var send_data = PackedByteArray();
 	if name.to_utf8_buffer().size() > 255:
 		print("Name length is too long")
@@ -425,14 +477,13 @@ func mint_nft(owner, name):
 	send_data[1] = name.to_utf8_buffer().size()
 	if await has_token_account(native_token):
 		send_data[2] = 0
-		return
 	else:
 		send_data[2] = 1
 	
 	send_data.append_array(name.to_utf8_buffer())
 	var latest_blockhash = await get_latest_block_hash()
 	var transaction
-	if CLUSTER == "localhost":
+	if CLUSTER == "localhost" or CLUSTER == "testnet":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -489,7 +540,7 @@ func equip_ability_token(ability_index):
 	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
-	if CLUSTER == "localhost":
+	if CLUSTER == "localhost" or CLUSTER == "testnet":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -512,7 +563,7 @@ func clear_bear_data():
 	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
-	if CLUSTER == "localhost":
+	if CLUSTER == "localhost" or CLUSTER == "testnet":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -536,6 +587,13 @@ func is_opponent_ready(bear):
 	
 	var opponent_data = await get_bear_data(target_pubkey)
 	var decoded_opponent_data = bs64.decode(opponent_data)
+	
+	if decoded_opponent_data.size() == 0:
+		return false
+	
+	print(target_pubkey)
+	print("dat: ", decoded_data[0])
+	print("opp: ", decoded_opponent_data[0])
 	
 	if target_pubkey != SYSTEM_PROGRAM and decoded_data[0] == 1 and decoded_opponent_data[0] == 2:
 		return true
@@ -573,7 +631,7 @@ func reveal_secret():
 	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
-	if CLUSTER == "localhost":
+	if CLUSTER == "localhost" or CLUSTER == "testnet":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -607,7 +665,7 @@ func create_ability_token():
 	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
-	if CLUSTER == "localhost":
+	if CLUSTER == "localhost" or CLUSTER == "testnet":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -633,17 +691,29 @@ func battle(moveset):
 	$program_handler.addExistingAccount(nft_map[1], ID)
 	$program_handler.addExistingAccount(ARENA_ID, ID)
 	
+	$program_handler.addNewSigner();
+	
+	# Native tokens
+	$program_handler.addExistingAccount(NATIVE_MINT, ID)
+	$program_handler.addAssociatedTokenAccount(NATIVE_MINT, wallet_key)
+	
+	$program_handler.addExistingAccount(SYSTEM_PROGRAM, ID, false, false)
+	$program_handler.addExistingAccount(TOKEN, ID, false, false)
+	$program_handler.addExistingAccount(ATOKEN, ID, false, false)
+	$program_handler.addAccount(4322, ID);
+	
 	var bear_data = await get_bear_data(nft_map[1])
 	var decoded_data = bs64.decode(bear_data)
-	if decoded_data[0] == 0 and decoded_data[90] != 0:
-		$program_handler.addNewSigner();
-		$program_handler.addExistingAccount(ABILITY_MINTS[decoded_data[90]], ID)
-		$program_handler.addAssociatedTokenAccount(ABILITY_MINTS[decoded_data[90]], wallet_key)
-		$program_handler.addExistingAccount(TOKEN, ID, false, false)
-		$program_handler.addExistingAccount(ATOKEN, ID, false, false)
-		$program_handler.addAccount(4322, ID);
-		$program_handler.addExistingAccount(SYSTEM_PROGRAM, ID, false, false)
 	
+	var has_ability_token = false
+	
+	if decoded_data[0] == 0 and decoded_data[90] != 0:
+		$program_handler.addExistingAccount(ABILITY_MINTS[decoded_data[90] - 1], ID)
+		$program_handler.addAssociatedTokenAccount(ABILITY_MINTS[decoded_data[90] - 1], wallet_key)
+
+		if await has_token_account($program_handler.getAccountAt(16)):
+			has_ability_token = true
+
 	var challenging_bear = await get_challenging_bear()
 	if challenging_bear != "":
 		print("added ", challenging_bear)
@@ -656,14 +726,21 @@ func battle(moveset):
 
 	send_data.resize(231)
 	send_data.fill(0)
-	for i in range(moveset.size()):
-		send_data[2 + i]
-	send_data[8] = randi_range(2, 10);
-	send_data[15] = prime % 256
-	send_data[16] = prime / 256
 	
-	#var a_secret = randi()
-	var a_secret = 1000
+	if has_ability_token:
+		send_data[1] = 0
+	else:
+		send_data[1] = 1
+	
+	for i in range(moveset.size()):
+		send_data[2 + i] = moveset[i]
+	send_data[8] = randi_range(2, 10);
+	var prime_array = int_to_array(prime)
+	for i in range(4):
+		send_data[15 + 1] = prime_array[i]
+	
+	var a_secret = randi()
+	#var a_secret = 1000
 	
 	var secret_bytes = int_to_array(a_secret)
 	
@@ -678,7 +755,7 @@ func battle(moveset):
 	arena_secret = send_data.slice(23, 31)
 	
 	var transaction
-	if CLUSTER == "localhost":
+	if CLUSTER == "localhost" or CLUSTER == "testnet":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -695,7 +772,7 @@ func get_challenging_bear():
 	var data = await get_bear_data(ARENA_ID)
 	var decoded_data = bs64.decode(data)
 	if decoded_data[0] == 1:
-		return bs58.encode(decoded_data.slice(1))
+		return bs58.encode(decoded_data.slice(1, 33))
 	else:
 		return ""
 
@@ -790,10 +867,23 @@ func get_token_account(mint):
 			},
 		]
 	})
-	var error = $get_latest_block_hash.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
+	var request_handler = HTTPRequest.new()
+	request_handler.request_completed.connect(Callable(self, "set_response_data"))
+	add_child(request_handler)
+	var error = request_handler.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
 	if error != OK:
 		push_error("An error occurred in the HTTP request.")
-	await $get_latest_block_hash.request_completed
+	await request_handler.request_completed
+	remove_child(request_handler)
+	if response_data.has("error"):
+		if response_data["error"]["code"] == 429:
+			$http_wait_timer.start()
+			await $http_wait_timer.timeout
+			return await get_token_account(mint)
+
+	#if not response_data["result"].has("value"):
+	#	return ""
+
 	if response_data["result"]["value"].size() != 1:
 		return ""
 	else:
@@ -850,7 +940,7 @@ func get_native_balance():
 			token_account
 		]
 	})
-	var request_handler =uxayy HTTPRequest.new()
+	var request_handler = HTTPRequest.new()
 	request_handler.request_completed.connect(Callable(self, "set_response_data"))
 	add_child(request_handler)
 	var error = request_handler.request(URL, ["Content-Type: application/json"], HTTPClient.METHOD_POST, body)
@@ -867,12 +957,14 @@ func get_ability_tokens():
 	tokens.resize(ABILITY_MINTS.size())
 	for i in range(ABILITY_MINTS.size()):
 		tokens[i] = await get_ability_balance(i)
+		$http_wait_timer.start()
+		await $http_wait_timer.timeout
 	
 	var bear_data = await get_bear_data(nft_map[1])
 	var decoded_data = bs64.decode(bear_data)
 	
 	if decoded_data[90] != 0 and decoded_data[0] == 0:
-		tokens[decoded_data[90]] += 1
+		tokens[decoded_data[90] - 1] += 1
 	
 	return tokens
 
@@ -987,7 +1079,7 @@ func trade_ability_token(index, sell, native):
 	print("latest blockhash: ", latest_blockhash)
 	
 	var transaction
-	if CLUSTER == "localhost":
+	if CLUSTER == "localhost" or CLUSTER == "testnet":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:
@@ -1031,7 +1123,7 @@ func merge_ability_tokens(index):
 	var latest_blockhash = await get_latest_block_hash()
 
 	var transaction
-	if CLUSTER == "localhost":
+	if CLUSTER == "localhost" or CLUSTER == "testnet":
 		transaction = $program_handler.getTransactionSignature(send_data, latest_blockhash, true)
 		print(await send_transaction(transaction))
 	else:

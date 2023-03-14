@@ -25,7 +25,7 @@ use crate::{
     token_handler::ability_token::{give_ability_token, give_native_token}, NATIVE_TOKEN_ID,
 };
 
-use spl_token::instruction::burn;
+use spl_token_2022::instruction::burn;
 
 use crate::account_security::verify_ability_token;
 
@@ -76,23 +76,27 @@ pub fn arena_signup<'a>(
     let grizzly_account = next_account_info(accounts_iter)?;
     let arena_queue_account = next_account_info(accounts_iter)?;
 
+    let _dummy_signer = next_account_info(accounts_iter)?;
+    let mint_authority = next_account_info(accounts_iter)?;
+
     let native_mint = next_account_info(accounts_iter)?;
     let native_token = next_account_info(accounts_iter)?;
 
     let system_program = next_account_info(accounts_iter)?;
     let token_program = next_account_info(accounts_iter)?;
     let associated_token_program = next_account_info(accounts_iter)?;
-    let mint_authority = next_account_info(accounts_iter)?;
     let rent = next_account_info(accounts_iter)?;
     
+    //msg!("{}", rent.key.to_string());
 
-    msg!("Validating bear nft");
+
+    //msg!("Validating bear nft");
     match validate_bear_nft(program_id, sender_account, mint_account, token_account, metadata_account, grizzly_account, mapping_account){
         Ok(_) => (),
         Err(_) => return Err(ProgramError::IllegalOwner),
     }
 
-    msg!("Checking arena account");
+    //msg!("Checking arena account");
     if *arena_queue_account.key != arena_queue_id()
     {
         return Err(ProgramError::InvalidAccountData);
@@ -102,14 +106,15 @@ pub fn arena_signup<'a>(
         return Err(ProgramError::IllegalOwner);
     }
 
+    //msg!("Checking native token");
     if native_mint.key.to_string() != NATIVE_TOKEN_ID{
         return Err(ProgramError::IllegalOwner);
     }
 
 
-    // TODO: Give native tokens to cover fee
+    // TODO: Give lamports to cover fee
 
-    msg!("Verifying grizzly owner");
+    //msg!("Verifying grizzly owner");
     let mut grizzly_data = verify_and_get_mut_data(program_id, grizzly_account)?;
     let mut arena_queue_data = verify_and_get_mut_data(program_id, arena_queue_account)?;
 
@@ -118,8 +123,18 @@ pub fn arena_signup<'a>(
     let past_timestamp = i64::from_le_bytes(grizzly_data[grizzly_structure::TIMESTAMP].try_into().unwrap());
 
     let delta_time = timestamp - past_timestamp;
-    give_native_token(program_id, sender_account, native_mint, native_token, token_program, associated_token_program, mint_authority, rent, system_program, (delta_time / SECONDS_UNTIL_PRIZE_REDUCTION as i64) as u64)?;
 
+    const MAX_NATIVE_GIFT: i64 = 10000;
+    if (delta_time / SECONDS_UNTIL_PRIZE_REDUCTION as i64) > MAX_NATIVE_GIFT{
+        //msg!("Giving max tokens");
+        give_native_token(program_id, sender_account, native_mint, native_token, token_program, associated_token_program, mint_authority, rent, system_program, MAX_NATIVE_GIFT as u64)?;
+    }
+    else if (delta_time / SECONDS_UNTIL_PRIZE_REDUCTION as i64) > 0{
+        //msg!("Giving some tokens");
+        give_native_token(program_id, sender_account, native_mint, native_token, token_program, associated_token_program, mint_authority, rent, system_program, (delta_time / SECONDS_UNTIL_PRIZE_REDUCTION as i64) as u64)?;
+    }
+
+    //msg!("Verifying ability token");
     verify_ability_token(sender_account, native_mint, native_token)?;
     grizzly_data[grizzly_structure::TIMESTAMP].copy_from_slice(&timestamp.to_le_bytes());
 
@@ -142,26 +157,22 @@ pub fn arena_signup<'a>(
     )?;
 
     if grizzly_data[0] == 0 && grizzly_data[grizzly_structure::AB.start] != 0{
-        msg!("Claiming ability token");
-        let _dummy_signer = next_account_info(accounts_iter)?;
-        let mint_authority = next_account_info(accounts_iter)?;
+        //msg!("Claiming ability token");
+        //let _dummy_signer = next_account_info(accounts_iter)?;
+        //let mint_authority = next_account_info(accounts_iter)?;
 
         let ability_mint = next_account_info(accounts_iter)?;
         let ability_token = next_account_info(accounts_iter)?;
-        let token_program = next_account_info(accounts_iter)?;
-        let associated_token_program = next_account_info(accounts_iter)?;
-        let rent = next_account_info(accounts_iter)?;
-        let system_program = next_account_info(accounts_iter)?;
         
 
         let allocate_space = match instruction_data[1]{
             0 => false,
             _ => true,
         };
-        give_ability_token(program_id, sender_account, ability_mint, ability_token, token_program, associated_token_program, mint_authority, rent, system_program, 1, grizzly_data[grizzly_structure::AB.start], allocate_space)?;
+        give_ability_token(program_id, sender_account, ability_mint, ability_token, token_program, associated_token_program, mint_authority, rent, system_program, 1, grizzly_data[grizzly_structure::AB.start] - 1, allocate_space)?;
     }
 
-    msg!("Updating moveset");
+    //msg!("Updating moveset");
     for i in 0..5{
         const MOVESET_OFFSET: usize = 2;
 
@@ -174,7 +185,7 @@ pub fn arena_signup<'a>(
         }
     }
 
-    msg!("Checking if bear is ready for battle");
+    //msg!("Checking if bear is ready for battle");
     // Check that bear is ready for battle.
     if is_battle_aborted(&grizzly_data) {
         msg!("Battle aborted");
@@ -213,14 +224,14 @@ pub fn arena_signup<'a>(
         grizzly_data[grizzly_structure::TARGET]
             .copy_from_slice(&(*challenging_bear).key.to_bytes());
 
-        msg!("Setting encryption keys");
+        //msg!("Setting encryption keys");
         // Set encryption public keys.
         let secret = u64::from_le_bytes(instruction_data[CRYPTO_OFFSET + 16..CRYPTO_OFFSET + 24].try_into().unwrap());
     
         grizzly_data[grizzly_structure::P].copy_from_slice(&challenging_bear_data[grizzly_structure::P]);
         grizzly_data[grizzly_structure::G].copy_from_slice(&challenging_bear_data[grizzly_structure::G]);
     
-        msg!("Preparing shared secret");
+        //msg!("Preparing shared secret");
         let ab = mod_exp(u64::from_le_bytes(grizzly_data[grizzly_structure::G].try_into().unwrap()),
             secret,
             u64::from_le_bytes(grizzly_data[grizzly_structure::P].try_into().unwrap())
@@ -242,14 +253,14 @@ pub fn arena_signup<'a>(
         arena_queue_data[arena_structure::HAS_CHALLENGER] = 0;
     }
     else{
-        msg!("Setting encryption keys");
+        //msg!("Setting encryption keys");
         // Set encryption public keys.
         let secret = u64::from_le_bytes(instruction_data[CRYPTO_OFFSET + 16..CRYPTO_OFFSET + 24].try_into().unwrap());
     
         grizzly_data[grizzly_structure::P].copy_from_slice(&instruction_data[CRYPTO_OFFSET..CRYPTO_OFFSET + 8]);
         grizzly_data[grizzly_structure::G].copy_from_slice(&instruction_data[CRYPTO_OFFSET + 8..CRYPTO_OFFSET + 16]);
     
-        msg!("Preparing shared secret");
+        //msg!("Preparing shared secret");
         let ab = u64::from_le_bytes(grizzly_data[grizzly_structure::AB].try_into().unwrap());
     
         grizzly_data[grizzly_structure::AB].copy_from_slice(&secret.to_le_bytes());
@@ -284,6 +295,24 @@ pub fn clear_bear_data<'a>(
     }
 
     grizzly_data[90] = 2;
+
+    for i in grizzly_structure::ABILITY_LEVELS..grizzly_structure::ABILITY_LEVELS + 5{
+        grizzly_data[i] = 1;
+    }
+    grizzly_data[grizzly_structure::HEART_SIZE].copy_from_slice(&1_u32.to_le_bytes());
+    grizzly_data[grizzly_structure::LOWER_ARM_SIZE].copy_from_slice(&1_u32.to_le_bytes());
+    grizzly_data[grizzly_structure::LOWER_BODY_SIZE].copy_from_slice(&1_u32.to_le_bytes());
+    grizzly_data[grizzly_structure::LOWER_LEG_SIZE].copy_from_slice(&1_u32.to_le_bytes());
+    grizzly_data[grizzly_structure::BRAIN_SIZE].copy_from_slice(&1_u32.to_le_bytes());
+    grizzly_data[grizzly_structure::UPPER_ARM_SIZE].copy_from_slice(&1_u32.to_le_bytes());
+    grizzly_data[grizzly_structure::UPPER_BODY_SIZE].copy_from_slice(&1_u32.to_le_bytes());
+    grizzly_data[grizzly_structure::UPPER_LEG_SIZE].copy_from_slice(&1_u32.to_le_bytes());
+
+    grizzly_data[grizzly_structure::EQUIPPED_ABILITIES + 0] = 0;
+    grizzly_data[grizzly_structure::EQUIPPED_ABILITIES + 1] = 1;
+    grizzly_data[grizzly_structure::EQUIPPED_ABILITIES + 2] = 2;
+    grizzly_data[grizzly_structure::EQUIPPED_ABILITIES + 3] = 3;
+    grizzly_data[grizzly_structure::EQUIPPED_ABILITIES + 4] = 4;
 
     Ok(())
 }

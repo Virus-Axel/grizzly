@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://cy5l0yqbpxexq"]
+
+[ext_resource type="PackedScene" uid="uid://ho0kohq1wu5k" path="res://grizzly_bear/bear.glb" id="1_rom1q"]
+
+[node name="bear" instance=ExtResource("1_rom1q")]
+
+[node name="uploads_files_147354_bear(7)" parent="Armature/Skeleton3D" index="0"]
+blend_shapes/mouth = 1.0

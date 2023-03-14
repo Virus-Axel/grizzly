@@ -1,0 +1,45 @@
+[gd_scene load_steps=3 format=3 uid="uid://puiuiw1fb25v"]
+
+[ext_resource type="Script" path="res://UI/moveset_select/queue.gd" id="1_k7kda"]
+[ext_resource type="PackedScene" uid="uid://dvlrtmckj5deu" path="res://UI/loading_indicator.tscn" id="2_a8ilb"]
+
+[node name="queue" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_k7kda")
+
+[node name="poll_2" type="Timer" parent="."]
+wait_time = 5.0
+
+[node name="poll_timer" type="Timer" parent="."]
+wait_time = 5.0
+
+[node name="confirm_timer" type="Timer" parent="."]
+wait_time = 5.0
+
+[node name="loading_indicator" parent="." instance=ExtResource("2_a8ilb")]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -225.0
+offset_right = 200.0
+offset_bottom = 225.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" parent="loading_indicator" index="2"]
+text = "Searching for Opponent..."
+
+[connection signal="timeout" from="poll_2" to="." method="_on_poll_2_timeout"]
+[connection signal="timeout" from="poll_timer" to="." method="_on_poll_timer_timeout"]
+[connection signal="timeout" from="confirm_timer" to="." method="_on_confirm_timer_timeout"]
+
+[editable path="loading_indicator"]

@@ -2,7 +2,9 @@ use solana_program::{
     account_info::AccountInfo, entrypoint::ProgramResult, msg, program_error::ProgramError,
     pubkey::Pubkey,
 };
+use spl_associated_token_account::get_associated_token_address_with_program_id;
 
+use crate::ENABLE_METADATA;
 use crate::bank_account_id;
 use std::cell::RefMut;
 
@@ -57,7 +59,7 @@ pub fn validate_bear_nft<'a>(
     }
 
     // Check if token account is ours
-    let expected_token_account = get_associated_token_address(&sender_account.key, &mint_account.key);
+    let expected_token_account = get_associated_token_address_with_program_id(&sender_account.key, &mint_account.key, &spl_token_2022::ID);
     msg!("Checking that {} equals to {}", expected_token_account.to_string(), token_account.key.to_string());
     if expected_token_account != *token_account.key{
         return Err(ProgramError::IllegalOwner);
@@ -89,28 +91,29 @@ pub fn validate_bear_nft<'a>(
         return Err(ProgramError::InsufficientFunds);
     }
 
-    // Verify with metaplex
-    const METADATA_SIGNED: usize = 358;
-    if metadata_data[METADATA_SIGNED] == 0{
-        msg!("Data at 358 is not 1: {}", token_data[358]);
-        return Err(ProgramError::InsufficientFunds);
+    if ENABLE_METADATA{
+        // Verify with metaplex
+        const METADATA_SIGNED: usize = 358;
+        if metadata_data[METADATA_SIGNED] == 0{
+            msg!("Data at 358 is not 1: {}", token_data[358]);
+            return Err(ProgramError::InsufficientFunds);
+        }
+
+        msg!("Checking if we provided the correct metaplex key");
+        //if metadata_account.owner != &mpl_token_metadata::ID{
+        //   return Err(ProgramError::IllegalOwner);
+        //}
+
+        let update_auth = Pubkey::new(&metadata_data[1..33]);
+        let freeze_auth = Pubkey::new(&metadata_data[326..358]);
+
+        if update_auth != expected_mint_authority{
+            return Err(ProgramError::InvalidAccountData);
+        }
+        if freeze_auth != expected_mint_authority{
+            return Err(ProgramError::InvalidAccountData);
+        }
     }
-
-    msg!("Checking if we provided the correct metaplex key");
-    //if metadata_account.owner != &mpl_token_metadata::ID{
-     //   return Err(ProgramError::IllegalOwner);
-    //}
-
-    let update_auth = Pubkey::new(&metadata_data[1..33]);
-    let freeze_auth = Pubkey::new(&metadata_data[326..358]);
-
-    if update_auth != expected_mint_authority{
-        return Err(ProgramError::InvalidAccountData);
-    }
-    if freeze_auth != expected_mint_authority{
-        return Err(ProgramError::InvalidAccountData);
-    }
-
     msg!("NFT is valid");
 
     Ok(())
@@ -124,7 +127,7 @@ pub fn verify_ability_token<'a>(
 
     // Check if token account is ours
     msg!("Checking if token is ours");
-    let expected_token_account = get_associated_token_address(&sender_account.key, &mint_account.key);
+    let expected_token_account = get_associated_token_address_with_program_id(&sender_account.key, &mint_account.key, &spl_token_2022::ID);
     if expected_token_account != *token_account.key{
         return Err(ProgramError::IllegalOwner);
     }

@@ -10,7 +10,7 @@ use oorandom::Rand32;
 use crate::{
     data_structures::{
         grizzly_structure,
-        grizzly_structure::MAX_EQUIPPED_ABILITIES,
+        grizzly_structure::{MAX_EQUIPPED_ABILITIES, AMOUNT_OF_ABILITIES},
     }
 };
 
@@ -37,26 +37,14 @@ pub fn is_battle_aborted(bear_data: &[u8]) -> bool {
 }
 
 fn push_action(bear_data: &mut [u8], opponent_data: &mut [u8], position: usize, action: u8, opponent_turn: bool){
-    let offset = position / 2;
-    if position % 2 == 0{
-        if opponent_turn{
-            bear_data[grizzly_structure::ACTION_LIST + offset] = action + MAX_EQUIPPED_ABILITIES as u8;
-            opponent_data[grizzly_structure::ACTION_LIST + offset] = action;
-        }
-        else{
-            bear_data[grizzly_structure::ACTION_LIST + offset] = action;
-            opponent_data[grizzly_structure::ACTION_LIST + offset] = action + MAX_EQUIPPED_ABILITIES as u8;
-        }
+    let offset = position;
+    if opponent_turn{
+        bear_data[grizzly_structure::ACTION_LIST + offset] = action + AMOUNT_OF_ABILITIES as u8;
+        opponent_data[grizzly_structure::ACTION_LIST + offset] = action;
     }
     else{
-        if opponent_turn{
-            bear_data[grizzly_structure::ACTION_LIST + offset] |= (action + MAX_EQUIPPED_ABILITIES as u8) << 4;
-            opponent_data[grizzly_structure::ACTION_LIST + offset] |= action << 4;
-        }
-        else{
-            bear_data[grizzly_structure::ACTION_LIST + offset] |= action << 4;
-            opponent_data[grizzly_structure::ACTION_LIST + offset] |= (action + MAX_EQUIPPED_ABILITIES as u8) << 4;
-        }
+        bear_data[grizzly_structure::ACTION_LIST + offset] = action;
+        opponent_data[grizzly_structure::ACTION_LIST + offset] = action + AMOUNT_OF_ABILITIES as u8;
     }
 }
 
@@ -102,6 +90,7 @@ pub fn evaluate_winner(sender_bear: &mut [u8], opponent_bear: &mut [u8], randomn
 
                 push_action(sender_bear, opponent_bear, position, selected_ability_index, false);
                 if opponent_bear_health <= 0.0{
+                    push_action(sender_bear, opponent_bear, position + 1, 2 * AMOUNT_OF_ABILITIES as u8, false);
                     return Ok(random_generator.rand_u32() % 65536);
                 }
 
@@ -123,6 +112,7 @@ pub fn evaluate_winner(sender_bear: &mut [u8], opponent_bear: &mut [u8], randomn
 
                 push_action(sender_bear, opponent_bear, position, selected_ability_index, true);
                 if sender_bear_health <= 0.0{
+                    push_action(sender_bear, opponent_bear, position + 1, 2 * AMOUNT_OF_ABILITIES as u8, false);
                     return Ok(random_generator.rand_u32() % 65536 + 65536);
                 }
 

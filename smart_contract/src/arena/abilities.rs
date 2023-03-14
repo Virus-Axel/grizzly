@@ -18,10 +18,40 @@ pub struct Ability{
     pub x2_factor: f32,
 }
 
-pub const ABILITIES: [Ability; 3] = [
+pub const ABILITIES: [Ability; 32] = [
     Ability{stamina_cost: 0.05, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.0, gain_lower_body: 0.0, gain_upper_body: 0.005, x0_factor: 0.01, x1_factor: 0.0, x2_factor: 0.01},
     Ability{stamina_cost: 0.04, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.0, gain_upper_arm: 0.01, gain_lower_leg: 0.0, gain_upper_leg: 0.0, gain_lower_body: 0.0, gain_upper_body: 0.0, x0_factor: 0.004, x1_factor: 0.001, x2_factor: 0.01},
     Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+    Ability{stamina_cost: 0.1, gain_brain: 0.0, gain_heart: 0.0, gain_lower_arm: 0.01, gain_upper_arm: 0.02, gain_lower_leg: 0.002, gain_upper_leg: 0.01, gain_lower_body: 0.04, gain_upper_body: 0.005, x0_factor: 0.02, x1_factor: 0.002, x2_factor: -0.02},
+
 ];
 
 impl Ability{
