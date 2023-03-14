@@ -38,6 +38,7 @@ func _process(delta):
 func send_bear_to_battle():
 	var w3 = get_node("/root/w3")
 	$CanvasLayer/moveset_select.visible = true
+	$AnimationPlayer.play("hide_buttons")
 	#w3.battle()
 
 
@@ -81,6 +82,8 @@ func _on_back_button_pressed():
 		$AnimationPlayer.play_backwards("fridge_view")
 		$ui_player.play_backwards("hide_buttons")
 		fridge_shown = false
+	
+	$CanvasLayer/moveset_select.visible = false
 	
 	for child in $CanvasLayer/HBoxContainer.get_children():
 			child.disabled = false;

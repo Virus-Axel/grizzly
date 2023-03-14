@@ -371,6 +371,7 @@ expand_icon = true
 visible = false
 
 [node name="Button" type="Button" parent="CanvasLayer"]
+visible = false
 offset_left = 849.0
 offset_top = 28.0
 offset_right = 1051.0

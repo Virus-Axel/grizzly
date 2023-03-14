@@ -109,8 +109,8 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = -1300.0
-offset_right = 24013.3
-offset_bottom = 24840.0
+offset_right = 25093.3
+offset_bottom = 25920.0
 grow_horizontal = 2
 grow_vertical = 2
 texture = ExtResource("2_2h3ua")
@@ -310,6 +310,7 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 24
 
 [node name="Button2" type="Button" parent="CanvasLayer"]
+visible = false
 offset_right = 323.0
 offset_bottom = 359.0
 text = "create ability"

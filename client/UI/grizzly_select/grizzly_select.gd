@@ -56,16 +56,16 @@ func _ready():
 	$AnimationPlayer.play("fog")
 	var w3 = get_node("/root/w3")
 
+	if not w3.USE_PHANTOM:
+		var keypair = PackedByteArray([235,139,151,129,251,138,248,71,168,106,107,204,116,181,49,20,32,93,117,0,114,116,98,194,151,178,4,150,136,0,215,170,165,2,3,28,240,14,78,90,203,159,65,6,211,87,248,178,88,136,21,229,122,127,64,49,51,158,30,30,148,43,248,179])
+		var sk = bs58.encode(keypair.slice(0, 32))
+		var pk = bs58.encode(keypair.slice(32))
 
-	var keypair = PackedByteArray([235,139,151,129,251,138,248,71,168,106,107,204,116,181,49,20,32,93,117,0,114,116,98,194,151,178,4,150,136,0,215,170,165,2,3,28,240,14,78,90,203,159,65,6,211,87,248,178,88,136,21,229,122,127,64,49,51,158,30,30,148,43,248,179])
-	var sk = bs58.encode(keypair.slice(0, 32))
-	var pk = bs58.encode(keypair.slice(32))
-
-	get_node("/root/w3").wallet_key = pk
-	print("sk: ", sk)
-	print("pk: ", pk)
-	get_node("/root/w3").get_node("program_handler").setKeys(sk, pk, w3.ID)
-	
+		get_node("/root/w3").wallet_key = pk
+		print("sk: ", sk)
+		print("pk: ", pk)
+		get_node("/root/w3").get_node("program_handler").setKeys(sk, pk, w3.ID)
+		
 	#w3.create_account(289)
 	#w3.create_account(0)
 	#return
@@ -74,7 +74,7 @@ func _ready():
 	#w3.create_account(33)
 	#return
 	#var nft_keys = await w3.get_nft_keys(w3.wallet_key)
-	var nft_keys = await get_node("/root/w3").get_nft_keys(pk)
+	var nft_keys = await get_node("/root/w3").get_nft_keys(w3.wallet_key)
 	for map in nft_keys:
 		await add_selectable_bear(map)
 	
