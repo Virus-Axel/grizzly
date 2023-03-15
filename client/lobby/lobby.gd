@@ -7,7 +7,8 @@ var fridge_shown: bool = false
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	$bear.get_node("AnimationPlayer").animation_finished.connect(Callable(self, "replay"))
-	$bear.get_node("AnimationPlayer").play("ArmatureAction")
+	$bear.get_node("AnimationPlayer").play("idle001")
+	$bear.get_node("Armature/Skeleton3D/uploads_files_147354_bear(7)").set_blend_shape_value(0, 1.0)
 	#get_node("/root/w3").create_account(33 + 32*8);
 	#await _on_shop_update_timeout()
 	#var ID = get_node("/root/w3").ID
@@ -120,7 +121,7 @@ func _on_button_pressed():
 	get_tree().change_scene_to_file("res://UI/grizzly_select/grizzly_select.tscn")
 
 func replay(name):
-	$bear.get_node("AnimationPlayer").play("ArmatureAction")
+	$bear.get_node("AnimationPlayer").play("idle001")
 
 
 func clear_data_remove():

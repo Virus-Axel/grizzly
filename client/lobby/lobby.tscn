@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://rkg8xa2aoxrr"]
+[gd_scene load_steps=30 format=3 uid="uid://rkg8xa2aoxrr"]
 
 [ext_resource type="Script" path="res://lobby/lobby.gd" id="1_oy7wp"]
 [ext_resource type="PackedScene" uid="uid://7ud6q6bvsqan" path="res://lobby/lobby.glb" id="2_mfqke"]
@@ -42,6 +42,9 @@ corner_radius_bottom_left = 25
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_6mvtu"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_grcox"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_250cg"]
+texture = ExtResource("9_ksri3")
 
 [sub_resource type="Animation" id="Animation_mlrlm"]
 length = 0.001
@@ -255,24 +258,28 @@ grow_vertical = 0
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxTexture_amwoo")
+theme_override_styles/hover = SubResource("StyleBoxTexture_gss48")
 theme_override_styles/disabled = SubResource("StyleBoxTexture_gss48")
 
 [node name="battle_button" type="Button" parent="CanvasLayer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxTexture_uvmeq")
+theme_override_styles/hover = SubResource("StyleBoxTexture_uvmeq")
 theme_override_styles/disabled = SubResource("StyleBoxTexture_uvmeq")
 
 [node name="store_button" type="Button" parent="CanvasLayer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxTexture_4r3sw")
+theme_override_styles/hover = SubResource("StyleBoxTexture_4r3sw")
 theme_override_styles/disabled = SubResource("StyleBoxTexture_4r3sw")
 
 [node name="rank_button" type="Button" parent="CanvasLayer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("StyleBoxTexture_02f3b")
+theme_override_styles/hover = SubResource("StyleBoxTexture_02f3b")
 theme_override_styles/disabled = SubResource("StyleBoxTexture_02f3b")
 
 [node name="Control" type="Control" parent="CanvasLayer"]
@@ -364,7 +371,9 @@ theme_override_font_sizes/font_size = 32
 [node name="Button" type="Button" parent="CanvasLayer/VBoxContainer"]
 custom_minimum_size = Vector2(70, 70)
 layout_mode = 2
-icon = ExtResource("9_ksri3")
+size_flags_horizontal = 0
+theme_override_styles/normal = SubResource("StyleBoxTexture_250cg")
+theme_override_styles/hover = SubResource("StyleBoxTexture_250cg")
 expand_icon = true
 
 [node name="moveset_select" parent="CanvasLayer" instance=ExtResource("10_c80fc")]

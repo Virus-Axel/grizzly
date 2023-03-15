@@ -4,6 +4,8 @@ extends Control
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	var id = get_node("/root/w3").ID
+	if not get_node("/root/w3").USE_PHANTOM:
+		get_tree().change_scene_to_file("res://UI/grizzly_select/grizzly_select.tscn")
 	#get_node("/root/w3").get_node("program_handler").setKeys("HJyMW82CKUrsbfTSKaNXdsgqcS1HJm8jAjbVVq3Uj4AN", "9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", id)
 	#print(await get_node("/root/w3").mint_nft("9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm", "Noin"))
 	#var arr = await get_node("/root/w3").get_nft_keys("9wxXgHP5trhtdQmqqmjPVXrrxXLEfQ1bxCvwemmivZxm")
